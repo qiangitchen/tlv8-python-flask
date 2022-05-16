@@ -36,25 +36,7 @@ $.jpolite.Data.system = {
 			return $.jpolite.Data.send('system/User/logout', {}, callback);
 		},
 		check : function(callback) {
-			return $.jpolite.Data.send('system/User/check', {}, function(data) {
-				if (data.status) {
-					delete data.status;
-					for ( var i in data) {
-						$.jpolite.Data.system.User["$" + i] = data[i];
-					}
-					data.status = true;
-					if ($.isFunction(callback))
-						callback.call(this, data);
-				} else {
-					for ( var i in $.jpolite.Data.system.User) {
-						if (i[0] == "$") {
-							delete $.jpolite.Data.system.User[i];
-						}
-					}
-					if ($.isFunction(callback))
-						callback.call(this, data);
-				}
-			});
+			return $.jpolite.Data.send('system/User/check', {}, callback);
 		},
 		getAgents : function(username, password, callback) {
 			return $.jpolite.Data.send('system/User/getAgents', {

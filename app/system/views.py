@@ -23,7 +23,7 @@ def user_login(f):
 
 # 用户登录
 @system.route("/User/login", methods=["GET", "POST"])
-def user_login():
+def login():
     rdata = dict()
     form = LoginForm()
     if form.is_submitted():
@@ -47,4 +47,33 @@ def user_login():
     else:
         rdata['status'] = False
         rdata['msg'] = "参数错误~"
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 前端登录验证
+@system.route("/User/check", methods=["GET", "POST"])
+def login_check():
+    rdata = dict()
+    if "user_id" in session:
+        rdata['status'] = True
+    else:
+        rdata['status'] = False
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 初始化登录人员信息
+@system.route("/User/initPortalInfo", methods=["GET", "POST"])
+@user_login
+def init_portal_info():
+    rdata = dict()
+    person_id = session['user_id']
+    person = Person.query.filter_by(sid=person_id).first()
+    person_info = dict()
+    person_info['personid'] = person_id
+    person_info['personName'] = person.sname
+    org = Organization.query.filter_by(spersonid=person_id).first()
+    person_info['orgFullName'] = org.sfname
+    rdata['status'] = True
+    rdata['data'] = person_info
+    print(rdata)
     return json.dumps(rdata, ensure_ascii=False)

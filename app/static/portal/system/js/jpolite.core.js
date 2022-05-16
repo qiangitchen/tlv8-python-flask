@@ -50,15 +50,9 @@ $.extend($.jpolite, {
 				url:cpath+"/system/User/initPortalInfo",
 				async:false,
 				type:"POST",
-				dataFilter: function(data, type){
-					var items = window["eval"]("(" + data+ ")");
-					return items;
-				},
-				error:function(XMLHttpRequest, textStatus, errorThrown){
-					//alert("error");
-				},
+				dataType:"json",
 				success:function(data, textStatus){
-					var datainfo = window["eval"]("(" + data[0].data + ")");
+					var datainfo = data.data;
 					$.extend($.jpolite.clientInfo, datainfo);
 					$.jpolite.clientInfo.orgfullname = datainfo.orgFullName;
 					$.jpolite.clientInfo.personname = datainfo.personName;

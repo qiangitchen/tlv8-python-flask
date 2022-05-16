@@ -15,7 +15,7 @@ $(function() {
 	 */
 	$.logout = function() {
 		$.jpolite.Data.system.User.logout(function() {
-			var loginPage = "login.html?temp="
+			var loginPage = "/login?temp="
 					+ new Date().getTime();
 			window.location.href = loginPage;
 		});

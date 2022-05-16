@@ -20,7 +20,7 @@ def user_login(f):
 @home.route("/")
 @user_login
 def index():
-    return redirect(url_for("home.user_list"))
+    return redirect(url_for("home.login"))
 
 
 @home.route("/captchaimage")
