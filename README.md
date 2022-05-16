@@ -4,34 +4,87 @@
 基于Flask（Flask是一个用Python编写的Web应用程序框架）开发的Web应用系统框架，项目集成了工作流引擎，内置了组织机构权限管理等功能，可以应用于OA、HR、CRM、PM等系统开发。
 
 #### 软件架构
-软件架构说明
+Flask：轻量级的用Python编写的Web应用程序框架；
+Mysql：数据库
+layui：开源免费的前端
 
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  为开发环境安装virtualenv
+virtualenv是一个虚拟的Python环境构建器。它可以帮助用户并行创建多个Python环境。 因此，它可以避免不同版本的库之间的兼容性问题。
+
+以下命令用于安装virtualenv：
+
+```
+pip install virtualenv
+```
+
+此命令需要管理员权限。您可以在Linux / Mac OS上的 pip 之前添加 sudo 。
+
+如果您使用的是Windows，请以管理员身份登录。在Ubuntu上， virtualenv可以使用它的包管理器安装。
+
+```
+sudo apt-get install virtualenv
+```
+
+
+2.  创建virtualenv虚拟环境：进入项目文件夹，执行下面的命令：
+
+```
+virtualenv venv
+```
+
+
+3.  启动venv虚拟环境
+Windows环境：
+
+```
+venv\Scripts\activate
+```
+Linux环境：
+
+```
+source venv/bin/activate
+```
+
+4.  确保已经将资源包中的requirements.txt文件复制到Travel目录下（与新创建的venv同级），然后使用如下命令安装Flask依赖包:
+
+```
+pip install -r requirements.txt
+```
+
+5.  确保已经将资源包中的app文件夹、manage.py和config.py文件复制到Travel目录下（与新创建的venv同级），然后使用migrate创建数据表，命令如下：
+
+```
+python  manage.py  db  init        # 创建迁移仓库,首次使用  
+python  manage.py  db  migrate     # 创建迁移脚本
+python  manage.py  db  upgrade     # 把迁移应用到数据库中
+```
+
+6.  初始化基础数据：
+
+导入sql目录下的init.sql
+
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  启动测试服务：
 
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+```
+python  manage.py runserver
+```
 
 
-#### 特技
+2.  浏览器访问：
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+```
+http://127.0.0.1:5000/
+```
+
+
+3.  登录系统：
+
+默认用户：system/1
+
+
