@@ -1,0 +1,174 @@
+<script type="text/javascript">
+	function accordtionselected(title, index) {
+		if (index == 0) {
+			$("#options_widgets_page").hide();
+			$("#options_layout_wrapper").show();
+		} else {
+			$("#options_widgets_page").show();
+			$("#options_layout_wrapper").hide();
+		}
+	}
+</script>
+<div id="options_layout_inner" class="easyui-layout" fit="true" border="false">
+	<!-- 
+	<div id="options_layout_title" data-options="region:'north',title:'当前布局 ',split:false,border:false" style="height:100px;">
+		<div id="option_layout_current"></div>
+	</div>
+	 -->
+	<div data-options="region:'west',split:true,border:false"
+		style="width: 160px; text-align: center; border-right: 1px solid #95b8e7;">
+		<div class="easyui-accordion"
+			data-options="fit:true,border:false,multiple:false,onSelect:accordtionselected">
+			<div title="布局分类">
+				<div id="options_layouts_nav" class="options_page_nav"></div>
+			</div>
+			<div title="组件"></div>
+		</div>
+	</div>
+	<div data-options="region:'center',border:false" style="border-left: 1px solid #95b8e7;">
+		<div id="options_layout_wrapper" class="options_wrapper"></div>
+		<div id="options_widgets_page" class="options_pagination" style="padding: 5px; line-height: 30px;"></div>
+	</div>
+</div>
+<script>
+	function getWidgets(initWidgets) {
+		if (!portalConfig.widgetsToolbar)
+			portalConfig.widgetsToolbar = {};
+		if (!portalConfig.widgets)
+			portalConfig.widgets = {};
+		for ( var i in initWidgets) {
+			var widget = initWidgets[i];
+			var widgetID = widget.id;
+			portalConfig.widgets[widget.id] = widget;
+		}
+	}
+	function createLays(id) {
+		$("#options_layout_wrapper").html("");
+		var layouts = portalConfig.layouts;
+		for (var i = 0; i < 7; i++) {
+			var layout = layouts[id + "_" + i];
+			if (layout) {
+				var layitem = $("<div></div>").appendTo(
+						$("#options_layout_wrapper"));
+				layitem.attr("id", id + "_" + i)
+				layitem.css("border", "1px solid #eee");
+				layitem.css("margin", "10px");
+				layitem.css("width", "100px");
+				layitem.css("height", "100px");
+				layitem.css("float", "left");
+				layitem.css("cursor", "pointer");
+				for (var j = 0; j < layout.length; j++) {
+					var lots = $("<div></div>").appendTo(layitem);
+					var w_ = parseInt(layout[j]) - 2;
+					var h_ = 100;
+					if (parseInt(layout[j]) == 100) {
+						h_ = 50;
+					}
+					lots.css("width", w_ + "px");
+					lots.css("height", h_ + "px");
+					lots.css("background", "#eee");
+					lots.css("border", "1px solid #555");
+					lots.css("float", "left");
+				}
+				layitem.click(function() {
+					portalConfig.defaultsLid = $(this).attr("id");
+					initPortallet($.indexpageTabs, portal_index, true);
+				});
+			} else {
+				break;
+			}
+		}
+	}
+	(function() {
+		getWidgets(PortalLet_DATA);
+
+		var layoutCategory = null;
+		var $ul = $("<ul></ul>").appendTo("#options_layouts_nav");
+		for ( var i in portalConfig.layoutsToolbar) {
+			var layoutItem = portalConfig.layoutsToolbar[i];
+			$("<li></li>").appendTo($ul).append(
+					$.extend($("<a href='javascript:void(0)'></a>").text(
+							layoutItem.category).attr("id", i).get(0),
+							layoutItem));
+		}
+		$("a", "#options_layouts_nav").click(function() {
+			createLays($(this).attr("id"));
+			$(".options_page_nav>ul>li>a").css("font-weight", "normal");
+			$(this).css("font-weight", "bold");
+		}).get(0).click();
+		var ul$ = $("<ul></ul>").appendTo("#options_widgets_page");
+		for (var i = 0; i < PortalLet_DATA.length; i++) {
+			var widget = PortalLet_DATA[i];
+			var acl = $("<a href='javascript:void(0)'></a>");
+			acl.text(widget.title);
+			acl.get(0).widget = widget;
+			$("<li></li>").append(acl).appendTo(ul$);
+		}
+		function widgetIshave(id) {
+			var panles = $('#client').portal('getPanels');
+			for (var i = 0; i < panles.length; i++) {
+				var pd = panles[i].panel("options");
+				if (pd.id == id) {
+					return true;
+				}
+			}
+			return false;
+		}
+		function addPortalet(PortalLet) {
+			var p;
+			if (widgetIshave(PortalLet.id)) {
+				p = $("#" + PortalLet.id);
+			} else {
+				p = $("<div id='"+PortalLet.id+"'></div>").appendTo('body');
+			}
+			var url = PortalLet.arguments.url + "?PortalLetId=" + PortalLet.id;
+			if (PortalLet.arguments.process
+					&& PortalLet.arguments.process != "") {
+				url += "&process=" + PortalLet.arguments.process;
+			}
+			if (PortalLet.arguments.activity
+					&& PortalLet.arguments.activity != "") {
+				url += "&activity=" + PortalLet.arguments.activity;
+			}
+			var framecontent = "<iframe frameborder='0' class='portal_body_frame' id='"
+					+ PortalLet.id
+					+ "' name='"
+					+ PortalLet.id
+					+ "' src='' ref='"
+					+ url
+					+ "' style='width:100%;height:100%;overflow:auto;'/>";
+			p.panel({
+				id : PortalLet.id,
+				title : PortalLet.title,
+				columnIndex : PortalLet.psmCount,
+				content : framecontent,
+				height : PortalLet.height,
+				closable : true,
+				collapsible : true,
+				tools : [ {
+					iconCls : 'icon-reload',
+					handler : function(e) {
+						var surl = $(this).parent().parent().parent().find(
+								"iframe").attr("src");
+						$(this).parent().parent().parent().find("iframe").attr(
+								"src", surl);
+					}
+				} ],
+				onClose : portalonStateChange,
+				closed : false
+			});
+			if (!widgetIshave(PortalLet.id)) {
+				$('#client').portal('add', {
+					panel : p,
+					columnIndex : PortalLet.psmCount
+				});
+			}
+			$("iframe[id='" + PortalLet.id + "']").attr("src", url);
+		}
+		$("a", "#options_widgets_page").click(function() {
+			var PortalLet = this.widget;
+			addPortalet(PortalLet);
+			portalonStateChange();
+		});
+	}());
+</script>

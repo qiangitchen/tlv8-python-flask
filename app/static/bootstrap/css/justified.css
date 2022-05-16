@@ -1,0 +1,131 @@
+body {
+	padding-top: 2px;
+}
+
+a:hover { color: #090; }
+
+.space30 { margin-top: 30px; }
+
+.row ul { padding-left: 30px; }
+
+.clear { clear: both; }
+
+.float_left { float: left; }
+.float_right { float: right; }
+
+.img_left_gallery {	float: left; margin: 12px; padding: 8px; border: 1px solid #CCC; }
+
+.img_left {	float: left; margin-right: 20px; margin-bottom: 15px; }
+
+.img_right { float: right; margin: 0px 0px 15px 20px; }
+
+.img_bottom { margin-bottom: 15px; }
+
+.footer {
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+  margin-top: 20px;
+  text-align: center;
+}
+.copyrights{text-indent:-9999px;height:0;line-height:0;font-size:0;overflow:hidden;}
+/* Main marketing message and sign up button */
+.jumbotron {
+  text-align: center;
+  background-color: transparent;
+}
+/* Customize the nav-justified links to be fill the entire space of the .navbar */
+
+.nav-justified {
+  /* background-color: #4d9ac6; */
+  background-repeat: repeat-x;
+  border-radius: 6px;
+  border-top: 1px solid #4d9ac6;
+  border-left: 1px solid #4d9ac6;
+  border-right: 1px solid #4d9ac6;
+  
+  background-image: -moz-linear-gradient(top, #65a5cc 0%, #4d9ac6 100%); /* FF3.6+ */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#65a5cc), color-stop(100%,#4d9ac6)); /* Chrome,Safari4+ */
+  background-image: -webkit-linear-gradient(top, #65a5cc 0%,#4d9ac6 100%); /* Chrome 10+,Safari 5.1+ */
+  background-image: -ms-linear-gradient(top, #65a5cc 0%,#4d9ac6 100%); /* IE10+ */
+  background-image: -o-linear-gradient(top, #65a5cc 0%,#4d9ac6 100%); /* Opera 11.10+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#65a5cc', endColorstr='#4d9ac6',GradientType=0 ); /* IE6-9 */
+  background-image: linear-gradient(top, #65a5cc 0%,#4d9ac6 100%); /* W3C */
+}
+.nav-justified > li{
+	width: auto;
+	cursor: pointer;
+}
+
+.nav-justified > li > a {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  color: #FFFFFF;
+  font-weight: bold;
+  text-align: center;
+  /* border-bottom: 1px solid #005588; */
+  background-color: #4d9ac6; /* Old browsers */
+  background-repeat: repeat-x; /* Repeat the gradient */
+  
+  background-image: -moz-linear-gradient(top, #65a5cc 0%, #4d9ac6 100%); /* FF3.6+ */
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#65a5cc), color-stop(100%,#4d9ac6)); /* Chrome,Safari4+ */
+  background-image: -webkit-linear-gradient(top, #65a5cc 0%,#4d9ac6 100%); /* Chrome 10+,Safari 5.1+ */
+  background-image: -ms-linear-gradient(top, #65a5cc 0%,#4d9ac6 100%); /* IE10+ */
+  background-image: -o-linear-gradient(top, #65a5cc 0%,#4d9ac6 100%); /* Opera 11.10+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#65a5cc', endColorstr='#4d9ac6',GradientType=0 ); /* IE6-9 */
+  background-image: linear-gradient(top, #65a5cc 0%,#4d9ac6 100%); /* W3C */
+}
+
+.nav-justified > .active > a,
+.nav-justified > .active > a:hover,
+.nav-justified > .active > a:focus {
+  color: #555;
+  background-color: #eee;
+  background-image: none;
+  box-shadow: inset 0 3px 7px rgba(0,10,0,.25);
+}
+
+.nav-justified > li > a:hover { 
+	color: #555;
+	background-color: #eee; 
+	background-image: none;
+	box-shadow: inset 0 3px 7px rgba(0,10,0,.25);
+}
+
+.nav-justified > li:first-child > a {
+  border-radius: 5px 5px 0 0;
+}
+.nav-justified > li:last-child > a {
+  border-bottom: 0;
+  border-radius: 0 0 5px 5px;
+}
+
+@media (min-width: 768px) {
+  .nav-justified {
+    max-height: 52px;
+  }
+  /*
+  .nav-justified > li > a {
+    border-left: 1px solid #0099FF;
+    border-right: 1px solid #005588;
+  }
+    */
+  .nav-justified > li:first-child > a {
+    border-left: 0;
+    border-radius: 5px 0 0 5px;
+  }
+  .nav-justified > li:last-child > a {
+    border-radius: 0 5px 5px 0;
+    border-right: 0;
+  }
+}
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+  /* Remove the padding we set earlier */
+  .masthead,
+  .marketing,
+  .footer {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

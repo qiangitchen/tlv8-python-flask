@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>TLv8平台-登陆</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="{{ url_for('static',filename='layui/css/layui.css') }}" media="all">
+    <link rel="stylesheet" href="{{ url_for('static',filename='portal/css/login.css') }}" media="all">
+    <script type="text/javascript" src="{{ url_for('static',filename='common/js/jquery/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='common/js/jquery/jquery.cookie.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='portal/system/js/jpolite.data.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='portal/system/js/md5.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename='portal/system/js/jpolite.login.js') }}"></script>
+</head>
+<body>
+<div class="layui-container">
+    <div class="admin-login-background">
+        <div class="layui-form login-form">
+            <form class="layui-form" action="">
+                <div class="layui-form-item logo-title">
+                    <h1>TLv8平台-登陆</h1>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-icon layui-icon-username"></label>
+                    <input type="text" id="TxtUserName" name="username" lay-verify="required|account" placeholder="用户名" autocomplete="off" class="layui-input" value="system">
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-icon layui-icon-password"></label>
+                    <input type="password" id="TxtPassword" name="password" lay-verify="required|password" placeholder="密码" autocomplete="off" class="layui-input" value="1">
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-icon layui-icon-vercode"></label>
+                    <input type="text" id="captcha_input" name="captcha" lay-verify="required|captcha" placeholder="图形验证码" autocomplete="off" class="layui-input verification captcha">
+                    <div class="captcha-img">
+                        <img id="captchaPic">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <!--
+                    <input type="checkbox" id="password_checkbox" name="rememberMe" value="true" lay-skin="primary" title="记住密码">
+                    -->
+                </div>
+                <div class="layui-form-item">
+                    <button id="login_button" class="layui-btn layui-btn layui-btn-normal layui-btn-fluid" lay-submit="" lay-filter="login">登 入</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    ©版权所有 <a href="//www.tlv8.com">www.tlv8.com</a><span class="padding-5">|</span><a target="_blank" href="//beian.miit.gov.cn">滇ICP备2020009468号-3</a>
+</div>
+<script src="{{ url_for('static',filename='layui/layui.js') }}" charset="utf-8"></script>
+<script src="{{ url_for('static',filename='portal/lib/jq-module/jquery.particleground.min.js') }}" charset="utf-8"></script>
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer;
+
+        // 登录过期的时候，跳出ifram框架
+        if (top.location != self.location) top.location = self.location;
+
+        // 粒子线条背景
+        $(document).ready(function(){
+            $('.layui-container').particleground({
+                dotColor:'#7ec7fd',
+                lineColor:'#7ec7fd'
+            });
+        });
+
+        // 进行登录操作
+        form.on('submit(login)', function (data) {
+            data = data.field;
+            if (data.username == '') {
+                layer.msg('用户名不能为空');
+                return false;
+            }
+            if (data.password == '') {
+                layer.msg('密码不能为空');
+                return false;
+            }
+            if (data.captcha == '') {
+                layer.msg('验证码不能为空');
+                return false;
+            }
+            $.jpolite.Login.doLogin();
+            //layer.msg('登录成功', function () {
+            //    window.location = '../index.html';
+            //});
+            return false;
+        });
+    });
+    $(function() {
+		$.jpolite.Login.indexPage = "index.html"; // 登陆后跳转页面
+		//$.jpolite.Login.checkLogin();				     // 检查是否登陆过，如果登陆这则跳转到主页面
+		$.jpolite.Login.initUsernameInput("TxtUserName"); // 初始化用户名输入框
+		$.jpolite.Login.initPasswordInput("TxtPassword"); // 初始化密码输入框
+		$.jpolite.Login.initLanguageInput("language"); // 初始化语言输入框
+		//此处为生成验证图片时的Js脚本初始化调用
+		$.jpolite.Login.initCaptchaInput("captcha_input");			// 初始化校验输入框
+		$.jpolite.Login.initCaptchaImage("captchaPic");			    // 初始化校验图片
+
+		//$.jpolite.Login.initAgentSelect("agent_select"); // 初始化代理选择框
+		//$.jpolite.Login.initHintLable("hint_lable"); // 初始化提示信息标签
+		//$.jpolite.Login.initLoadingImage("loading_image"); // 初始化加载中图片
+		//$.jpolite.Login.initRememberCheckbox("remember_checkbox"); // 初始化记住设置选择框
+		$.jpolite.Login.initPasswordCheckbox("password_checkbox");	// 初始化记住密码设置选择框
+		//$.jpolite.Login.initMaximize("maximize_checkbox"); // 初始化记住最大化选择框
+		//$.jpolite.Login.initLoginButton("login_button"); // 初始化登陆按钮
+		//$.jpolite.Login.initCancelButton("cancel_button"); // 初始化取消按钮
+		//$.jpolite.Login.initFromCookie(); // 初始化存储信息，从Cookie中
+		$.jpolite.Login.initFocus(); // 初始化焦点
+	});
+</script>
+</body>
+</html>
