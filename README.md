@@ -73,7 +73,7 @@ python  manage.py  db  upgrade     # 把迁移应用到数据库中
 
 6.  初始化基础数据：
 
-导入sql目录下的init.sql
+导入sql目录下的: tlv8.sql
 
 
 #### 使用说明
