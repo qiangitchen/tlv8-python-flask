@@ -49,13 +49,21 @@ Linux环境：
 source venv/bin/activate
 ```
 
-4.  确保已经将资源包中的requirements.txt文件复制到Travel目录下（与新创建的venv同级），然后使用如下命令安装Flask依赖包:
+4.  使用如下命令安装Flask依赖包:
 
 ```
 pip install -r requirements.txt
 ```
 
-5.  确保已经将资源包中的app文件夹、manage.py和config.py文件复制到Travel目录下（与新创建的venv同级），然后使用migrate创建数据表，命令如下：
+5.  创建数据库并且确认config.py文件中数据库配置部分无误，
+
+数据库：tlv8(可以自定义需要注意config.py中的配置)
+
+- 字符集：utf8mb4
+- 排序规则：utf8mb4_unicode_ci
+
+
+然后使用migrate创建数据表，命令如下：
 
 ```
 python  manage.py  db  init        # 创建迁移仓库,首次使用  
