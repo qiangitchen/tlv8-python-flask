@@ -4,9 +4,11 @@
 基于Flask（Flask是一个用Python编写的Web应用程序框架）开发的Web应用系统框架，项目集成了工作流引擎，内置了组织机构权限管理等功能，可以应用于OA、HR、CRM、PM等系统开发。
 
 #### 软件架构
-Flask：轻量级的用Python编写的Web应用程序框架；
-Mysql：数据库
-layui：开源免费的前端
+
+- Flask：轻量级的用Python编写的Web应用程序框架；
+- Mysql：数据库
+- layui：开源免费的前端 特别感谢：[layui mini](https://gitee.com/zhongshaofa/layuimini)
+
 
 
 #### 安装教程
