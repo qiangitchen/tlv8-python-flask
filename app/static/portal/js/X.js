@@ -21,7 +21,7 @@ $.X.parseFunc = function(func) {
 $.X.createFunc = function(func) {
 	var url = func.url;
 	if((url.substring(0,4)).toLowerCase() !="http"){
-		var serverPath = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split("/")[1];
+		var serverPath = window.location.protocol + "//" + window.location.host + cpath;
 		url = serverPath + url;
 	}
 	if (url.indexOf("?") > 0) {

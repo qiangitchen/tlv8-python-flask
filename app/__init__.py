@@ -15,9 +15,11 @@ def create_app(config_name):
     db.init_app(app)
     # 注册蓝图
     from app.home import home as home_blueprint
-    from app.system import system as system_blueprint
-    app.register_blueprint(home_blueprint)
-    app.register_blueprint(system_blueprint, url_prefix="/system")
+    from app.sa import system as system_blueprint
+    from app.oa import oa as oa_blueprint
+    app.register_blueprint(home_blueprint)  # 登录页、首页
+    app.register_blueprint(system_blueprint, url_prefix="/system")  # 系统管理模块
+    app.register_blueprint(oa_blueprint, url_prefix="/oa")  # 业务模块（OA） 添加其他业务模块可以参考OA
     # 初始化Excel包
     excel.init_excel(app)
     return app

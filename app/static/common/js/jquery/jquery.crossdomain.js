@@ -1,6 +1,6 @@
 if (!jQuery) jQuery = {};
 if (!jQuery.crossdomain) jQuery.crossdomain = {
-	relayPage: window.location.href.replace(/\/[^\/]*$/, "/system/crossdomain.html"),
+	relayPage: window.location.href.replace(/\/[^\/]*$/, "/sa/crossdomain.html"),
 	sendToClient: function(iframe, cmd) {
 		if (typeof iframe == "string")
 			iframe = document.getElementById(iframe);

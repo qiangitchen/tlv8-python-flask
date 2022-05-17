@@ -287,7 +287,7 @@ layui.config({
     } else if(type === 'group'){
       //模拟系统消息
       /*layim.getMessage({
-        system: true
+        sa: true
         ,id: res.data.id
         ,type: "group"
         ,content: '模拟群员'+(Math.random()*100|0) + '加入群聊'

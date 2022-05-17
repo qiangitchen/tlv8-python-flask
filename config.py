@@ -9,7 +9,10 @@ class Config:
 
     @staticmethod
     def init_app(app):
-        pass
+        f = open('app/banner.txt', 'r')
+        file_contents = f.read()
+        print(file_contents)
+        f.close()
 
 
 # the config for development
@@ -18,7 +21,14 @@ class DevelopmentConfig(Config):
     DEBUG = True
 
 
+# 生产环境
+class ProductionConfig(Config):
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:password@127.0.0.1:3306/tlv8'
+    DEBUG = False
+
+
 # define the config
 config = {
-    'default': DevelopmentConfig
+    'default': DevelopmentConfig,
+    'production': ProductionConfig
 }

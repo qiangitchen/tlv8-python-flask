@@ -26,102 +26,102 @@ if (!$.jpolite.Data)
 $.jpolite.Data.system = {
 	User : {
 		login : function(username, password, params, callback) {
-			return $.jpolite.Data.send('system/User/login', $.extend(params
+			return $.jpolite.Data.send('sa/User/login', $.extend(params
 					|| {}, {
 				username : username,
 				password : password
 			}), callback, true);
 		},
 		logout : function(callback) {
-			return $.jpolite.Data.send('system/User/logout', {}, callback);
+			return $.jpolite.Data.send('sa/User/logout', {}, callback);
 		},
 		check : function(callback) {
-			return $.jpolite.Data.send('system/User/check', {}, callback);
+			return $.jpolite.Data.send('sa/User/check', {}, callback);
 		},
 		getAgents : function(username, password, callback) {
-			return $.jpolite.Data.send('system/User/getAgents', {
+			return $.jpolite.Data.send('sa/User/getAgents', {
 				username : username,
 				password : password
 			}, callback, true);
 		},
 		changePassword : function(username, password, new_password, callback) {
-			return $.jpolite.Data.send('system/User/changePassword', {
+			return $.jpolite.Data.send('sa/User/changePassword', {
 				username : username,
 				password : password,
 				new_password : new_password
 			}, callback, true);
 		},
 		getOnlineCount : function(callback) {
-			return $.jpolite.Data.send('system/User/getOnlineCount', {},
+			return $.jpolite.Data.send('sa/User/getOnlineCount', {},
 					callback);
 		},
 		getOnlineUserInfo : function(callback) {
-			return $.jpolite.Data.send('system/User/getOnlineUserInfo', {},
+			return $.jpolite.Data.send('sa/User/getOnlineUserInfo', {},
 					callback);
 		},
 		getOnceFunc : function(callback) {
-			return $.jpolite.Data.send('system/User/getOnceFunc', {}, callback);
+			return $.jpolite.Data.send('sa/User/getOnceFunc', {}, callback);
 		},
 		getLanguage : function(callback) {
-			return $.jpolite.Data.send('system/User/getLanguage', {}, callback);
+			return $.jpolite.Data.send('sa/User/getLanguage', {}, callback);
 		},
 		setLanguage : function(language, callback) {
-			return $.jpolite.Data.send('system/User/setLanguage', {
+			return $.jpolite.Data.send('sa/User/setLanguage', {
 				language : language
 			}, callback);
 		}
 	},
 	Layout : {
 		loadTabs : function(callback) {
-			return $.jpolite.Data.send('system/Layout/loadTabs', {}, callback);
+			return $.jpolite.Data.send('sa/Layout/loadTabs', {}, callback);
 		},
 		saveTabs : function(layout, callback) {
-			return $.jpolite.Data.send('system/Layout/saveTabs', {
+			return $.jpolite.Data.send('sa/Layout/saveTabs', {
 				layout : layout || ""
 			}, callback, true);
 		},
 		removeTabs : function(callback) {
 			return $.jpolite.Data
-					.send('system/Layout/removeTabs', {}, callback);
+					.send('sa/Layout/removeTabs', {}, callback);
 		},
 		loadTheme : function(callback) {
-			return $.jpolite.Data.send('system/Layout/loadTheme', {}, callback);
+			return $.jpolite.Data.send('sa/Layout/loadTheme', {}, callback);
 		},
 		saveTheme : function(theme, callback) {
-			return $.jpolite.Data.send('system/Layout/saveTheme', {
+			return $.jpolite.Data.send('sa/Layout/saveTheme', {
 				theme : theme || ""
 			}, callback, true);
 		},
 		removeTheme : function(callback) {
-			return $.jpolite.Data.send('system/Layout/removeTheme', {},
+			return $.jpolite.Data.send('sa/Layout/removeTheme', {},
 					callback);
 		},
 		loadShortcuts : function(callback) {
-			return $.jpolite.Data.send('system/Layout/loadShortcuts', {},
+			return $.jpolite.Data.send('sa/Layout/loadShortcuts', {},
 					callback);
 		},
 		saveShortcuts : function(shortcuts, callback) {
-			return $.jpolite.Data.send('system/Layout/saveShortcuts', {
+			return $.jpolite.Data.send('sa/Layout/saveShortcuts', {
 				shortcuts : shortcuts || ""
 			}, callback, true);
 		},
 		removeShortcuts : function(callback) {
-			return $.jpolite.Data.send('system/Layout/removeShortcuts', {},
+			return $.jpolite.Data.send('sa/Layout/removeShortcuts', {},
 					callback);
 		}
 	},
 	FuncTree : function(callback) {
-		return $.jpolite.Data.send('system/FuncTree', {}, callback);
+		return $.jpolite.Data.send('sa/FuncTree', {}, callback);
 	},
 	FuncTree2 : function(callback) {
-		return $.jpolite.Data.send('system/FuncTree2', {}, callback);
+		return $.jpolite.Data.send('sa/FuncTree2', {}, callback);
 	},
 	en_FuncTree : function(callback) {
-		return $.jpolite.Data.send('system/en_FuncTree', {}, callback);
+		return $.jpolite.Data.send('sa/en_FuncTree', {}, callback);
 	},
 	// 20100811 MaDuo 为了让widget并发取页面
 	Func : function(func, callback, async) {
-		return $.jpolite.Data.send('system/Func', func, callback, async);
+		return $.jpolite.Data.send('sa/Func', func, callback, async);
 	}
 };
 

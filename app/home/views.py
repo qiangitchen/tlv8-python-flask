@@ -1,19 +1,11 @@
 # _*_ coding: utf-8 _*_
+import app.menus.functiontree
 from . import home
 from flask import render_template, url_for, redirect, session, send_file
 from functools import wraps
-from app.captcha import generate_captcha
-
-
-# 登录装饰器
-def user_login(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if "user_id" not in session:
-            return redirect(url_for("home.login"))
-        return f(*args, **kwargs)
-
-    return decorated_function
+from app.common.captcha import generate_captcha
+from app.sa.views import user_login
+import json
 
 
 # 项目首页
@@ -41,3 +33,26 @@ def login():
 @home.route("/index")
 def index_page():
     return render_template("index.html")
+
+
+# 加载菜单
+@home.route("/portal/initMenu")
+def init_menu():
+    rdata = dict()
+    head = dict()
+    head['title'] = "首页"
+    head['href'] = "/home/console"
+    rdata['homeInfo'] = head
+    logos = dict()
+    logos['title'] = "TLv8 平台"
+    logos['image'] = url_for("static", filename="portal/images/logo.png")
+    logos['href'] = ""
+    rdata['logoInfo'] = logos
+    rdata['menuInfo'] = app.menus.functiontree.functions  # 没有控制权限
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 首页控制台
+@home.route("/home/console")
+def home_console():
+    return render_template("home/console.html")

@@ -1,0 +1,24 @@
+/*页面文字样式*/
+.spanFont{
+	font-family: '\'cb\'ce\'cc\'e5'; 
+	color: #000000; 
+	font-size: 13px;
+}
+
+/*细线表格*/
+.tableMain {
+	border-collapse: collapse;
+	text-align:left;
+	}
+	
+.tableMain td{
+    border:#778899 1px solid;
+	text-align:left;
+}
+
+.output-body{readonly:expression(this.readOnly=true);border:0px;}
+
+.layui-fluid{
+	padding: 10px;
+	background: #f2f2f2;
+}

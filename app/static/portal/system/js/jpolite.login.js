@@ -209,7 +209,7 @@ if (!$.jpolite.Login) $.jpolite.Login = {
 				//var rebackFun=function(data){ 
 				//	window.location.href = window.location.href.replace(/login.html.*/,"index.html?temp="+new Date().getTime());
 				//};
-				//$.jpolite.Data.send('system/User/themeType',{},rebackFun,true);  
+				//$.jpolite.Data.send('sa/User/themeType',{},rebackFun,true);
 			} else {
 				$.jpolite.Login.items.captchaImage && $.jpolite.Login.items.captchaImage.click();
 				$.jpolite.Login.items.loadingImage && $.jpolite.Login.items.loadingImage.hide();
