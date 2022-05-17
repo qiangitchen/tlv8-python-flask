@@ -1,12 +1,25 @@
 # _*_ coding: utf-8 _*_
 import hashlib
-from datetime import date
+import os
+from datetime import date, datetime
+from urllib.parse import unquote, unquote_to_bytes
 
 
 # md5加密
 def md5_code(s):
-    # sha1 才会与java和php的结果一样
-    return hashlib.sha1(s.encode('utf-8')).hexdigest().upper()
+    return str(hashlib.md5(s.encode('utf-8')).hexdigest()).upper()
+
+
+# 生成32随机主键
+def guid():
+    curr_time = str(datetime.now())
+    rm = str(os.urandom(16))
+    mid = curr_time + rm
+    return md5_code(mid)
+
+
+def url_decode(s):
+    return unquote_to_bytes(s).decode('utf-8')
 
 
 # 日期增加n年

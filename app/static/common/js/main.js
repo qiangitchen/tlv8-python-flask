@@ -134,6 +134,25 @@ tlv8.showSate = function(state) {
 	} catch (e) {
 	}
 };
+function addEvent(elm, evType, fn, useCapture) {
+	if (elm.addEventListener) {
+		elm.addEventListener(evType, fn, useCapture);
+		return true;
+	} else if (elm.attachEvent) {
+		var r = elm.attachEvent('on' + evType, fn);
+		return r;
+	} else {
+		elm['on' + evType] = fn;
+	}
+}
+function removeEvent(obj, type, fn, cap) {
+	var cap = cap || false;
+	if (obj.removeEventListener) {
+		obj.removeEventListener(type, fn, cap);
+	} else {
+		obj.detachEvent("on" + type, fn);
+	}
+}
 // 添加页面加载事件
 addEvent(window, "load", function() {
 	if (!window.actiondoing) {
@@ -254,7 +273,7 @@ function writeLog(ev, actionName, discription) {
 		param.set("actionName", actionName ? actionName : "查看");
 		param.set("srcPath", srcPath);
 		param.set("discription", discription ? discription : "");
-		tlv8.XMLHttpRequest("/sa/WriteSystemLogAction", param, "post", true,
+		tlv8.XMLHttpRequest("/system/WriteSystemLogAction", param, "post", true,
 				null, true);
 	} catch (e) {
 	}
@@ -746,8 +765,8 @@ tlv8.Data = function() {
 		var inputs = $JromTag("INPUT");
 		for (var i = 0; i < inputs.length; i++) {
 			if (inputs[i].type == "text" || inputs[i].type == "textarea"
-					|| inputs[i].type == "password" 
-					|| inputs[i].type == "date" || inputs[i].type == "datetime" 
+					|| inputs[i].type == "password"
+					|| inputs[i].type == "date" || inputs[i].type == "datetime"
 					|| inputs[i].type == "hidden") {
 				var $rid = inputs[i].id;
 				if ($rid && $rid != ""
@@ -1142,8 +1161,8 @@ tlv8.Data = function() {
 		var inputs = $JromTag("INPUT");
 		for (var i = 0; i < inputs.length; i++) {
 			if (inputs[i].type == "text" || inputs[i].type == "textarea"
-					|| inputs[i].type == "password" || inputs[i].type == "number" 
-					|| inputs[i].type == "date" || inputs[i].type == "datetime" 
+					|| inputs[i].type == "password" || inputs[i].type == "number"
+					|| inputs[i].type == "date" || inputs[i].type == "datetime"
 					|| inputs[i].type == "hidden") {
 				var $rid = inputs[i].id;
 				if ($rid && $rid != ""
@@ -1323,7 +1342,7 @@ tlv8.Data = function() {
 							}
 							try {
 								// 单选框赋值
-								var cellname = revalueEl.id || $(revalueEl).attr("name"); 
+								var cellname = revalueEl.id || $(revalueEl).attr("name");
 								$('input[name="'+cellname+'"][value="'+$dval+'"]').attr('checked','checked');
 								layui.form.render('radio');
 							} catch (e) {
@@ -4680,321 +4699,9 @@ var mAlert = function(msg, img) {
 		alert(msg);
 		return;
 	}
-	var sHeight = document.body.clientHeight;
-	if (window.innerHeight && window.scrollMaxY) {
-		sHeight = window.innerHeight + window.scrollMaxY;
-	} else if (document.body.scrollHeight > document.body.offsetHeight) {
-		sHeight = document.body.scrollHeight;
-	} else {
-		sHeight = document.body.offsetHeight;
-	}
-	allviewcap.style.height = sHeight;
-	allviewcap.style.position = "absolute";
-	allviewcap.style.background = "#777";
-	allviewcap.style.filter = "alpha(opacity = 20)";
-	allviewcap.style.opacity = 0.2;
-	allviewcap.style.zIndex = "1";
-	if (document.getElementById("mAlertmsgDiv"))
-		document.getElementById("mAlertmsgDiv").parentNode.removeChild(document
-				.getElementById("mAlertmsgDiv"));
-	document.body.appendChild(allviewcap);
-	var msWidth = parseInt(msg.length) * 16;
-	msWidth = ((!msWidth ? 0 : msWidth) < 200) ? 200 : msWidth;
-	var msgView = document.createElement("div");
-	msgView.id = "fd";
-	msgView.style.filter = "alpha(opacity=100)";
-	msgView.style.opacity = "1";
-	msgView.style.textAlign = "center";
-	msgView.style.width = msWidth + "px";
-	msgView.style.height = "80px";
-	msgView.style.background = "#EDF1F8";
-	msgView.style.border = "1px solid #849BCA";
-	msgView.style.marginTop = "1px";
-	msgView.style.marginLeft = "1px";
-	msgView.style.overflow = "hidden";
-	msgView.style.position = "absolute";
-	msgView.style.cursor = "move";
-	msgView.style.display = "none";
-	msgView.style.left = (document.body.offsetWidth - msWidth) / 2;
-	msgView.style.top = 200;
-	msgView.style.zIndex = "2";
-	if (document.getElementById("fd"))
-		document.getElementById("fd").parentNode.removeChild(document
-				.getElementById("fd"));
-	document.body.appendChild(msgView);
-	img = img ? img : $dpimgpath + "toolbar/confirm/info.gif";
-	var msgTable = "<table style='width:100%;height:100%;'><tr style='background:url("
-			+ $dpimgpath
-			+ "button_line.gif) 0px -2px;'><td align='left' style='vertical-align:middle;height:18px;'><div style='align:left;font-size:12px;'><strong>信息提示</strong></div></td></tr><tr><td align='center' style='vertical-align:middle;'><div class='content' style='font-size:14px;'><table style='width:100%;'><tr style='align:center;'><td><img src='"
-			+ img
-			+ "' style='width:24px;height:24px;'/></td><td><p style='float:left;font-size:12px;'>&nbsp;"
-			+ msg
-			+ "</p></td></tr></table></div></td></tr><tr><td style='vertical-align: bottom;'><div class='content' style='text-align:center;height:20px;'><input type='button' class='center' id='mAlert_EgnButton' value='确定'></input></div></td></tr></table>";
-	msgView.innerHTML = msgTable;
-	document.getElementById("mAlert_EgnButton").onclick = function() {
-		closeed("fd");
-		return false;
-	};
-	var prox;
-	var proy;
-	var proxc;
-	var proyc;
-	var show = function(id) {
-		clearInterval(prox);
-		clearInterval(proy);
-		clearInterval(proxc);
-		clearInterval(proyc);
-		var o = document.getElementById(id);
-		o.style.display = "block";
-		o.style.width = "1px";
-		o.style.height = "1px";
-		prox = setInterval(function() {
-			openx(o, msWidth);
-		}, 10);
-	};
-	show("fd");
-	var openx = function(o, x) {
-		var cx = parseInt(o.style.width);
-		if (cx < x) {
-			o.style.width = (cx + Math.ceil((x - cx) / 5)) + "px";
-		} else {
-			clearInterval(prox);
-			proy = setInterval(function() {
-				openy(o, 80);
-			}, 10);
-		}
-	};
-	var openy = function(o, y) {
-		var cy = parseInt(o.style.height);
-		if (cy < y) {
-			o.style.height = (cy + Math.ceil((y - cy) / 5)) + "px";
-		} else {
-			clearInterval(proy);
-			document.getElementById("mAlert_EgnButton").focus();
-		}
-	};
-	var closeed = function(id) {
-		clearInterval(prox);
-		clearInterval(proy);
-		clearInterval(proxc);
-		clearInterval(proyc);
-		var o = document.getElementById(id);
-		proyc = setInterval(function() {
-			closey(o);
-		}, 10);
-	};
-	var closey = function(o) {
-		var cy = parseInt(o.style.height);
-		if (cy > 0) {
-			o.style.height = (cy - Math.ceil(cy / 5)) + "px";
-		} else {
-			clearInterval(proyc);
-			o.innerHTML = "";
-			proxc = setInterval(function() {
-				closex(o);
-			}, 10);
-		}
-	};
-	var closex = function(o) {
-		var cx = parseInt(o.style.width);
-		if (cx > 0) {
-			o.style.width = (cx - Math.ceil(cx / 5)) + "px";
-		} else {
-			clearInterval(proxc);
-			document.body.removeChild(o);
-			document.body.removeChild(allviewcap);
-		}
-	};
-	var od = document.getElementById("fd");
-	var dx, dy, mx, my, mouseD;
-	var odrag;
-	var isIE = document.all ? true : false;
-	document.onmousedown = function(e) {
-		var e = e ? e : event;
-		if (e.button == (document.all ? 1 : 0)) {
-			mouseD = true;
-		}
-	};
-	document.onmouseup = function() {
-		mouseD = false;
-		odrag = "";
-		if (isIE) {
-			od.releaseCapture();
-			od.filters.alpha.opacity = 100;
-		} else {
-			window.releaseEvents(od.MOUSEMOVE);
-			od.style.opacity = 1;
-		}
-	};
-	od.onmousedown = function(e) {
-		odrag = this;
-		var e = e ? e : event;
-		if (e.button == (document.all ? 1 : 0)) {
-			mx = e.clientX;
-			my = e.clientY;
-			od.style.left = od.offsetLeft + "px";
-			od.style.top = od.offsetTop + "px";
-			if (isIE) {
-				od.setCapture();
-				od.filters.alpha.opacity = 50;
-			} else {
-				window.captureEvents(Event.mousemove);
-				od.style.opacity = 0.5;
-			}
-		}
-	};
-	document.onmousemove = function(e) {
-		var e = e ? e : event;
-		if (mouseD == true && odrag) {
-			var mrx = e.clientX - mx;
-			var mry = e.clientY - my;
-			od.style.left = parseInt(od.style.left) + mrx + "px";
-			od.style.top = parseInt(od.style.top) + mry + "px";
-			mx = e.clientX;
-			my = e.clientY;
-		}
-	};
 };
 function Confirm(msg, okcallFn, cancelcallFn, img) {
-	var allviewcap = document.createElement("div");
-	allviewcap.setAttribute("id", "mAlertmsgDiv");
-	allviewcap.style.left = "0px";
-	allviewcap.style.top = "0px";
-	allviewcap.style.width = document.body.clientWidth;
-	var sHeight = document.body.clientHeight;
-	if (window.innerHeight && window.scrollMaxY) {
-		sHeight = window.innerHeight + window.scrollMaxY;
-	} else if (document.body.scrollHeight > document.body.offsetHeight) {
-		sHeight = document.body.scrollHeight;
-	} else {
-		sHeight = document.body.offsetHeight;
-	}
-	allviewcap.style.height = sHeight;
-	allviewcap.style.position = "absolute";
-	allviewcap.style.background = "#777";
-	allviewcap.style.filter = "alpha(opacity = 20)";
-	allviewcap.style.opacity = 0.2;
-	allviewcap.style.zIndex = "1";
-	if (document.getElementById("mAlertmsgDiv"))
-		document.getElementById("mAlertmsgDiv").parentNode.removeChild(document
-				.getElementById("mAlertmsgDiv"));
-	document.body.appendChild(allviewcap);
-	var msWidth = parseInt(msg.length) * 16;
-	msWidth = (msWidth < 200) ? 200 : msWidth;
-	var msgView = document.createElement("div");
-	msgView.id = "fd_Confirm";
-	msgView.style.filter = "alpha(opacity=100)";
-	msgView.style.opacity = "1";
-	msgView.style.textAlign = "center";
-	msgView.style.width = msWidth + "px";
-	msgView.style.height = "80px";
-	msgView.style.background = "#EDF1F8";
-	msgView.style.border = "1px solid #849BCA";
-	msgView.style.marginTop = "1px";
-	msgView.style.marginLeft = "1px";
-	msgView.style.overflow = "hidden";
-	msgView.style.position = "absolute";
-	msgView.style.cursor = "move";
-	msgView.style.left = (document.body.offsetWidth - msWidth) / 2;
-	msgView.style.top = 200;
-	msgView.style.zIndex = "2";
-	if (document.getElementById("fd"))
-		document.getElementById("fd").parentNode.removeChild(document
-				.getElementById("fd"));
-	document.body.appendChild(msgView);
-	img = img ? img : $dpimgpath + "toolbar/confirm/ask.gif";
-	var msgTable = "<table style='width:100%;height:100%;'><tr style='background:url("
-			+ $dpimgpath
-			+ "button_line.gif) 0px -2px;'><td align='left' style='vertical-align:middle;height:18px;float:left;'><table style='width:100%;'><tr><td><div style='align:left;font-size:12px;float:left;'><strong>选择提示</strong></div></td><td style='width:20px;'><div style='align:right;font-size:12px;float:left;'><input type='button' id='Confirm_closeBtn' value='×' style='height:18px;align:right;'></input></div></td></tr></table></td></tr><tr><td align='center' style='vertical-align:middle;'><div class='content' style='font-size:14px;'><table style='width:100%;'><tr style='align:center;'><td><img src='"
-			+ img
-			+ "' style='width:24px;height:24px;'/></td><td><p style='float:left;font-size:14px;'>&nbsp;"
-			+ msg
-			+ "</p></td></tr></table></div></td></tr><tr><td style='vertical-align: bottom;'><div class='content' style='text-align:center;height:20px;'><input type='button' class='center' id='Confirm_EgnButton' value='确定'></input><input type='button' class='center' id='Confirm_ConcelButton' value='取消'></input></div></td></tr></table>";
-	msgView.innerHTML = msgTable;
-	var closeed = function() {
-		document.body.removeChild(document.getElementById("mAlertmsgDiv"));
-		document.body.removeChild(document.getElementById("fd_Confirm"));
-	};
-	document.getElementById("Confirm_EgnButton").onclick = function() {
-		closeed();
-		if (okcallFn && typeof (okcallFn) == "function") {
-			okcallFn();
-		} else if (typeof (okcallFn) == "string") {
-			var sFN = eval(okcallFn);
-			try {
-				sFN();
-			} catch (e) {
-			}
-		}
-		return true;
-	};
-	document.getElementById("Confirm_ConcelButton").onclick = function() {
-		closeed();
-		if (cancelcallFn && typeof (cancelcallFn) == "function") {
-			cancelcallFn();
-		} else if (typeof (cancelcallFn) == "string") {
-			var sFN = eval(cancelcallFn);
-			try {
-				sFN();
-			} catch (e) {
-			}
-		}
-		return false;
-	};
-	document.getElementById("Confirm_closeBtn").onclick = function() {
-		closeed();
-		return false;
-	};
-	document.getElementById("Confirm_EgnButton").focus();
-	var od = document.getElementById("fd_Confirm");
-	var dx, dy, mx, my, mouseD;
-	var odrag;
-	var isIE = document.all ? true : false;
-	document.onmousedown = function(e) {
-		var e = e ? e : event;
-		if (e.button == (document.all ? 1 : 0)) {
-			mouseD = true;
-		}
-	};
-	document.onmouseup = function() {
-		mouseD = false;
-		odrag = "";
-		if (isIE) {
-			od.releaseCapture();
-			od.filters.alpha.opacity = 100;
-		} else {
-			window.releaseEvents(od.MOUSEMOVE);
-			od.style.opacity = 1;
-		}
-	};
-	od.onmousedown = function(e) {
-		odrag = this;
-		var e = e ? e : event;
-		if (e.button == (document.all ? 1 : 0)) {
-			mx = e.clientX;
-			my = e.clientY;
-			od.style.left = od.offsetLeft + "px";
-			od.style.top = od.offsetTop + "px";
-			if (isIE) {
-				od.setCapture();
-				od.filters.alpha.opacity = 50;
-			} else {
-				window.captureEvents(Event.mousemove);
-				od.style.opacity = 0.5;
-			}
-		}
-	};
-	document.onmousemove = function(e) {
-		var e = e ? e : event;
-		if (mouseD == true && odrag) {
-			var mrx = e.clientX - mx;
-			var mry = e.clientY - my;
-			od.style.left = parseInt(od.style.left) + mrx + "px";
-			od.style.top = parseInt(od.style.top) + mry + "px";
-			mx = e.clientX;
-			my = e.clientY;
-		}
-	};
+	layui.layer.confirm(msg,okcallFn,cancelcallFn);
 }
 tlv8.isHaveAuthorization = function(url) {
 	var orgFID = tlv8.Context.getCurrentPersonFID();
@@ -5111,10 +4818,10 @@ tlv8.showModelState = function(state, msg) {
 	}else if($.messager){
 		if(state==true){
 			msg = msg || "正在加载，请稍候... ...";
-			$("<div class=\"datagrid-mask\"></div>").css({display:"block",width:"100%",height:$(document.body).height()}).appendTo("body");   
-		    $("<div class=\"datagrid-mask-msg\"></div>").html("<span style='font-size:9pt; float:left;'>"+msg+"</span>").appendTo("body").css({display:"block",left:($(document.body).outerWidth(true) - 190) / 2,top:($(document.body).height() - 45) / 2}); 
+			$("<div class=\"datagrid-mask\"></div>").css({display:"block",width:"100%",height:$(document.body).height()}).appendTo("body");
+		    $("<div class=\"datagrid-mask-msg\"></div>").html("<span style='font-size:9pt; float:left;'>"+msg+"</span>").appendTo("body").css({display:"block",left:($(document.body).outerWidth(true) - 190) / 2,top:($(document.body).height() - 45) / 2});
 		}else{
-			$(".datagrid-mask").remove();   
+			$(".datagrid-mask").remove();
 		    $(".datagrid-mask-msg").remove();
 		}
 	}else{
@@ -5141,7 +4848,7 @@ tlv8.showModelState = function(state, msg) {
 	}
 	if(state!=true){
 		try{
-			$(".datagrid-mask").remove();   
+			$(".datagrid-mask").remove();
 		    $(".datagrid-mask-msg").remove();
 		}catch(e){
 		}
@@ -5508,7 +5215,7 @@ $(document).ready(function() {
 /*
  * sDate1和sDate2是2002-12-18格式
  */
-function DateDiff(startDate, endDate) { 
+function DateDiff(startDate, endDate) {
 	var aDate, oDate1, oDate2, iDays;
 	aDate = startDate.split("-");
 	oDate1 = new Date(aDate[1] + '-' + aDate[2] + '-' + aDate[0]); // 转换为12-18-2002格式
@@ -5526,15 +5233,15 @@ function DateDiff(startDate, endDate) {
 /**
  * 基于JQuery的列表下拉组件 $("#ttt").gridSelect(options); 基础实现参考jQuery easyUI的列表下拉组件
  */
-(function($){  
-    $.fn.gridSelect = function(options){ 
-    	var defaults = {  
-    		editable: false,  
+(function($){
+    $.fn.gridSelect = function(options){
+    	var defaults = {
+    		editable: false,
     		valueField:"id",
     		textField:"text",
     		method:"get"
-		};    
-	    var opts = $.extend(defaults, options); 
+		};
+	    var opts = $.extend(defaults, options);
 		var _this = $(this);
 		var optiondata;
 		if(opts.data){
@@ -5599,7 +5306,7 @@ function DateDiff(startDate, endDate) {
 			}
 		});
     };
-})(jQuery); 
+})(jQuery);
 
 try{
 	var $rp = $dpjspath.replace("/comon/js/","/");

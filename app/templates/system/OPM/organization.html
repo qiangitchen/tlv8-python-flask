@@ -6,14 +6,16 @@
     <link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='bootstrap/css/bootstrap.min.css') }}"/>
     <link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='layui/css/layui.css') }}"/>
     <link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='common/css/zTreeStyle/zTreeStyle.css') }}"></link>
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='common/css/toolbar.main.css') }}"></link>
     <script type="text/javascript" src="{{ url_for('static',filename='common/js/jquery/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='common/js/jquery/jquery.ztree.core-3.1.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='common/js/main.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='common/jTree/tree.main.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='bootstrap/js/bootstrap.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='layui/layui.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='system/OPM/organization.js',v='1.20220517.1') }}"></script>
 </head>
-<body>
+<body onload="pageLoad()">
     <div class="layui-fluid">
         <div class="layui-row layui-col-space15">
             <div class="layui-col-md3">

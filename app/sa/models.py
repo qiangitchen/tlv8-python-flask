@@ -1,7 +1,7 @@
 # _*_ Coding:utf-8 _*_
 
 from app import db
-import uuid
+from app.common.pubstatic import guid
 from datetime import datetime
 
 
@@ -9,14 +9,14 @@ from datetime import datetime
 class SAOrganization(db.Model):
     __tablename__ = "sa_oporg"
     __table_args__ = {"useexisting": True}
-    sid = db.Column(db.String(100), primary_key=True, default=uuid.uuid1().hex)  # 主键
+    sid = db.Column(db.String(100), primary_key=True, default=guid)  # 主键
     sname = db.Column(db.String(128))  # 名称
     scode = db.Column(db.String(64))  # 编号
     slongname = db.Column(db.String(255))  # 全称
     sfname = db.Column(db.String(2048))  # 路径（全）名
     sfcode = db.Column(db.String(2048))  # 路径（全）编号
     sfid = db.Column(db.String(2048))  # 路径（全）ID
-    sorgkindid = db.Column(db.String(5), index=True)  # 组织类型（ogn:机构，dept:部门， pos:岗位, psm:人员）
+    sorgkindid = db.Column(db.String(5), index=True)  # 组织类型（ogn:机构，dpt:部门， pos:岗位, psm:人员）
     svalidstate = db.Column(db.Integer)  # 状态（0：禁用，1：正常，-1：删除）
     sparent = db.Column(db.String(100), index=True)  # 父级id
     slevel = db.Column(db.Integer)  # 层级
@@ -36,7 +36,7 @@ class SAOrganization(db.Model):
 class SAPerson(db.Model):
     __tablename__ = "sa_opperson"
     __table_args__ = {"useexisting": True}
-    sid = db.Column(db.String(32), primary_key=True, default=uuid.uuid1().hex)  # 主键
+    sid = db.Column(db.String(32), primary_key=True, default=guid)  # 主键
     sname = db.Column(db.String(64))  # 名称
     scode = db.Column(db.String(64), unique=True)  # 编号
     sloginname = db.Column(db.String(64))  # 登录名（默认用scode）-可用于中文登录，不能重复
@@ -56,7 +56,7 @@ class SAPerson(db.Model):
 class SALogs(db.Model):
     __tablename__ = "sa_log"
     __table_args__ = {"useexisting": True}
-    sid = db.Column(db.String(32), primary_key=True, default=uuid.uuid1().hex)  # 主键
+    sid = db.Column(db.String(32), primary_key=True, default=guid)  # 主键
     sdescription = db.Column(db.Text)  # 描述
     sprocessname = db.Column(db.String(2048))  # 功能模块名称
     sactivityname = db.Column(db.String(1024))  # 功能名称

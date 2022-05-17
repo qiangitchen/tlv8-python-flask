@@ -1,0 +1,53 @@
+/* CSS Document */
+
+.standard_toolbar {
+	margin: 0px auto;
+	font-size: 11pt;
+	color: #333333;
+	border-collapse: collapse; /*细线表格*/
+	table-layout: fixed;
+	word-break: break-all;
+}
+
+img {
+	border: none;
+}
+
+a.toobar_item {
+	display: block;
+	padding: 0px 0px;
+	margin: 1px;
+	border: 0px;
+	text-decoration: none;
+	height: 30px;
+	border: 1px #ccc solid;
+	font: 12px 宋体, "Arial Narrow", arial, serif;
+	cursor: pointer;
+	padding: 5px 10px;
+	border-radius: 4px;
+}
+
+a.toobar_item:hover {
+	color: #000;
+	background: #eee;
+}
+
+a.toobar_item:active {
+	color: #000;
+}
+
+a.dialog_item {
+	margin-top: 2px;
+	height:19px;
+	border: 0px;
+	text-decoration: none;
+}
+
+a.dialog_item:hover {
+	border-left: 1px #c0c0c0 solid;
+	border-right: 1px #c0c0c0 solid;
+}
+
+button{
+	cursor: pointer;
+}

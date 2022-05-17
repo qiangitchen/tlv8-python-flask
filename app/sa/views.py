@@ -3,11 +3,11 @@
 from . import system
 from flask import session, redirect, url_for, render_template, request
 from sqlalchemy import or_
-from urllib.parse import unquote, unquote_to_bytes
 from app import db
 from app.sa.forms import LoginForm
 from app.sa.models import SAOrganization, SAPerson, SALogs
 from app.menus.menuutils import get_process_name, get_process_full
+from app.common.pubstatic import url_decode
 from functools import wraps
 import json
 
@@ -97,10 +97,10 @@ def write_system_log():
     rdata = dict()
     try:
         data = request.form
-        srcPath = unquote_to_bytes(data.get('srcPath', '')).decode('utf-8')
-        activateName = unquote_to_bytes(data.get('activateName', '')).decode('utf-8')
-        actionName = unquote_to_bytes(data.get('actionName', '')).decode('utf-8')
-        discription = unquote_to_bytes(data.get('discription', '')).decode('utf-8')
+        srcPath = url_decode(data.get('srcPath', ''))
+        activateName = url_decode(data.get('activateName', ''))
+        actionName = url_decode(data.get('actionName', ''))
+        discription = url_decode(data.get('discription', ''))
         personID = data.get('personID', session['user_id'])
         if len(activateName) < 1:
             activateName = get_process_name(srcPath)
@@ -132,3 +132,19 @@ def write_system_log():
 @user_login
 def organization():
     return render_template("system/OPM/organization.html")
+
+
+# 加载机构树
+@system.route("/OPM/TreeSelectAction", methods=["GET", "POST"])
+@user_login
+def tree_select():
+    rdata = dict()
+    data = request.form
+    print(data)
+    params = url_decode(data.get('params', ''))  # 接收的参数需要解码
+    orderby = url_decode(data.get('orderby', ''))
+    print(params)
+    print(orderby)
+    param_dict = eval(params)  # 字符串转字典
+    print(param_dict)
+    return json.dumps(rdata, ensure_ascii=False)
