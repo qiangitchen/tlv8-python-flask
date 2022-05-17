@@ -1,4 +1,6 @@
 # _*_ coding: utf-8 _*_
+
+import socket
 import hashlib
 import os
 from datetime import date, datetime
@@ -18,8 +20,16 @@ def guid():
     return md5_code(mid)
 
 
+# url参数解码：utf-8
 def url_decode(s):
     return unquote_to_bytes(s).decode('utf-8')
+
+
+# 获取本机IP
+def get_ip():
+    hostname = socket.gethostname()
+    ip = socket.gethostbyname(hostname)
+    return ip
 
 
 # 日期增加n年

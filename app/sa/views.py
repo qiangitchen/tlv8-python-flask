@@ -8,6 +8,8 @@ from app.sa.forms import LoginForm
 from app.sa.models import SAOrganization, SAPerson, SALogs
 from app.menus.menuutils import get_process_name, get_process_full
 from app.common.pubstatic import url_decode
+from app.sa.persons import get_person_info
+from app.sa.onlineutils import set_online, clear_online
 from functools import wraps
 import json
 
@@ -36,6 +38,7 @@ def login():
             if person:
                 if person.spassword == data['password']:
                     session['user_id'] = person.sid
+                    set_online(person.sid)
                     rdata['status'] = True
                 else:
                     rdata['status'] = False
@@ -56,6 +59,7 @@ def login():
 @system.route("/User/logout", methods=["GET", "POST"])
 def logout():
     rdata = dict()
+    clear_online()
     session.pop("user_id", None)
     rdata['status'] = True
     return json.dumps(rdata, ensure_ascii=False)
@@ -78,12 +82,7 @@ def login_check():
 def init_portal_info():
     rdata = dict()
     person_id = session['user_id']
-    person = SAPerson.query.filter_by(sid=person_id).first()
-    person_info = dict()
-    person_info['personid'] = person_id
-    person_info['personName'] = person.sname
-    org = SAOrganization.query.filter_by(spersonid=person_id).first()
-    person_info['orgFullName'] = org.sfname
+    person_info = get_person_info(person_id)
     rdata['status'] = True
     rdata['data'] = person_info
     print(rdata)

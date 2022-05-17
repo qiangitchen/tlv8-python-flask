@@ -69,3 +69,20 @@ class SALogs(db.Model):
     sip = db.Column(db.String(64))  # 操作者IP
     screatetime = db.Column(db.DateTime, default=datetime.now)  # 操作时间
     version = db.Column(db.Integer, nullable=False, default=0)  # 版本号
+
+
+# 在线用户
+class SAOnlineInfo(db.Model):
+    __tablename__ = "sa_onlineinfo"
+    __table_args__ = {"useexisting": True}
+    sid = db.Column(db.String(32), primary_key=True, default=guid)  # 主键
+    suserid = db.Column(db.String(36))  # 用户id
+    susername = db.Column(db.String(100))  # 用户
+    suserfid = db.Column(db.String(2048))  # 用户全id
+    suserfname = db.Column(db.String(2048))  # 用户全名称
+    sloginip = db.Column(db.String(64))  # 用户IP
+    slogindate = db.Column(db.DateTime, default=datetime.now)
+    ssessionid = db.Column(db.String(64), unique=True)  # 唯一用户标志
+    sserviceip = db.Column(db.String(64))  # 服务器IP
+    smachinecode = db.Column(db.String(100), index=True)  # 机器码-多台服务器集群时用于区分服务器
+    version = db.Column(db.Integer, nullable=False, default=0)  # 版本号
