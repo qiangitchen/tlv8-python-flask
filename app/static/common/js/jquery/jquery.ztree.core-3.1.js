@@ -1065,8 +1065,7 @@
 			$.ajax( {
 				contentType : setting.async.contentType,
 				type : setting.async.type,
-				url : tools.apply(setting.async.url, [ setting.treeId, node ],
-						setting.async.url),
+				url : tools.apply(setting.async.url, [ setting.treeId, node ], setting.async.url),
 				async : false,
 				data : tmpParam,
 				dataType : setting.async.dataType,
@@ -1302,7 +1301,7 @@
 				var icon = (node.isParent && node.iconOpen && node.iconClose) ? (node.open ? node.iconOpen
 						: node.iconClose)
 						: node.icon;
-				icon = icon ? $dpimgpath + icon : "";
+				icon = icon ? icon : "";
 				if (icon)
 					icoStyle.push("background:url(", icon, ") 0 0 no-repeat;");
 				if (setting.view.showIcon == false

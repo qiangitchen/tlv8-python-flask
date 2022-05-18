@@ -2164,10 +2164,11 @@ tlv8.portal.dailog = {
     dailogEngin: function (data, b_g) {
         this.returnData = data ? data : this.returnData;
         try {
+            var callbackFn;
             if (b_g) {
-                var callbackFn = tlv8.portal.dailog.callback;
+                callbackFn = tlv8.portal.dailog.callback;
             } else {
-                var callbackFn = parent.tlv8.portal.dailog.callback;
+                callbackFn = window.parent.tlv8.portal.dailog.callback;
             }
             if (callbackFn) {
                 callbackFn(this.returnData);
@@ -2175,8 +2176,9 @@ tlv8.portal.dailog = {
         } catch (e) {
         }
         try {
-            var index = parent.layui.layer.getFrameIndex(window.name); // 先得到当前iframe层的索引
-            parent.layui.layer.close(index); // 再执行关闭
+            var index = window.parent.layui.layer.getFrameIndex(window.name); // 先得到当前iframe层的索引
+            window.parent.layui.layer.close(index); // 再执行关闭
+            window.parent.layui.layer.closeAll();
         } catch (e) {
         }
         if (this.dindex)
@@ -2206,8 +2208,9 @@ tlv8.portal.dailog = {
      */
     dailogCancel: function () {
         try {
-            var index = parent.layui.layer.getFrameIndex(window.name); // 先得到当前iframe层的索引
-            parent.layui.layer.close(index); // 再执行关闭
+            var index = window.parent.layui.layer.getFrameIndex(window.name); // 先得到当前iframe层的索引
+            window.parent.layui.layer.close(index); // 再执行关闭
+            window.parent.layui.layer.closeAll();
         } catch (e) {
         }
         if (this.dindex)
@@ -3416,8 +3419,6 @@ tlv8.GridSelect = function (div, dbkey, sql, master, caninput) {
     this.gridSelect = gridSelect;
     div.gridSelect = gridSelect;
     div.master = master;
-    if (!checkPathisHave($dpcsspath + "grid.main.css"))
-        createStyleSheet($dpcsspath + "grid.main.css");
     var gsID = div.id ? div.id : "";
     var param = new tlv8.RequestParam();
     param.set("dbkey", dbkey);
@@ -3637,8 +3638,6 @@ tlv8.inputCaption = function (input, dbkey, table, cell, where) {
             posX += aBox.offsetLeft;
             posY += aBox.offsetTop;
         } while (aBox.tagName != "BODY");
-        if (!checkPathisHave($dpcsspath + "grid.main.css"))
-            createStyleSheet($dpcsspath + "grid.main.css");
         var selectIfram = document.createElement("div");
         selectIfram.setAttribute("id", input.id + "_textCaption");
         selectIfram.setAttribute("align", "center");

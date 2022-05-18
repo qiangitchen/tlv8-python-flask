@@ -3,6 +3,7 @@
 import socket
 import hashlib
 import os
+from flask import url_for
 from datetime import date, datetime
 from urllib.parse import unquote, unquote_to_bytes
 
@@ -53,3 +54,17 @@ def hide_card_id(s):
     for i in range(6, 14, 1):
         ids[i] = '*'
     return ''.join(ids)
+
+
+# 获取组织图标
+def create_icon(kind):
+    if kind == 'ogn' or kind == 'org':
+        return url_for('static', filename='common/image/toolbar/org/org.gif')
+    if kind == 'dept' or kind == 'dpt':
+        return url_for('static', filename='common/image/toolbar/org/dept.gif')
+    if kind == 'pos':
+        return url_for('static', filename='common/image/toolbar/org/pos.gif')
+    if kind == 'psm':
+        return url_for('static', filename='common/image/toolbar/org/person.gif')
+
+    return url_for('static', filename='common/image/toolbar/org/folder-open.gif')

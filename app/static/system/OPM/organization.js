@@ -17,8 +17,7 @@ var param = {
         id: "sid",// 设置构建树的id
         name: "sname",// 树显示的名称
         parent: "sparent",// 表示树的层级
-        other: "sfid,sfname,sorgkindid,scode,sfcode",// 树中所带字段信息
-        orderby: "ssequence asc" // 排序字段
+        other: "sfid,sfname,sorgkindid,scode,sfcode"// 树中所带字段信息
     }
 };
 var setting = {
@@ -41,13 +40,27 @@ var setting = {
     isquickPosition: {
         enable: true, // 是否有快速查询框
         url: "/system/OPM/QuickTreeAction",
-        quickCells: "SID,SCODE,SNAME",// 用于快速查询的字段
-        path: "SFID"// 查询路径字段
+        quickCells: "sid,scode,sname",// 用于快速查询的字段
+        path: "sfid"// 查询路径字段
     },
     callback: {
-        beforeClick: beforeClick
+        beforeClick: beforeClick,
+        afterRefresh: afterRefresh
     }
 };
+
+function afterRefresh(event) {
+    currentNode = null;
+    currenttreeID = null;
+    currenttreeName = null;
+    sorgkindid = null;
+    scode = null;
+    sfname = null;
+    sfcode = null;
+    sfid = null;
+    sparent = null;
+    loadList();
+}
 
 function beforeClick(treeId, treeNode) {
     currentNode = treeNode;
@@ -96,9 +109,111 @@ function beforeClick(treeId, treeNode) {
             disabled: "disabled"
         });
     }
+
+    loadList();
+
 }
 
 var MainJtree = new Jtree();
-function pageLoad(){
+
+function pageLoad() {
     MainJtree.init("JtreeView", setting, param);
+}
+
+// 获取弹出菜单的位置
+var count = 0;
+
+function addorgitem() {
+    count++;
+    var aNode = $("#addOrgItem");
+    // 找到当前节点的位置
+    var offset = aNode.offset();
+    // 设置弹出框的位置
+    $("#showdivt").css({"left": offset.left, "top": (offset.top + 40), "z-index": 9999}).slideDown("fast");
+    // .slideDown("fast");
+    $("body").bind("mousedown", onBodyDown);
+    // if (count % 2 == 0) {
+    // hideMenu();
+    // }
+}
+
+// 隐藏树
+function hideMenu() {
+    $("#showdivt").fadeOut("fast");
+    $("body").unbind("mousedown", onBodyDown);
+}
+
+function onBodyDown(event) {
+    if (!(event.target.id == "addOrgItem" || event.target.id == "showdivt" || $(
+        event.target).parents("#showdivt").length > 0)) {
+        hideMenu();
+    }
+}
+
+function loadList() {
+    var url = '/system/OPM/orgList';
+    if (currenttreeID && currenttreeID !== '') {
+        url += "?parent=" + currenttreeID;
+    }
+    layui.table.render({
+        elem: '#orglist'
+        , url: url
+        , toolbar: '#list_toolbar'
+        , height: 'full-100'
+        , defaultToolbar: ['exports']
+        , cols: [[
+            {field: 'sid', title: 'ID', hide: true}
+            , {field: 'no', title: '序号', width: 60, unresize: true, align: 'center'}
+            , {field: 'scode', title: '编号', width: 80}
+            , {field: 'sname', title: '名称', width: 150}
+            , {field: 'sdescription', title: '描述'}
+            , {field: 'sfcode', title: '全编号', width: 200}
+            , {field: 'sfname', title: '全名称', width: 200}
+            , {fixed: 'right', title: '操作', toolbar: '#actionBar', width: 490}
+        ]]
+        , even: true
+        , page: true
+    });
+}
+
+function creat_dailogcallback(data) {
+    MainJtree.refreshJtree("JtreeView");
+    setTimeout(function () {
+        MainJtree.quickPosition(data);
+    }, 300)
+}
+
+function editOrgData(data) {
+    var rowid = data.sid;
+    var SORGKINDID = data.sorgkindid;
+    var SPARENT = data.sparent;
+    var SPERSONID = data.spersonid;
+    if (SORGKINDID == "psm") {
+        tlv8.portal.dailog
+            .openDailog('人员信息',
+                "/SA/OPM/organization/dialog/organ-psm-createpsm.html?gridrowid="
+                + rowid + "&name=" + currenttreeName
+                + "&scode=" + scode + "&sfname="
+                + J_u_encode(sfname) + "&sfcode=" + sfcode
+                + "&SPERSONID=" + SPERSONID + "&operator=edit",
+                800, 490, creatPsm_dailogcallback, null);
+    } else {
+        tlv8.portal.dailog.openDailog('机构管理',
+            "/system/OPM/organization/org_edit?gridrowid="
+            + rowid + "&name=" + currenttreeName + "&sparent="
+            + SPARENT + "&operator=edit", 700, 500,
+            creat_dailogcallback, null);
+    }
+}
+
+// 添加组织
+function newognData(type) {
+    hideMenu();
+    tlv8.portal.dailog.openDailog('新建组织',
+        "/system/OPM/organization/org_edit?rowid="
+        + currenttreeID + "&name=" + J_u_encode(currenttreeName)
+        + "&scode=" + scode + "&sfname=" + J_u_encode(sfname)
+        + "&sfcode=" + sfcode + "&sparent=" + sparent
+        + "&type=" + type + "&sfid=" + sfid, 700, 500, creat_dailogcallback,
+        null);
 }

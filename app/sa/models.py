@@ -17,18 +17,18 @@ class SAOrganization(db.Model):
     sfcode = db.Column(db.String(2048))  # 路径（全）编号
     sfid = db.Column(db.String(2048))  # 路径（全）ID
     sorgkindid = db.Column(db.String(5), index=True)  # 组织类型（ogn:机构，dpt:部门， pos:岗位, psm:人员）
-    svalidstate = db.Column(db.Integer)  # 状态（0：禁用，1：正常，-1：删除）
+    svalidstate = db.Column(db.Integer, default=1)  # 状态（0：禁用，1：正常，-1：删除）
     sparent = db.Column(db.String(100), index=True)  # 父级id
-    slevel = db.Column(db.Integer)  # 层级
+    slevel = db.Column(db.Integer, default=0)  # 层级
     sphone = db.Column(db.String(64))  # 电话
     sfax = db.Column(db.String(64))  # 传真
     saddress = db.Column(db.String(255))  # 地址
     szip = db.Column(db.String(16))  # 邮编
     sdescription = db.Column(db.String(1024))  # 描述
     spersonid = db.Column(db.String(32), index=True)  # 人员id （sorgkindid为psm时有值）
-    snodekind = db.Column(db.String(32))  # 节点类型
+    snodekind = db.Column(db.String(32))  # 节点类型(nkLimb:分配的人员)
     sshowname = db.Column(db.String(100))  # 展示名称
-    ssequence = db.Column(db.Integer)  # 排序序号
+    ssequence = db.Column(db.Integer, default=1)  # 排序序号
     version = db.Column(db.Integer, nullable=False, default=0)  # 版本号
 
 

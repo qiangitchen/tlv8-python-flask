@@ -1,0 +1,94 @@
+<html lang="zh_CN">
+{% include "common/form_page_head.html" %}
+<script type="text/javascript"
+        src="{{ url_for('static',filename='system/OPM/dialog/organ-org-createorg.js') }}"></script>
+<body onload="initDialog()" style="overflow: hidden;">
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form id="org_create_form" class="layui-form" afterRefresh="afRefresh">
+                <div style="display: none;">
+                    <input type="text" name="sfcode" id="sfcode" value="{{ model.sfcode }}" readonly="readonly"
+                           style="display: none;"/>
+                    <input type="text" name="sfid" id="sfid" value="{{ model.sfid }}" readonly="readonly"
+                           style="display: none;"/>
+                    {{ form.sid(value=model.sid) }}
+                    {{ form.sparent(value=model.sparent) }}
+                </div>
+                <div class="layui-form-item" style="display: none;">
+                    <label class="layui-form-label">路径</label>
+                    <div class="layui-input-block" style="margin-left:80px;">
+                        <input type="text" name="sfname" id="SFNAME" value="{{ model.sfname }}" readonly="readonly"
+                               class="layui-input"/>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">编号</label>
+                        <div class="layui-input-inline">
+                            {{ form.scode(value=nul2em(model.scode)) }}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">类型</label>
+                        <div class="layui-input-inline">
+                            {{ form.sorgkindid(value=model.sorgkindid) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">名称</label>
+                    <div class="layui-input-block" style="margin-left:80px;">
+                        {{ form.sname(value=nul2em(model.sname)) }}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">层级</label>
+                        <div class="layui-input-inline">
+                            {{ form.slevel(value=model.slevel) }}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">序号</label>
+                        <div class="layui-input-inline">
+                            {{ form.ssequence(value=model.ssequence) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">电话</label>
+                        <div class="layui-input-inline">
+                            {{ form.sphone(value=nul2em(model.sphone)) }}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">传真</label>
+                        <div class="layui-input-inline">
+                            {{ form.sfax(value=nul2em(model.sfax)) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">地址</label>
+                    <div class="layui-input-block" style="margin-left:80px;">
+                        {{ form.saddress(value=nul2em(model.saddress)) }}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">描述</label>
+                    <div class="layui-input-block" style="margin-left:80px;">
+                        {{ form.sdescription(value=nul2em(model.sdescription)) }}
+                    </div>
+                </div>
+                <div style="display: none;">
+                    {{ form.csrf_token }}
+                    {{ form.submit }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

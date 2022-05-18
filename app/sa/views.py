@@ -2,12 +2,12 @@
 
 from . import system
 from flask import session, redirect, url_for, render_template, request
-from sqlalchemy import or_
+from sqlalchemy import or_, and_, not_
 from app import db
-from app.sa.forms import LoginForm
+from app.sa.forms import LoginForm, OrgForm
 from app.sa.models import SAOrganization, SAPerson, SALogs
 from app.menus.menuutils import get_process_name, get_process_full
-from app.common.pubstatic import url_decode
+from app.common.pubstatic import url_decode, create_icon, nul2em
 from app.sa.persons import get_person_info
 from app.sa.onlineutils import set_online, clear_online
 from functools import wraps
@@ -136,14 +136,146 @@ def organization():
 # 加载机构树
 @system.route("/OPM/TreeSelectAction", methods=["GET", "POST"])
 @user_login
-def tree_select():
+def org_tree_select():
     rdata = dict()
     data = request.form
-    print(data)
     params = url_decode(data.get('params', ''))  # 接收的参数需要解码
-    orderby = url_decode(data.get('orderby', ''))
-    print(params)
-    print(orderby)
     param_dict = eval(params)  # 字符串转字典
-    print(param_dict)
+    others = param_dict.get('other', '').split(',')
+    org_query = SAOrganization.query.filter(SAOrganization.scode != 'SYSTEM', SAOrganization.svalidstate > -1)
+    currenid = data.get('currenid')
+    if currenid:
+        org_query = org_query.filter(SAOrganization.sparent == currenid)
+    else:
+        org_query = org_query.filter(or_(SAOrganization.sparent.is_(None), SAOrganization.sparent == ''))
+    orgs = org_query.order_by(SAOrganization.ssequence).all()
+    json_result = list()
+    for org in orgs:
+        item = dict()
+        item['id'] = getattr(org, param_dict['id'])
+        item['name'] = getattr(org, param_dict['name'])
+        item['parent'] = getattr(org, param_dict['parent'])
+        if org.sorgkindid == 'psm':
+            item['isParent'] = False
+        else:
+            item['isParent'] = True
+        item['icon'] = create_icon(org.sorgkindid)
+        for o in others:
+            item[o] = getattr(org, o)
+        json_result.append(item)
+    rdata['jsonResult'] = json_result
     return json.dumps(rdata, ensure_ascii=False)
+
+
+# 机构树-搜索
+@system.route("/OPM/QuickTreeAction", methods=["GET", "POST"])
+@user_login
+def org_quick_tree():
+    rdata = dict()
+    data = request.form
+    quicktext = url_decode(data.get('quicktext', ''))
+    # quickCells = url_decode(data.get('quickCells', ''))
+    path = url_decode(data.get('path', ''))
+    org_query = SAOrganization.query.filter(SAOrganization.scode != 'SYSTEM', SAOrganization.svalidstate > -1)
+    org_query = org_query.filter(
+        or_(SAOrganization.sid.ilike(quicktext), SAOrganization.scode.ilike('%' + quicktext + '%'),
+            SAOrganization.sname.ilike('%' + quicktext + '%')))
+    orgs = org_query.order_by(SAOrganization.ssequence).all()
+    json_result = list()
+    for org in orgs:
+        item = dict()
+        item[path] = getattr(org, path)
+        json_result.append(item)
+    rdata['jsonResult'] = json_result
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 机构列表
+@system.route("/OPM/orgList", methods=["GET", "POST"])
+@user_login
+def org_list():
+    rdata = dict()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 16, type=int)
+    parent = request.args.get('parent')
+    org_query = SAOrganization.query.filter(SAOrganization.scode != 'SYSTEM', SAOrganization.svalidstate > -1)
+    if parent:
+        org_query = org_query.filter(or_(SAOrganization.sparent == parent, SAOrganization.sid == parent))
+    rdata['code'] = 0
+    rdata['count'] = org_query.count()
+    page_data = org_query.paginate(page, limit)
+    row_data = list()
+    no = 1
+    for d in page_data.items:
+        item = dict()
+        item['sid'] = d.sid
+        item['no'] = no + (page - 1) * limit
+        item['scode'] = d.scode
+        item['sname'] = d.sname
+        item['sdescription'] = d.sdescription
+        item['sfcode'] = d.sfcode
+        item['sfname'] = d.sfname
+        item['sparent'] = d.sparent
+        item['spersonid'] = d.spersonid
+        item['sorgkindid'] = d.sorgkindid
+        item['snodekind'] = d.snodekind
+        item['svalidstate'] = d.svalidstate
+        row_data.append(item)
+        no += 1
+    rdata['data'] = row_data
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 机构编辑/添加
+@system.route("/OPM/organization/org_edit", methods=["GET", "POST"])
+@user_login
+def org_edit():
+    gridrowid = request.args.get('gridrowid', '')
+    model = SAOrganization.query.filter_by(sid=gridrowid).first()
+    form = OrgForm()
+    if form.validate_on_submit():
+        rdata = dict()
+        data = form.data
+        operator = request.args.get('operator')
+        if operator == 'edit':
+            model = SAOrganization.query.filter_by(sid=data['sid']).first()
+            if not model:
+                model = SAOrganization()
+        else:
+            model = SAOrganization()
+        model.sparent = data['sparent']
+        model.scode = data['scode']
+        model.sname = data['sname']
+        model.sorgkindid = data['sorgkindid']
+        model.slevel = data['slevel']
+        model.ssequence = data['ssequence']
+        model.sphone = data['sphone']
+        model.sfax = data['sfax']
+        model.saddress = data['saddress']
+        model.sdescription = data['sdescription']
+        parent_org = SAOrganization.query.filter_by(sid=model.sparent).first()
+        if parent_org:
+            if operator == 'edit':
+                model.sfid = parent_org.sfid + '/' + model.sid + '.' + model.sorgkindid
+            model.sfcode = parent_org.sfcode + '/' + model.scode
+            model.sfname = parent_org.sfname + '/' + model.sname
+            model.slevel = parent_org.slevel + 1
+        else:
+            if operator == 'edit':
+                model.sfid = '/' + model.sid + '.' + model.sorgkindid
+            model.sfcode = '/' + model.scode
+            model.sfname = '/' + model.sname
+        db.session.add(model)
+        db.session.commit()
+        if operator != 'edit':  # 如果不是编辑则需要保存之后更新fid
+            if parent_org:
+                model.sfid = parent_org.sfid + '/' + model.sid + '.' + model.sorgkindid
+            else:
+                model.sfid = '/' + model.sid + '.' + model.sorgkindid
+            db.session.add(model)
+            db.session.commit()
+        rdata['state'] = True
+        return json.dumps(rdata, ensure_ascii=False)
+    if not model:
+        model = SAOrganization(slevel=0, ssequence=1)
+    return render_template("system/OPM/dialog/organ-org-createorg.html", form=form, model=model, nul2em=nul2em)

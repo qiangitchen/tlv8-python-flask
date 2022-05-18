@@ -282,8 +282,10 @@ function zTreeOnRename(event, treeId, treeNode) {
  * @memberOf {TypeName}
  */
 Jtree.prototype.quickPosition = function (text) {
-    if (!text || text == "")
+    if (!text || text == ""){
+        this.refreshJtree();
         return;
+    }
     var qNode = new Array();
     try {
         var action = this.setting.isquickPosition.url ? this.setting.isquickPosition.url
@@ -293,25 +295,36 @@ Jtree.prototype.quickPosition = function (text) {
         var quickCells = this.setting.isquickPosition.quickCells ? this.setting.isquickPosition.quickCells
             : "";
         var param = new tlv8.RequestParam();
-        var quicktext = this.Jtreeid
-            + ","
-            + this.Jtreename
-            + ","
-            + this.tableName
-            + ","
-            + this.databaseName
-            + ","
-            + this.Jtreeparent
-            + ","
-            + text
-            + ","
-            + path
-            + ","
-            + (this.param.cell.rootFilter ? this.param.cell.rootFilter : "")
-            + "," + (this.param.cell.filter ? this.param.cell.filter : "");
+        // var str = "{\"id\":\"" + this.Jtreeid + "\",\"name\":\"" + this.Jtreename
+        // + "\",\"parent\":\"" + this.Jtreeparent + "\",\"other\":\""
+        // + this.Jtreeother + "\",\"tableName\":\"" + this.tableName
+        // + "\",\"databaseName\":\"" + this.databaseName
+        // + "\",\"rootFilter\":\""
+        // + (this.param.cell.rootFilter ? this.param.cell.rootFilter : "")
+        // + "\",\"filter\":\""
+        // + (this.param.cell.filter ? this.param.cell.filter : "") + "\"}";
+        // param.set("params", str);
+        var quicktext = text;
+        // var quicktext = this.Jtreeid
+        //     + ","
+        //     + this.Jtreename
+        //     + ","
+        //     + this.tableName
+        //     + ","
+        //     + this.databaseName
+        //     + ","
+        //     + this.Jtreeparent
+        //     + ","
+        //     + text
+        //     + ","
+        //     + path
+        //     + ","
+        //     + (this.param.cell.rootFilter ? this.param.cell.rootFilter : "")
+        //     + "," + (this.param.cell.filter ? this.param.cell.filter : "");
         param.set("quicktext", quicktext);
         param.set("quickCells", quickCells);
-        param.set("cloums", this.Jtreeother);
+        // param.set("cloums", this.Jtreeother);
+        param.set("path", path);
         action = (action.startWith(cpath) ? action : (cpath + action));
         var nodes = (this.setting.async.enable) ? (eval(tlv8
                 .XMLHttpRequest(action, param, "post", false, null).jsonResult))
@@ -373,16 +386,22 @@ Jtree.prototype.refreshJtree = function (panle, afcalback) {
         : "");
     var Jtree_Ext = this;
     action = (action.startWith(cpath) ? action : (cpath + action));
-    tlv8.XMLHttpRequest(action, pamstens, "post", true, function (data) {
-        var zNodes = data.jsonResult;
-        if (typeof zNodes == "string") {
-            zNodes = window.eval("(" + zNodes + ")");
-        }
-        $.fn.zTree.init($("#" + panle), Jtree_Ext.setting, zNodes,
-            Jtree_Ext.param);
-        Jtree_Ext.zNodes = zNodes;
-        if (afcalback && typeof afcalback == "function") {
-            afcalback(zNodes);
-        }
-    });
+    panle = panle || this.treeId;
+    $.fn.zTree.init($("#" + panle), Jtree_Ext.setting, [], Jtree_Ext.param);
+    var afterRefresh = this.setting.callback.afterRefresh;
+    if(afterRefresh && typeof afterRefresh == "function"){
+        afterRefresh(Jtree_Ext)
+    }
+    // tlv8.XMLHttpRequest(action, pamstens, "post", true, function (data) {
+    //     var zNodes = data.jsonResult;
+    //     if (typeof zNodes == "string") {
+    //         zNodes = window.eval("(" + zNodes + ")");
+    //     }
+    //     $.fn.zTree.init($("#" + panle), Jtree_Ext.setting, zNodes,
+    //         Jtree_Ext.param);
+    //     Jtree_Ext.zNodes = zNodes;
+    //     if (afcalback && typeof afcalback == "function") {
+    //         afcalback(zNodes);
+    //     }
+    // });
 };
