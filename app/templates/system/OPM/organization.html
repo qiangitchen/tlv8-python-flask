@@ -149,6 +149,12 @@
             if (obj.event === 'cancelPar') {
                 disassignPsmFn(data);
             }
+            if (obj.event === 'setMainOrg') {
+                setMemberOrg(data);
+            }
+            if (obj.event === 'move') {
+                moveOrg(data);
+            }
             if (obj.event === 'del') {
 
             }

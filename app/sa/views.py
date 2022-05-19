@@ -85,7 +85,6 @@ def init_portal_info():
     person_info = get_person_info(person_id)
     rdata['status'] = True
     rdata['data'] = person_info
-    print(rdata)
     return json.dumps(rdata, ensure_ascii=False)
 
 
@@ -143,6 +142,9 @@ def org_tree_select():
     param_dict = eval(params)  # 字符串转字典
     others = param_dict.get('other', '').split(',')
     org_query = SAOrganization.query.filter(SAOrganization.scode != 'SYSTEM', SAOrganization.svalidstate > -1)
+    hide_psm = request.args.get('hide_psm')
+    if hide_psm:
+        org_query = org_query.filter(SAOrganization.sorgkindid != 'psm')
     currenid = data.get('currenid')
     if currenid:
         org_query = org_query.filter(SAOrganization.sparent == currenid)
@@ -242,6 +244,7 @@ def org_edit():
     if form.validate_on_submit():
         rdata = dict()
         data = form.data
+        print(data)
         operator = request.args.get('operator')
         if operator == 'edit':
             model = SAOrganization.query.filter_by(sid=data['sid']).first()
@@ -249,7 +252,8 @@ def org_edit():
                 model = SAOrganization()
         else:
             model = SAOrganization()
-        model.sparent = data['sparent']
+        if data['sparent'] and data['sparent'] != "":
+            model.sparent = data['sparent']
         model.scode = data['scode']
         model.sname = data['sname']
         model.sorgkindid = data['sorgkindid']
@@ -494,3 +498,46 @@ def disassign_psm():
         rdata['state'] = False
         rdata['msg'] = '指定的id不存在！'
     return json.dumps(rdata, ensure_ascii=False)
+
+
+# 设置所属部门
+@system.route("/OPM/organization/setMemberOrgAction", methods=["GET", "POST"])
+@user_login
+def set_member_org():
+    rdata = dict()
+    rowid = url_decode(request.form.get('rowid'))
+    org = SAOrganization.query.filter_by(sid=rowid, sorgkindid='psm').first()
+    if org:
+        # 更新其他部门下的人员为（分配）
+        other_orgs = SAOrganization.query.filter(SAOrganization.sid != rowid, SAOrganization.sorgkindid == 'psm',
+                                                 SAOrganization.spersonid == org.spersonid).all()
+        for o in other_orgs:
+            o.snodekind = 'nkLimb'
+            db.session.add(o)
+        # 更新人员表的机构ID
+        person = SAPerson.query.filter_by(sid=org.spersonid).first()
+        person.smainorgid = org.sparent
+        db.session.add(person)
+        # 更新节点类型为空
+        org.snodekind = None
+        db.session.add(org)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = '指定的id不存在！'
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 移动/选择机构
+@system.route("/OPM/organization/moveOrg", methods=["GET", "POST"])
+@user_login
+def move_org():
+    if request.method == "POST":
+        rdata = dict()
+        rowid = request.form.get('rowid')
+        orgID = request.form.get('orgID')
+        rdata['state'] = False
+        rdata['msg'] = '指定的id不存在！'
+        return json.dumps(rdata, ensure_ascii=False)
+    return render_template("system/OPM/dialog/moveOrg.html")

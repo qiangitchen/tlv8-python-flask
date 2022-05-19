@@ -1,0 +1,15 @@
+<html lang="zh_CN">
+{% include "common/tree_page_head.html" %}
+<script type="text/javascript"
+        src="{{ url_for('static',filename='system/OPM/dialog/moveOrg.js',v='1.0.20220519') }}"></script>
+<body>
+<div id="maintree" style="width: 100%; height: 100%;">
+    <ul id="mainJtree" class="ztree"></ul>
+</div>
+<script type="text/javascript">
+    var JtreeOrg = new Jtree();
+    var treebody = "mainJtree";
+    JtreeOrg.init(treebody, setting, param);
+</script>
+</body>
+</html>

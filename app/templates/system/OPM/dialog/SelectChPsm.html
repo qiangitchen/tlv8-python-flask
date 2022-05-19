@@ -1,11 +1,5 @@
 <html lang="zh_CN">
-{% include "common/form_page_head.html" %}
-<link type="text/css" rel="stylesheet"
-      href="{{ url_for('static',filename='common/css/zTreeStyle/zTreeStyle.css') }}"></link>
-<link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='common/css/toolbar.main.css') }}"></link>
-<script type="text/javascript"
-        src="{{ url_for('static',filename='common/js/jquery/jquery.ztree.core-3.1.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static',filename='common/jTree/tree.main.js') }}"></script>
+{% include "common/tree_page_head.html" %}
 <script type="text/javascript"
         src="{{ url_for('static',filename='system/OPM/dialog/SelectChPsm.js',v='1.0.20220519') }}"></script>
 <body onload="pageLoad()">

@@ -1,7 +1,7 @@
 var currentNode;
-var currenttreeID = null;
-var currenttreeName = null;
-var sorgkindid = null;
+var currenttreeID = "";
+var currenttreeName = "";
+var sorgkindid = "";
 
 /* =========创建树========== */
 
@@ -44,9 +44,9 @@ var setting = {
 
 function afterRefresh(event) {
     currentNode = null;
-    currenttreeID = null;
-    currenttreeName = null;
-    sorgkindid = null;
+    currenttreeID = "";
+    currenttreeName = "";
+    sorgkindid = "";
     loadList();
 }
 
@@ -160,10 +160,7 @@ function loadList() {
 }
 
 function creat_dailogcallback(data) {
-    // MainJtree.refreshJtree("JtreeView");
-    // setTimeout(function () {
-    //     MainJtree.quickPosition(data);
-    // }, 1000)
+    MainJtree.refreshJtree("JtreeView");
     if (data && data != "") {
         MainJtree.quickPosition(data);
     } else {
@@ -282,10 +279,49 @@ function disassignPsmFn(data) {
                 null);
             if (r.state == true) {
                 layui.layer.alert("取消分配成功！");
-                loadList();
+                creat_dailogcallback(currenttreeID);// 操作完成刷新数据
             } else {
                 layui.layer.alert(r.msg);
             }
         }
     );
+}
+
+//设置所属部门
+function setMemberOrg(data) {
+    layui.layer.confirm("确认将【" + data.sname + "】的主部门设置为【" + currentNode.name + "】吗?", function () {
+        var param1 = new tlv8.RequestParam();
+        param1.set("rowid", data.sid);
+        tlv8.XMLHttpRequest("/system/OPM/organization/setMemberOrgAction", param1, "post", true,
+            function (r) {
+                if (r.state == true) {
+                    layui.layer.alert("设置成功！");
+                    loadList();
+                } else {
+                    alert(r.msg);
+                }
+            });
+    });
+}
+
+// 移动数据回调
+function dailogcallback(data, rowid) {
+    var param1 = new tlv8.RequestParam();
+    param1.set("rowid", rowid);
+    param1.set("orgID", data);
+    var r = tlv8.XMLHttpRequest("/system/OPM/organization/moveOrg", param1, "post", false, null);
+    if (r.state != true) {
+        layui.layer.alert(r.msg);
+        return;
+    }
+    creat_dailogcallback(data);
+}
+
+// 移动
+function moveOrg(data) {
+    tlv8.portal.dailog.openDailog('移动机构',
+        "/system/OPM/organization/moveOrg?rowid=" + data.sid, 400, 350,
+        function (rdata) {
+            dailogcallback(rdata, data.sid);
+        }, null);
 }
