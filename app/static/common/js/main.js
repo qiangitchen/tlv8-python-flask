@@ -2101,7 +2101,7 @@ tlv8.portal.dailog = {
             area: [Math.min(width, ww) + 'px', Math.min(height, hh) + 'px'],
             title: [name, 'font-size:18px;'],
             content: '<div id="dailogmsgDiv" style="width:99%;height:99%;overflow:hidden;border-top:1px solid #eee;border-bottom:1px solid #eee;"><iframe id="windowdialogIframe" frameborder="0" style="border:none;width:100%;height:100%;"></iframe></div>',
-            btn: ['确定', '取消'],
+            btn: itemSetInit == false ? [] : ['确定', '取消'],
             yes: function (index, layero) {
                 var dlw = J$("windowdialogIframe").contentWindow;
                 if (dlw.dailogEngin) {

@@ -1,0 +1,58 @@
+<html lang="zh_CN">
+{% include "common/form_page_head.html" %}
+<body>
+<table lay-filter="org_list" class="layui-table"
+       lay-data="{height:'full-20', url:'/system/OPM/orgList?parent={{ rowid }}&unself=true', page:true,limit:100, id:'org_list'}">
+    <thead>
+    <tr>
+        <th lay-data="{field:'scode', width:150}">编号</th>
+        <th lay-data="{field:'sname'}">名称</th>
+        <th lay-data="{fixed:'right', toolbar: '#actionBar', width: 230}">操作</th>
+    </tr>
+    </thead>
+</table>
+<script type="text/html" id="actionBar">
+    <a class="layui-btn layui-btn-xs" lay-event="top">置顶</a>
+    <a class="layui-btn layui-btn-xs" lay-event="up">上移</a>
+    <a class="layui-btn layui-btn-xs" lay-event="down">下移</a>
+    <a class="layui-btn layui-btn-xs" lay-event="bottom">最后</a>
+</script>
+</body>
+<script>
+    layui.use('table', function () {
+        var table = layui.table;
+
+        //监听行工具事件
+        table.on('tool(org_list)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'top') {
+                sortData(data, 'top');
+            }
+            if (obj.event === 'up') {
+                sortData(data, 'up');
+            }
+            if (obj.event === 'down') {
+                sortData(data, 'down');
+            }
+            if (obj.event === 'bottom') {
+                sortData(data, 'bottom');
+            }
+        });
+    });
+
+    function sortData(data, act) {
+        $.ajax({
+            url: "/system/OPM/organization/sortOrgs?parent={{ rowid }}",
+            type: "post",
+            async: true,
+            data: {'sid': data.sid, 'act': act},
+            dataType: "json",
+            success: function (re, textStatus) {
+                layui.table.reload('org_list', {
+                    url: '/system/OPM/orgList?parent={{ rowid }}&unself=true'
+                });
+            }
+        });
+    }
+</script>
+</html>

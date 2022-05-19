@@ -198,14 +198,18 @@ def org_list():
     page = request.args.get('page', 1, type=int)
     limit = request.args.get('limit', 16, type=int)
     parent = request.args.get('parent')
+    unself = request.args.get('unself')
     org_query = SAOrganization.query.filter(SAOrganization.scode != 'SYSTEM', SAOrganization.svalidstate > -1)
     if parent:
-        org_query = org_query.filter(or_(SAOrganization.sparent == parent, SAOrganization.sid == parent))
+        if unself:
+            org_query = org_query.filter(SAOrganization.sparent == parent)
+        else:
+            org_query = org_query.filter(or_(SAOrganization.sparent == parent, SAOrganization.sid == parent))
     else:
         org_query = org_query.filter(or_(SAOrganization.sparent.is_(None), SAOrganization.sid == ''))
     rdata['code'] = 0
     rdata['count'] = org_query.count()
-    page_data = org_query.paginate(page, limit)
+    page_data = org_query.order_by(SAOrganization.slevel.asc(), SAOrganization.ssequence.asc()).paginate(page, limit)
     row_data = list()
     no = 1
     for d in page_data.items:
@@ -339,3 +343,154 @@ def psm_edit():
     if not model:
         model = SAPerson(smainorgid=parent)
     return render_template("system/OPM/dialog/organ-psm-createpsm.html", form=form, model=model, org=org, nul2em=nul2em)
+
+
+# 机构排序
+@system.route("/OPM/organization/sortOrgs", methods=["GET", "POST"])
+@user_login
+def org_sort():
+    rowid = request.args.get('rowid')
+    if request.method == "POST":
+        rdata = dict()
+        act = request.form.get('act')
+        sid = request.form.get('sid')
+        org = SAOrganization.query.filter_by(sid=sid).first()
+        if org:
+            if act == 'up':
+                s = org.ssequence - 1
+                if s < 1:
+                    s = 1
+                org.ssequence = s
+            if act == 'top':
+                org.ssequence = 1
+            if act == 'down':
+                s = org.ssequence + 1
+                org.ssequence = s
+            if act == 'bottom':
+                s = SAOrganization.query.filter_by(sparent=org.sparent).count() + 1
+                org.ssequence = s
+            db.session.add(org)
+            db.session.commit()
+        rdata['state'] = True
+        return json.dumps(rdata, ensure_ascii=False)
+    return render_template("system/OPM/dialog/sortOrgs.html", rowid=rowid)
+
+
+# 重置密码
+@system.route("/OPM/organization/ResetPassword", methods=["GET", "POST"])
+@user_login
+def reset_password():
+    rdata = dict()
+    personid = request.form.get('personid')
+    person = SAPerson.query.filter_by(sid=personid).first()
+    if person:
+        person.spassword = md5_code('123456')  # 默认密码
+        db.session.add(person)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = '指定的人员id不存在！'
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 人员列表
+@system.route("/OPM/psmList", methods=["GET", "POST"])
+@user_login
+def psm_list():
+    rdata = dict()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 16, type=int)
+    spfid = request.args.get('spfid')
+    if spfid and spfid != "":
+        org_query = SAOrganization.query.filter(SAOrganization.sfid.like(spfid + '%'),
+                                                SAOrganization.sorgkindid == 'psm')
+    else:
+        org_query = SAOrganization.query.filter_by(sorgkindid='psm')
+    rdata['count'] = org_query.count()
+    page_data = org_query.order_by(SAOrganization.slevel.asc(), SAOrganization.ssequence.asc()).paginate(page, limit)
+    row_data = list()
+    no = 1
+    for d in page_data.items:
+        item = dict()
+        item['sid'] = d.sid
+        item['no'] = no + (page - 1) * limit
+        item['scode'] = d.scode
+        item['sname'] = d.sname
+        item['sdescription'] = d.sdescription
+        item['sfcode'] = d.sfcode
+        item['sfname'] = d.sfname
+        item['sparent'] = d.sparent
+        item['spersonid'] = d.spersonid
+        item['sorgkindid'] = d.sorgkindid
+        item['snodekind'] = d.snodekind
+        item['svalidstate'] = d.svalidstate
+        row_data.append(item)
+        no += 1
+    rdata['data'] = row_data
+    rdata['code'] = 0
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 选择人员（多选）
+@system.route("/OPM/organization/SelectChPsm")
+@user_login
+def select_ch_psm():
+    return render_template("system/OPM/dialog/SelectChPsm.html")
+
+
+# 分配人员
+@system.route("/OPM/organization/appendPersonMembers", methods=["POST"])
+@user_login
+def append_person_members():
+    rdata = dict()
+    orgId = url_decode(request.form.get('orgId'))
+    personIds = url_decode(request.form.get('personIds'))
+    parent_org = SAOrganization.query.filter_by(sid=orgId).first()
+    if len(personIds) < 1:
+        rdata['state'] = False
+        rdata['msg'] = '没有选择分配人员！'
+    else:
+        orgs = personIds.split(",")
+        for orgid in orgs:
+            org = SAOrganization.query.filter_by(sid=orgid).first()
+            if org:
+                if org.sparent == orgId:
+                    rdata['state'] = False
+                    rdata['msg'] = "[" + org.sname + "]已经在当前部门，不需要分配!"
+                    break
+                norg = SAOrganization(scode=org.scode, sname=org.sname, svalidstate=org.svalidstate,
+                                      sorgkindid=org.sorgkindid,
+                                      spersonid=org.spersonid)
+                norg.sid = org.spersonid + '@' + orgId
+                norg.sfid = parent_org.sfid + '/' + org.sid + '.psm'
+                norg.sfcode = parent_org.sfcode + '/' + org.scode
+                norg.sfname = parent_org.sfname + '/' + org.sname
+                norg.snodekind = 'nkLimb'
+                norg.sparent = orgId
+                norg.slevel = parent_org.slevel + 1
+                db.session.add(norg)
+        db.session.commit()
+        rdata['state'] = True
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 取消分配
+@system.route("/OPM/organization/disassignPsmAction", methods=["GET", "POST"])
+@user_login
+def disassign_psm():
+    rdata = dict()
+    rowid = url_decode(request.form.get('rowid'))
+    org = SAOrganization.query.filter_by(sid=rowid).first()
+    if org:
+        if org.snodekind == 'nkLimb':
+            db.session.delete(org)
+            db.session.commit()
+            rdata['state'] = True
+        else:
+            rdata['state'] = False
+            rdata['msg'] = '人员并非分配的人员，不能取消分配！'
+    else:
+        rdata['state'] = False
+        rdata['msg'] = '指定的id不存在！'
+    return json.dumps(rdata, ensure_ascii=False)

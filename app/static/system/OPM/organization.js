@@ -160,10 +160,15 @@ function loadList() {
 }
 
 function creat_dailogcallback(data) {
-    MainJtree.refreshJtree("JtreeView");
-    setTimeout(function () {
+    // MainJtree.refreshJtree("JtreeView");
+    // setTimeout(function () {
+    //     MainJtree.quickPosition(data);
+    // }, 1000)
+    if (data && data != "") {
         MainJtree.quickPosition(data);
-    }, 1000)
+    } else {
+        loadList();
+    }
 }
 
 function editOrgData(data) {
@@ -194,17 +199,93 @@ function newognData(type) {
 
 // 新增、编辑人员信息回调
 function creatPsm_dailogcallback(data) {
-    //MainJtree.refreshJtree("JtreeView");
-    setTimeout(function () {
-        MainJtree.quickPosition(currenttreeID);
-    }, 1000)
+    MainJtree.quickPosition(currenttreeID);
 }
 
 //添加人员
 function newPsmData() {
+    hideMenu();
     tlv8.portal.dailog
         .openDailog('添加人员',
             "/system/OPM/organization/psm_edit?parent="
             + currenttreeID + "&operator=new",
             700, 490, creatPsm_dailogcallback);
+}
+
+// 排序
+function sortOrgAction() {
+    var rowid = currenttreeID;
+    if (!rowid || rowid == "") {
+        layui.layer.alert("未选中数据!");
+        return;
+    }
+    tlv8.portal.dailog.openDailog('机构排序',
+        "/system/OPM/organization/sortOrgs?rowid=" + rowid, 600, 450, creat_dailogcallback);
+}
+
+// 重置密码
+function resetPassword(data) {
+    if (data.sorgkindid != 'psm') {
+        layui.layer.alert("当前行的数据不是人员，不能重置密码！");
+        return;
+    }
+    layui.layer.confirm("确定将该用户密码设置为初始密码吗?", function () {
+        var param = new tlv8.RequestParam();
+        param.set("personid", data.spersonid);
+        var r = tlv8.XMLHttpRequest("/system/OPM/organization/ResetPassword", param,
+            "post", false, null);
+        if (r.state == true) {
+            layui.layer.alert("密码重置成功！");
+        } else {
+            layui.layer.alert(r.msg);
+        }
+    });
+}
+
+// 分配人员
+function assignPsmData() {
+    hideMenu();
+    tlv8.portal.dailog.openDailog('分配人员',
+        "/system/OPM/organization/SelectChPsm?rowid="
+        + currenttreeID, 800, 700, assign_dailogcallback);
+}
+
+function assign_dailogcallback(data) {
+    var param = new tlv8.RequestParam();
+    param.set("orgId", currenttreeID);
+    param.set("personIds", data.id);
+    tlv8.XMLHttpRequest("/system/OPM/organization/appendPersonMembers", param, "post", true, function (
+        r) {
+        if (r.state == true) {
+            layui.layer.msg("操作成功!");
+            creat_dailogcallback(currenttreeID);// 分配完成刷新数据
+        } else {
+            layui.layer.alert(r.msg);
+        }
+    });
+}
+
+// 取消人员分配
+function disassignPsmFn(data) {
+    if (data.sorgkindid != 'psm') {
+        layui.layer.alert("当前行的数据不是人员，不能取消分配！");
+        return;
+    }
+    if (data.snodekind != 'nkLimb') {
+        layui.layer.alert("当前人员并非分配的人员，不能取消分配！");
+        return;
+    }
+    layui.layer.confirm("取消后不能恢复，确认取消吗?", function () {
+            var param = new tlv8.RequestParam();
+            param.set("rowid", data.sid);
+            var r = tlv8.XMLHttpRequest("/system/OPM/organization/disassignPsmAction", param, "post", false,
+                null);
+            if (r.state == true) {
+                layui.layer.alert("取消分配成功！");
+                loadList();
+            } else {
+                layui.layer.alert(r.msg);
+            }
+        }
+    );
 }

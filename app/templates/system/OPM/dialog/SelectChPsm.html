@@ -1,0 +1,61 @@
+<html lang="zh_CN">
+{% include "common/form_page_head.html" %}
+<link type="text/css" rel="stylesheet"
+      href="{{ url_for('static',filename='common/css/zTreeStyle/zTreeStyle.css') }}"></link>
+<link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='common/css/toolbar.main.css') }}"></link>
+<script type="text/javascript"
+        src="{{ url_for('static',filename='common/js/jquery/jquery.ztree.core-3.1.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static',filename='common/jTree/tree.main.js') }}"></script>
+<script type="text/javascript"
+        src="{{ url_for('static',filename='system/OPM/dialog/SelectChPsm.js',v='1.0.20220519') }}"></script>
+<body onload="pageLoad()">
+<div class="layui-row">
+    <div class="layui-col-sm4">
+        <div style="width:100%; height:100%; overflow: hidden;">
+            <ul id="JtreeView" class="ztree"></ul>
+        </div>
+    </div>
+    <div class="layui-col-sm8">
+        <table lay-filter="psmlist" class="layui-table" id="psmlist"
+               lay-data="{height:'full-180', url:'/system/OPM/psmList', page:true,limit:10, id:'psmlist'}">
+            <thead>
+            <tr>
+                <th lay-data="{checkbox:true}"></th>
+                <th lay-data="{field:'scode', width:150}">编号</th>
+                <th lay-data="{field:'sname'}">姓名</th>
+            </tr>
+            </thead>
+        </table>
+        <div style="height:150px;border: 1px solid #eeeeee;">
+            <div style="width:100%;height:30px; line-height: 30px; background:url({{ url_for('static',filename='common/image/toolbar/templete/d_5.gif') }}) repeat-x;">
+                &nbsp;&nbsp;
+                选择列表：
+                &nbsp;&nbsp;
+                <a href="javascript:void(0);" title="单个删除" onclick="deleteBills()">
+                    <img src="{{ url_for('static',filename='common/image/toolbar/templete/reset.gif') }}"></img>单个删除
+                </a>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="javascript:void(0);" title="全部清除" onclick="deleteAll()">
+                    <img src="{{ url_for('static',filename='common/image/toolbar/templete/reset_all.gif') }}"></img>全部清除
+                </a>
+            </div>
+            <span id="Chtext">
+            </span>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    layui.table.on('checkbox(psmlist)', function (obj) {
+        //console.log(obj); //当前行的一些常用操作集合
+        //console.log(obj.checked); //当前是否选中状态
+        //console.log(obj.data); //选中行的相关数据
+        //console.log(obj.type); //如果触发的是全选，则为：all，如果触发的是单选，则为：one
+        if (obj.type == 'one') {
+            gridChecked(obj.data, obj.checked);
+        } else {
+            gridCheckedAll(obj.checked);
+        }
+    });
+</script>
+</html>
