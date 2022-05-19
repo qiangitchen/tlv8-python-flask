@@ -4,10 +4,10 @@ from . import system
 from flask import session, redirect, url_for, render_template, request
 from sqlalchemy import or_, and_, not_
 from app import db
-from app.sa.forms import LoginForm, OrgForm
+from app.sa.forms import LoginForm, OrgForm, PersonForm
 from app.sa.models import SAOrganization, SAPerson, SALogs
 from app.menus.menuutils import get_process_name, get_process_full
-from app.common.pubstatic import url_decode, create_icon, nul2em
+from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code
 from app.sa.persons import get_person_info
 from app.sa.onlineutils import set_online, clear_online
 from functools import wraps
@@ -201,6 +201,8 @@ def org_list():
     org_query = SAOrganization.query.filter(SAOrganization.scode != 'SYSTEM', SAOrganization.svalidstate > -1)
     if parent:
         org_query = org_query.filter(or_(SAOrganization.sparent == parent, SAOrganization.sid == parent))
+    else:
+        org_query = org_query.filter(or_(SAOrganization.sparent.is_(None), SAOrganization.sid == ''))
     rdata['code'] = 0
     rdata['count'] = org_query.count()
     page_data = org_query.paginate(page, limit)
@@ -276,6 +278,64 @@ def org_edit():
             db.session.commit()
         rdata['state'] = True
         return json.dumps(rdata, ensure_ascii=False)
+    parent = request.args.get('parent')
     if not model:
-        model = SAOrganization(slevel=0, ssequence=1)
+        model = SAOrganization(slevel=0, ssequence=1, sparent=parent)
     return render_template("system/OPM/dialog/organ-org-createorg.html", form=form, model=model, nul2em=nul2em)
+
+
+# 人员编辑/添加
+@system.route("/OPM/organization/psm_edit", methods=["GET", "POST"])
+@user_login
+def psm_edit():
+    gridrowid = request.args.get('gridrowid', '')
+    org = SAOrganization.query.filter_by(sid=gridrowid).first()
+    parent = request.args.get('parent')
+    form = PersonForm()
+    if form.validate_on_submit():
+        rdata = dict()
+        data = form.data
+        parent_org = SAOrganization.query.filter_by(sid=parent).first()
+        person = SAPerson.query.filter_by(sid=data['sid']).first()
+        if not org:
+            org = SAOrganization(sparent=parent_org.sid, sorgkindid='psm')
+            person = SAPerson(smainorgid=parent, spassword=md5_code('123456'))  # 默认密码
+            person_check = SAPerson.query.filter_by(scode=data['scode']).first()
+            if person_check:
+                rdata['state'] = False
+                rdata['msg'] = '编号为：“' + data['scode'] + '”的用户已经存在！'
+                return json.dumps(rdata, ensure_ascii=False)
+        else:
+            parent_org = SAOrganization.query.filter_by(sid=org.sparent).first()
+        try:
+            person.scode = data['scode']
+            person.sname = data['sname']
+            person.sloginname = data['sloginname']
+            person.ssex = data['ssex']
+            person.smobilephone = data['smobilephone']
+            person.sbirthday = data['sbirthday']
+            person.smail = data['smail']
+            person.scasn = data['scasn']
+            person.sdescription = data['sdescription']
+            db.session.add(person)
+            db.session.commit()
+            org.sid = person.sid + '@' + parent_org.sid
+            org.spersonid = person.sid
+            org.sfid = parent_org.sfid + '/' + person.sid + '@' + parent_org.sid + '.psm'
+            org.scode = person.scode
+            org.sfcode = parent_org.sfcode + '/' + person.scode
+            org.sname = person.sname
+            org.sfname = parent_org.sfname + '/' + person.sname
+            db.session.add(org)
+            db.session.commit()
+            rdata['state'] = True
+        except Exception as e:
+            print(e)
+            rdata['state'] = False
+            rdata['msg'] = '保存到数据库时异常!'
+        return json.dumps(rdata, ensure_ascii=False)
+    personid = request.args.get('personid', '')
+    model = SAPerson.query.filter_by(sid=personid).first()
+    if not model:
+        model = SAPerson(smainorgid=parent)
+    return render_template("system/OPM/dialog/organ-psm-createpsm.html", form=form, model=model, org=org, nul2em=nul2em)

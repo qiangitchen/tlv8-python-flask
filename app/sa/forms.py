@@ -1,7 +1,7 @@
 # _*_ coding: utf-8 _*_
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, FileField, TextAreaField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, RadioField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Email, Regexp, EqualTo, ValidationError
 
 
@@ -134,6 +134,99 @@ class OrgForm(FlaskForm):
     )
     saddress = StringField(
         description="地址",
+        render_kw={
+            "class": "layui-input",
+            "type": "text"
+        }
+    )
+    sdescription = TextAreaField(
+        description="描述",
+        render_kw={
+            "class": "layui-textarea",
+            "style": "min-height:80px;"
+        }
+    )
+    submit = SubmitField(
+        '提交保存',
+        render_kw={
+            "class": "layui-btn",
+            "lay-submit": "",
+            "lay-filter": "mainform"
+        }
+    )
+
+
+# 人员表单
+class PersonForm(FlaskForm):
+    sid = StringField(
+        render_kw={
+            "style": "display:none",
+        }
+    )
+    smainorgid = StringField(
+        render_kw={
+            "style": "display:none",
+        }
+    )
+    scode = StringField(
+        validators=[
+            DataRequired("编号不能为空！")
+        ],
+        description="编号",
+        render_kw={
+            "class": "layui-input",
+            "lay-verify": "required",
+            "type": "text",
+            "placeholder": "请输入编号！",
+        }
+    )
+    sname = StringField(
+        validators=[
+            DataRequired("名称不能为空！")
+        ],
+        description="名称",
+        render_kw={
+            "class": "layui-input",
+            "lay-verify": "required",
+            "type": "text",
+            "placeholder": "请输入名称！",
+        }
+    )
+    sloginname = StringField(
+        description="登录名",
+        render_kw={
+            "class": "layui-input",
+            "type": "text"
+        }
+    )
+    ssex = SelectField(
+        label="性别",
+        choices=[('', '请选择'), ('男', '男'), ('女', '女')]
+    )
+    sbirthday = StringField(
+        description="生日",
+        render_kw={
+            "class": "layui-input Wdate",
+            "type": "text",
+            "onClick": "WdatePicker({dateFmt:'yyyy-MM-dd'})"
+        }
+    )
+    smobilephone = StringField(
+        description="手机号",
+        render_kw={
+            "class": "layui-input",
+            "type": "text"
+        }
+    )
+    smail = StringField(
+        description="邮箱",
+        render_kw={
+            "class": "layui-input",
+            "type": "text"
+        }
+    )
+    scasn = StringField(
+        description="CA编号",
         render_kw={
             "class": "layui-input",
             "type": "text"

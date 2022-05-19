@@ -1,14 +1,7 @@
-var addOrgItem, deleteUserItem, refreshUserItem, disableUserItem, ableUserItem, moveOrgItem, viewOrg, sortOrgItem;// 新增，删除，禁用，启用，移动按钮，显示机构
 var currentNode;
-var currentgrid = null;
 var currenttreeID = null;
 var currenttreeName = null;
 var sorgkindid = null;
-var scode = null;
-var sfname = null;
-var sfcode = null;
-var sparent = null;
-var sfid = null;
 
 /* =========创建树========== */
 
@@ -54,11 +47,6 @@ function afterRefresh(event) {
     currenttreeID = null;
     currenttreeName = null;
     sorgkindid = null;
-    scode = null;
-    sfname = null;
-    sfcode = null;
-    sfid = null;
-    sparent = null;
     loadList();
 }
 
@@ -68,11 +56,6 @@ function beforeClick(treeId, treeNode) {
     currenttreeID = treeNode.id;
     currenttreeName = treeNode.name;
     sorgkindid = treeNode.sorgkindid;
-    scode = treeNode.scode;
-    sfname = treeNode.sfname;
-    sfcode = treeNode.sfcode;
-    sfid = treeNode.sfid;
-    sparent = treeNode.parent;
     if ("org" == sorgkindid || sorgkindid == "ogn") {
         $(".buttnew").removeAttr("disabled");
     }
@@ -180,29 +163,24 @@ function creat_dailogcallback(data) {
     MainJtree.refreshJtree("JtreeView");
     setTimeout(function () {
         MainJtree.quickPosition(data);
-    }, 300)
+    }, 1000)
 }
 
 function editOrgData(data) {
     var rowid = data.sid;
     var SORGKINDID = data.sorgkindid;
-    var SPARENT = data.sparent;
     var SPERSONID = data.spersonid;
     if (SORGKINDID == "psm") {
         tlv8.portal.dailog
             .openDailog('人员信息',
-                "/SA/OPM/organization/dialog/organ-psm-createpsm.html?gridrowid="
-                + rowid + "&name=" + currenttreeName
-                + "&scode=" + scode + "&sfname="
-                + J_u_encode(sfname) + "&sfcode=" + sfcode
-                + "&SPERSONID=" + SPERSONID + "&operator=edit",
-                800, 490, creatPsm_dailogcallback, null);
+                "/system/OPM/organization/psm_edit?gridrowid="
+                + rowid + "&personid=" + SPERSONID + "&operator=edit",
+                800, 490, creatPsm_dailogcallback);
     } else {
         tlv8.portal.dailog.openDailog('机构管理',
             "/system/OPM/organization/org_edit?gridrowid="
-            + rowid + "&name=" + currenttreeName + "&sparent="
-            + SPARENT + "&operator=edit", 700, 500,
-            creat_dailogcallback, null);
+            + rowid + "&operator=edit", 700, 500,
+            creat_dailogcallback);
     }
 }
 
@@ -210,10 +188,23 @@ function editOrgData(data) {
 function newognData(type) {
     hideMenu();
     tlv8.portal.dailog.openDailog('新建组织',
-        "/system/OPM/organization/org_edit?rowid="
-        + currenttreeID + "&name=" + J_u_encode(currenttreeName)
-        + "&scode=" + scode + "&sfname=" + J_u_encode(sfname)
-        + "&sfcode=" + sfcode + "&sparent=" + sparent
-        + "&type=" + type + "&sfid=" + sfid, 700, 500, creat_dailogcallback,
-        null);
+        "/system/OPM/organization/org_edit?parent=" + currenttreeID + "&type=" + type,
+        700, 500, creat_dailogcallback);
+}
+
+// 新增、编辑人员信息回调
+function creatPsm_dailogcallback(data) {
+    //MainJtree.refreshJtree("JtreeView");
+    setTimeout(function () {
+        MainJtree.quickPosition(currenttreeID);
+    }, 1000)
+}
+
+//添加人员
+function newPsmData() {
+    tlv8.portal.dailog
+        .openDailog('添加人员',
+            "/system/OPM/organization/psm_edit?parent="
+            + currenttreeID + "&operator=new",
+            700, 490, creatPsm_dailogcallback);
 }

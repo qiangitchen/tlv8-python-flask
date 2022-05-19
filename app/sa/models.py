@@ -42,13 +42,15 @@ class SAPerson(db.Model):
     sloginname = db.Column(db.String(64))  # 登录名（默认用scode）-可用于中文登录，不能重复
     spassword = db.Column(db.String(64))  # 密码
     ssequence = db.Column(db.Integer)  # 排序序号
-    svalidstate = db.Column(db.Integer)  # 状态（0：禁用，1：正常，-1：删除）
+    svalidstate = db.Column(db.Integer, default=1)  # 状态（0：禁用，1：正常，-1：删除）
     smainorgid = db.Column(db.String(64), nullable=False)  # 所属机构
     sdescription = db.Column(db.String(2048))  # 描述
     ssex = db.Column(db.String(10))  # 性别
-    sbirthday = db.Column(db.Date)  # 生日
-    fcasn = db.Column(db.String(100))  # CA编号
-    fsignm = db.Column(db.String(100))  # 签名
+    sbirthday = db.Column(db.String(20))  # 生日
+    smobilephone = db.Column(db.String(20))  # 手机号
+    smail = db.Column(db.String(50))  # 邮箱
+    scasn = db.Column(db.String(100))  # CA编号
+    ssignm = db.Column(db.String(100))  # 签名
     version = db.Column(db.Integer, nullable=False, default=0)  # 版本号
 
 

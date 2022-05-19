@@ -1,7 +1,7 @@
 <html lang="zh_CN">
 {% include "common/form_page_head.html" %}
 <script type="text/javascript"
-        src="{{ url_for('static',filename='system/OPM/dialog/organ-org-createorg.js') }}"></script>
+        src="{{ url_for('static',filename='system/OPM/dialog/organ-psm-createpsm.js') }}"></script>
 <body onload="initDialog()" style="overflow: hidden;">
 <div class="layui-fluid" style="padding-top: 20px;">
     <div class="layui-card">
@@ -9,7 +9,7 @@
             <form id="org_create_form" class="layui-form">
                 <div style="display: none;">
                     {{ form.sid(value=model.sid) }}
-                    {{ form.sparent(value=model.sparent) }}
+                    {{ form.smainorgid(value=model.smainorgid) }}
                 </div>
                 <div class="layui-form-item">
                     <div class="layui-inline">
@@ -19,50 +19,52 @@
                         </div>
                     </div>
                     <div class="layui-inline">
-                        <label class="layui-form-label">类型</label>
+                        <label class="layui-form-label">名称</label>
                         <div class="layui-input-inline">
-                            {{ form.sorgkindid(value=model.sorgkindid) }}
-                        </div>
-                    </div>
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">名称</label>
-                    <div class="layui-input-block" style="margin-left:80px;">
-                        {{ form.sname(value=nul2em(model.sname)) }}
-                    </div>
-                </div>
-                <div class="layui-form-item" style="display: none;">
-                    <div class="layui-inline">
-                        <label class="layui-form-label">层级</label>
-                        <div class="layui-input-inline">
-                            {{ form.slevel(value=model.slevel) }}
-                        </div>
-                    </div>
-                    <div class="layui-inline">
-                        <label class="layui-form-label">序号</label>
-                        <div class="layui-input-inline">
-                            {{ form.ssequence(value=model.ssequence) }}
+                            {{ form.sname(value=nul2em(model.sname)) }}
                         </div>
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <div class="layui-inline">
-                        <label class="layui-form-label">电话</label>
+                        <label class="layui-form-label">登录名</label>
                         <div class="layui-input-inline">
-                            {{ form.sphone(value=nul2em(model.sphone)) }}
+                            {{ form.sloginname(value=nul2em(model.sloginname)) }}
                         </div>
                     </div>
                     <div class="layui-inline">
-                        <label class="layui-form-label">传真</label>
+                        <label class="layui-form-label">性别</label>
                         <div class="layui-input-inline">
-                            {{ form.sfax(value=nul2em(model.sfax)) }}
+                            {{ form.ssex(value=nul2em(model.ssex)) }}
                         </div>
                     </div>
                 </div>
                 <div class="layui-form-item">
-                    <label class="layui-form-label">地址</label>
-                    <div class="layui-input-block" style="margin-left:80px;">
-                        {{ form.saddress(value=nul2em(model.saddress)) }}
+                    <div class="layui-inline">
+                        <label class="layui-form-label">手机号</label>
+                        <div class="layui-input-inline">
+                            {{ form.smobilephone(value=nul2em(model.smobilephone)) }}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">生日</label>
+                        <div class="layui-input-inline">
+                            {{ form.sbirthday(value=nul2em(model.sbirthday)) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">邮箱</label>
+                        <div class="layui-input-inline">
+                            {{ form.smail(value=nul2em(model.smail)) }}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">CA编号</label>
+                        <div class="layui-input-inline">
+                            {{ form.scasn(value=nul2em(model.scasn)) }}
+                        </div>
                     </div>
                 </div>
                 <div class="layui-form-item">
