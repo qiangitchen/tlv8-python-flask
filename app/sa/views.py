@@ -630,22 +630,21 @@ def recycled():
         rdata = dict()
         action = url_decode(request.form.get('action'))
         rowids = url_decode(request.form.get('rowids'))
-        print(rowids)
-        if action == 'reduction':
+        if action == 'reduction':  # 还原
             for rowid in rowids.split(","):
                 org = SAOrganization.query.filter_by(sid=rowid).first()
                 if org:
                     child_org = SAOrganization.query.filter(SAOrganization.sfid.like(org.sfid + '%')).all()
                     for o in child_org:
                         if o.sorgkindid == 'psm':
+                            person = SAPerson.query.filter_by(smainorgid=o.sparent).first()
                             if person:
-                                person = SAPerson.query.filter_by(smainorgid=o.sparent).first()
                                 person.svalidstate = 1
                                 db.session.add(person)
                         o.svalidstate = 1
                         db.session.add(o)
                     db.session.commit()
-        elif action == 'delete':
+        elif action == 'delete':  # 删除数据
             for rowid in rowids.split(","):
                 org = SAOrganization.query.filter_by(sid=rowid).first()
                 if org:
@@ -659,15 +658,15 @@ def recycled():
                     db.session.commit()
         rdata['state'] = True
         return json.dumps(rdata, ensure_ascii=False)
-
-    page = request.args.get('page', 1, type=int)
-    limit = request.args.get('limit', 90, type=int)
+    # 加载数据到页面==
     org_query = SAOrganization.query.filter_by(svalidstate=-1)
     search_text = url_decode(request.args.get('search_text', ''))
     if search_text and search_text != '':
         org_query = org_query.filter(or_(SAOrganization.scode.ilike('%' + search_text + '%'),
                                          SAOrganization.sname.ilike('%' + search_text + '%')))
     count = org_query.count()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
     page_data = org_query.order_by(SAOrganization.slevel.asc(), SAOrganization.ssequence.asc()).paginate(page, limit)
     return render_template("system/OPM/recycled.html", count=count, page=page, limit=limit,
                            page_data=page_data, search_text=search_text,

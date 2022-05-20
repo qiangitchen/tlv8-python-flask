@@ -54,6 +54,7 @@
         {% endfor %}
         </tbody>
     </table>
+    <div id="data_list_page"></div>
 </div>
 </body>
 <script>
@@ -84,16 +85,16 @@
             });
     }
 
-    layui.use('table', function () {
+    layui.use(['table', 'laypage'], function () {
         var table = layui.table;
+        var laypage = layui.laypage;
+        //初始化数据表格
         table.init('datalist',
             {
                 toolbar: '#list_toolbar',
                 defaultToolbar: ['exports'],
-                height: 'full-20',
-                page: true,
-                limit: {{ limit }},
-                count: {{ count }}
+                height: 'full-80',
+                page: false
             }
         );
         //头工具栏事件
@@ -111,13 +112,30 @@
                     });
                     break;
                 case 'quickQuery':
-                    window.location.href = "/system/OPM/recycled?search_text=" + $("#query_text").val();
+                    window.location.href = "/system/OPM/recycled?search_text=" + J_u_encode($("#query_text").val());
                     break;
             }
         });
         $("#query_text").keyup(function (event) {
             if (event.keyCode == 13) {
-                window.location.href = "/system/OPM/recycled?search_text=" + $("#query_text").val();
+                window.location.href = "/system/OPM/recycled?search_text=" + J_u_encode($("#query_text").val());
+            }
+        });
+        //执行一个laypage实例
+        laypage.render({
+            elem: 'data_list_page', //注意，这里的ID，不用加 # 号
+            count: {{ count }}, //数据总数，从服务端得到
+            limit: {{ limit }}, //每页行数
+            limits: [10, 20, 30, 40, 50],
+            curr: {{ page }}, //当前页码
+            jump: function (obj, first) {
+                //obj包含了当前分页的所有参数，比如：
+                //console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
+                //console.log(obj.limit); //得到每页显示的条数
+                //首次不执行
+                if (!first) {
+                    window.location.href = "/system/OPM/recycled?page=" + obj.curr + "&limit=" + obj.limit + "&search_text=" + J_u_encode($("#query_text").val());
+                }
             }
         });
     });
