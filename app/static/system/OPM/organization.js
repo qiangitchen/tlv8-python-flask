@@ -101,23 +101,41 @@ var MainJtree = new Jtree();
 
 function pageLoad() {
     MainJtree.init("JtreeView", setting, param);
+    layui.table.render({
+        elem: '#orglist'
+        , url: '/system/OPM/orgList'
+        , toolbar: '#list_toolbar'
+        , height: 'full-100'
+        , defaultToolbar: ['exports']
+        , cols: [[
+            {field: 'sid', title: 'ID', hide: true}
+            , {field: 'no', title: '序号', width: 60, unresize: true, align: 'center'}
+            , {field: 'scode', title: '编号', width: 80}
+            , {field: 'sname', title: '名称', width: 150}
+            , {field: 'sdescription', title: '描述'}
+            , {field: 'sfcode', title: '全编号', width: 200}
+            , {field: 'sfname', title: '全名称', width: 200}
+            , {fixed: 'right', title: '操作', toolbar: '#actionBar', width: 490}
+        ]]
+        , limit: 20
+        , even: true
+        , page: true
+    });
+    $("#query_text").keyup(function (event) {
+        if (event.keyCode == 13) {
+            loadList();
+        }
+    });
 }
 
-// 获取弹出菜单的位置
-var count = 0;
-
+// 弹出菜单
 function addorgitem() {
-    count++;
     var aNode = $("#addOrgItem");
     // 找到当前节点的位置
     var offset = aNode.offset();
     // 设置弹出框的位置
     $("#showdivt").css({"left": offset.left, "top": (offset.top + 40), "z-index": 9999}).slideDown("fast");
-    // .slideDown("fast");
     $("body").bind("mousedown", onBodyDown);
-    // if (count % 2 == 0) {
-    // hideMenu();
-    // }
 }
 
 // 隐藏树
@@ -134,28 +152,16 @@ function onBodyDown(event) {
 }
 
 function loadList() {
-    var url = '/system/OPM/orgList';
+    var url = '/system/OPM/orgList?t=' + new Date().getTime();
     if (currenttreeID && currenttreeID !== '') {
-        url += "?parent=" + currenttreeID;
+        url += "&parent=" + currenttreeID;
     }
-    layui.table.render({
-        elem: '#orglist'
-        , url: url
-        , toolbar: '#list_toolbar'
-        , height: 'full-100'
-        , defaultToolbar: ['exports']
-        , cols: [[
-            {field: 'sid', title: 'ID', hide: true}
-            , {field: 'no', title: '序号', width: 60, unresize: true, align: 'center'}
-            , {field: 'scode', title: '编号', width: 80}
-            , {field: 'sname', title: '名称', width: 150}
-            , {field: 'sdescription', title: '描述'}
-            , {field: 'sfcode', title: '全编号', width: 200}
-            , {field: 'sfname', title: '全名称', width: 200}
-            , {fixed: 'right', title: '操作', toolbar: '#actionBar', width: 490}
-        ]]
-        , even: true
-        , page: true
+    var searchText = $("#query_text").val();
+    if (searchText && searchText != "") {
+        url += "&search_text=" + J_u_encode(searchText);
+    }
+    layui.table.reload('orglist', {
+        url: url
     });
 }
 
@@ -324,4 +330,49 @@ function moveOrg(data) {
         function (rdata) {
             dailogcallback(rdata, data.sid);
         }, null);
+}
+
+//改变“启用和禁用”状态
+function changeOrgAble(data) {
+    if (data.svalidstate == "1") {
+        layui.layer.confirm("禁用该组织，组织下的所有用户将不能使用系统，确定禁用吗?", function () {
+            changeOrgAbleAction(data.sid, "0");
+        });
+    } else {
+        layui.layer.confirm("启用该组织，组织下的所有用户都会被启用，确定启用吗?", function () {
+            changeOrgAbleAction(data.sid, "1");
+        });
+    }
+}
+
+function changeOrgAbleAction(rowid, state) {
+    var pam = new tlv8.RequestParam();
+    pam.set("rowid", rowid);
+    pam.set("state", state);
+    tlv8.XMLHttpRequest("/system/OPM/organization/changeOrgAble", pam, "post", true,
+        function (r) {
+            if (r.state == false) {
+                layui.layer.alert(r.msg);
+            } else {
+                layui.layer.alert("操作成功!");
+                loadList();
+            }
+        });
+}
+
+//删除（逻辑删除）
+function deleteorgitem(data) {
+    layui.layer.confirm("删除组织将会删除组织下的所有机构及人员信息。\n已删除组织可在回收站中查询，回收站删除将彻底删除。\n确认删除吗?", function () {
+        var pam = new tlv8.RequestParam();
+        pam.set("rowid", data.sid);
+        tlv8.XMLHttpRequest("/system/OPM/organization/deleteOrgLogic", pam, "post", false,
+            function (r) {
+                if (r.state == false) {
+                    layui.layer.alert(r.msg);
+                } else {
+                    layui.layer.alert("操作成功!");
+                    creat_dailogcallback(currenttreeID);// 操作完成刷新数据
+                }
+            });
+    });
 }

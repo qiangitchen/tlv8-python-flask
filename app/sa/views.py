@@ -7,9 +7,10 @@ from app import db
 from app.sa.forms import LoginForm, OrgForm, PersonForm
 from app.sa.models import SAOrganization, SAPerson, SALogs
 from app.menus.menuutils import get_process_name, get_process_full
-from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code
+from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, get_org_type
 from app.sa.persons import get_person_info
 from app.sa.onlineutils import set_online, clear_online
+from app.sa.orgutils import can_move_to, up_child_org_path
 from functools import wraps
 import json
 
@@ -198,7 +199,7 @@ def org_quick_tree():
 def org_list():
     rdata = dict()
     page = request.args.get('page', 1, type=int)
-    limit = request.args.get('limit', 16, type=int)
+    limit = request.args.get('limit', 20, type=int)
     parent = request.args.get('parent')
     unself = request.args.get('unself')
     org_query = SAOrganization.query.filter(SAOrganization.scode != 'SYSTEM', SAOrganization.svalidstate > -1)
@@ -209,6 +210,10 @@ def org_list():
             org_query = org_query.filter(or_(SAOrganization.sparent == parent, SAOrganization.sid == parent))
     else:
         org_query = org_query.filter(or_(SAOrganization.sparent.is_(None), SAOrganization.sid == ''))
+    search_text = request.args.get('search_text')
+    if search_text:
+        org_query = org_query.filter(or_(SAOrganization.scode.ilike('%' + search_text + '%'),
+                                         SAOrganization.sname.ilike('%' + search_text + '%')))
     rdata['code'] = 0
     rdata['count'] = org_query.count()
     page_data = org_query.order_by(SAOrganization.slevel.asc(), SAOrganization.ssequence.asc()).paginate(page, limit)
@@ -535,9 +540,136 @@ def set_member_org():
 def move_org():
     if request.method == "POST":
         rdata = dict()
-        rowid = request.form.get('rowid')
-        orgID = request.form.get('orgID')
-        rdata['state'] = False
-        rdata['msg'] = '指定的id不存在！'
+        rowid = url_decode(request.form.get('rowid'))
+        org_id = url_decode(request.form.get('orgID'))
+        from_org = SAOrganization.query.filter_by(sid=rowid).first()
+        to_org = SAOrganization.query.filter_by(sid=org_id).first()
+        if from_org and to_org:
+            state, msg = can_move_to(from_org, to_org)
+            if state:
+                if from_org.sorgkindid == 'psm':  # 如果是人员类型需要更新主键，需要特殊处理。
+                    new_org_id = from_org.spersonid + '@' + to_org.sid
+                    db.session.execute('update sa_oporg set sid = :nid_  where sid = :sid_',
+                                       {'nid_': new_org_id, 'sid_': from_org.sid})
+                    db.session.commit()
+                    from_org = SAOrganization.query.filter_by(sid=new_org_id).first()
+                    if from_org.snodekind != 'nkLimb':  # 如果不是挂载的人员需要更新人员表的机构id
+                        person = SAPerson.query.filter_by(sid=from_org.spersonid)
+                        person.smainorgid = to_org.sid
+                        db.session.add(person)
+                from_org.sparent = to_org.sid
+                from_org.sfid = to_org.sfid + '/' + from_org.sid + '.' + from_org.sorgkindid
+                from_org.sfcode = to_org.sfcode + '/' + from_org.scode
+                from_org.sfname = to_org.sfname + '/' + from_org.sname
+                db.session.add(from_org)
+                db.session.commit()
+                if from_org.sorgkindid != 'psm':  # 如果移动的不是人员需要更新下属组织的路径
+                    up_child_org_path(from_org)
+                rdata['state'] = True
+            else:
+                rdata['state'] = False
+                rdata['msg'] = msg
+        else:
+            rdata['state'] = False
+            rdata['msg'] = '指定的id不存在！'
         return json.dumps(rdata, ensure_ascii=False)
     return render_template("system/OPM/dialog/moveOrg.html")
+
+
+# 启用/禁用组织
+@system.route("/OPM/organization/changeOrgAble", methods=["GET", "POST"])
+@user_login
+def change_org_able():
+    rdata = dict()
+    rowid = url_decode(request.form.get('rowid'))
+    state = url_decode(request.form.get('state'))
+    org = SAOrganization.query.filter_by(sid=rowid).first()
+    if org:
+        child_org = SAOrganization.query.filter(SAOrganization.sfid.like(org.sfid + '%')).all()
+        for o in child_org:
+            o.svalidstate = state
+            db.session.add(o)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = '指定的id不存在！'
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 删除组织-逻辑删除
+@system.route("/OPM/organization/deleteOrgLogic", methods=["GET", "POST"])
+@user_login
+def delete_org_logic():
+    rdata = dict()
+    rowid = url_decode(request.form.get('rowid'))
+    org = SAOrganization.query.filter_by(sid=rowid).first()
+    if org:
+        child_org = SAOrganization.query.filter(SAOrganization.sfid.like(org.sfid + '%')).all()
+        for o in child_org:
+            if o.sorgkindid == 'psm':
+                person = SAPerson.query.filter_by(smainorgid=o.sparent).first()
+                if person:
+                    person.svalidstate = -1
+                    db.session.add(person)
+            o.svalidstate = -1
+            db.session.add(o)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = '指定的id不存在！'
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 回收站
+@system.route("/OPM/recycled", methods=["GET", "POST"])
+@user_login
+def recycled():
+    if request.method == "POST":
+        rdata = dict()
+        action = url_decode(request.form.get('action'))
+        rowids = url_decode(request.form.get('rowids'))
+        print(rowids)
+        if action == 'reduction':
+            for rowid in rowids.split(","):
+                org = SAOrganization.query.filter_by(sid=rowid).first()
+                if org:
+                    child_org = SAOrganization.query.filter(SAOrganization.sfid.like(org.sfid + '%')).all()
+                    for o in child_org:
+                        if o.sorgkindid == 'psm':
+                            if person:
+                                person = SAPerson.query.filter_by(smainorgid=o.sparent).first()
+                                person.svalidstate = 1
+                                db.session.add(person)
+                        o.svalidstate = 1
+                        db.session.add(o)
+                    db.session.commit()
+        elif action == 'delete':
+            for rowid in rowids.split(","):
+                org = SAOrganization.query.filter_by(sid=rowid).first()
+                if org:
+                    child_org = SAOrganization.query.filter(SAOrganization.sfid.like(org.sfid + '%')).all()
+                    for o in child_org:
+                        if o.sorgkindid == 'psm':
+                            person = SAPerson.query.filter_by(smainorgid=o.sparent).first()
+                            if person:
+                                db.session.delete(person)
+                        db.session.delete(o)
+                    db.session.commit()
+        rdata['state'] = True
+        return json.dumps(rdata, ensure_ascii=False)
+
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 90, type=int)
+    org_query = SAOrganization.query.filter_by(svalidstate=-1)
+    search_text = url_decode(request.args.get('search_text', ''))
+    if search_text and search_text != '':
+        org_query = org_query.filter(or_(SAOrganization.scode.ilike('%' + search_text + '%'),
+                                         SAOrganization.sname.ilike('%' + search_text + '%')))
+    count = org_query.count()
+    page_data = org_query.order_by(SAOrganization.slevel.asc(), SAOrganization.ssequence.asc()).paginate(page, limit)
+    return render_template("system/OPM/recycled.html", count=count, page=page, limit=limit,
+                           page_data=page_data, search_text=search_text,
+                           create_icon=create_icon,
+                           get_org_type=get_org_type)

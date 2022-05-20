@@ -1,22 +1,7 @@
 <html lang="zh_CN">
-<head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <title>机构管理</title>
-    <link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='bootstrap/css/bootstrap.min.css') }}"/>
-    <link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='layui/css/layui.css') }}"/>
-    <link type="text/css" rel="stylesheet"
-          href="{{ url_for('static',filename='common/css/zTreeStyle/zTreeStyle.css') }}"></link>
-    <link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='common/css/toolbar.main.css') }}"></link>
-    <script type="text/javascript" src="{{ url_for('static',filename='common/js/jquery/jquery.min.js') }}"></script>
-    <script type="text/javascript"
-            src="{{ url_for('static',filename='common/js/jquery/jquery.ztree.core-3.1.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static',filename='common/js/main.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static',filename='common/jTree/tree.main.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static',filename='bootstrap/js/bootstrap.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static',filename='layui/layui.js') }}"></script>
-    <script type="text/javascript"
-            src="{{ url_for('static',filename='system/OPM/organization.js',v='1.20220517.1') }}"></script>
-</head>
+{% include "common/tree_page_head.html" %}
+<script type="text/javascript"
+        src="{{ url_for('static',filename='system/OPM/organization.js',v='1.20220517.1') }}"></script>
 <body onload="pageLoad()">
 <div class="layui-fluid" style="background: #dddddd; padding: 20px;">
     <div class="layui-row layui-col-space15">
@@ -50,7 +35,7 @@
                                 </button>
                             </div>
                             <div class='input-group input-group-sm' style='float:left; width:280px; height: 30px;'>
-                                <input type="text" name="query_text" placeholder="快速查询..." class='form-control'>
+                                <input type="text" id="query_text" placeholder="快速查询..." class='form-control'>
                                 <span class='input-group-btn'>
                                     <button class='btn btn-default' lay-event="quickQuery"><span
                                             class='glyphicon glyphicon-search'></span>查询</button>
@@ -116,8 +101,6 @@
     layui.use('table', function () {
         var table = layui.table;
 
-        loadList();
-
         //头工具栏事件
         table.on('toolbar(orglist)', function (obj) {
             switch (obj.event) {
@@ -125,13 +108,13 @@
                     addorgitem();
                     break;
                 case 'refreshData':
-                    loadList(currenttreeID);
+                    loadList();
                     break;
                 case 'sortData':
                     sortOrgAction();
                     break;
                 case 'quickQuery':
-                    layui.layer.alert("查询");
+                    loadList();
                     break;
             }
         });
@@ -155,8 +138,11 @@
             if (obj.event === 'move') {
                 moveOrg(data);
             }
+            if (obj.event === 'disable') {
+                changeOrgAble(data);
+            }
             if (obj.event === 'del') {
-
+                deleteorgitem(data);
             }
         });
 

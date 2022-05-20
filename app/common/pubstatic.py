@@ -68,3 +68,15 @@ def create_icon(kind):
         return url_for('static', filename='common/image/toolbar/org/person.gif')
 
     return url_for('static', filename='common/image/toolbar/org/folder-open.gif')
+
+
+# 获取组织类型名称
+def get_org_type(kind):
+    if kind == 'ogn' or kind == 'org':
+        return '机构'
+    if kind == 'dept' or kind == 'dpt':
+        return '部门'
+    if kind == 'pos':
+        return '岗位'
+    if kind == 'psm':
+        return '人员'

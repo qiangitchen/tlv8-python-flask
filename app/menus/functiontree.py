@@ -23,6 +23,11 @@ functions = [
               "href": "/system/OPM/authorization",
               "process": "/SA/OPM/authorization/authorizationProcess",
               "activity": "mainActivity"
+              },
+             {"title": "回收站",
+              "href": "/system/OPM/recycled",
+              "process": "/SA/OPM/recycled/recycledProcess",
+              "activity": "mainActivity"
               }
          ]},
          {"title": "流程管理", "icon": "layui-icon layui-icon-auz", "child": [

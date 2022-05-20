@@ -1,0 +1,125 @@
+<html lang="zh_CN">
+{% include "common/tree_page_head.html" %}
+<body style="overflow: hidden;">
+<div class="layui-fluid">
+    <script type="text/html" id="list_toolbar">
+        <div class="layui-btn-container" style="padding-top: 1px;">
+            <div style='float:left; height: 30px;'>
+                <button class="layui-btn layui-btn-sm" lay-event="refreshData"><span
+                        class='glyphicon glyphicon-repeat'></span>&nbsp;刷新
+                </button>
+                <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="reduction"
+                        id="addOrgItem"><span
+                        class='layui-icon layui-icon-prev-circle'></span>&nbsp;还原
+                </button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="del"
+                        id="addOrgItem"><span
+                        class='layui-icon layui-icon-delete'></span>&nbsp;清除
+                </button>
+            </div>
+            <div class='input-group input-group-sm' style='float:left; width:280px; height: 30px;'>
+                <input type="text" id="query_text" value="{{ search_text }}" placeholder="快速查询..." class='form-control'>
+                <span class='input-group-btn'>
+                                    <button class='btn btn-default' lay-event="quickQuery"><span
+                                            class='glyphicon glyphicon-search'></span>查询</button>
+                                </span>
+            </div>
+        </div>
+    </script>
+    <table lay-filter="datalist" class="layui-table" id="datalist">
+        <thead>
+        <tr>
+            <th lay-data="{checkbox:true}"></th>
+            <th lay-data="{field: 'sid', hide: true}"></th>
+            <th lay-data="{field:'scode', width:150}">编号</th>
+            <th lay-data="{field:'sname', width:180}">名称</th>
+            <th lay-data="{field:'sorgkindid', width:80}">类型</th>
+            <th lay-data="{field:'sfcode'}">路径编号</th>
+            <th lay-data="{field:'sfname'}">路径名称</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for d in page_data.items %}
+            <tr>
+                <td></td>
+                <td>{{ d.sid }}</td>
+                <td>{{ d.scode }}</td>
+                <td>{{ d.sname }}</td>
+                <td>
+                    <img src="{{ create_icon(d.sorgkindid) }}">&nbsp;{{ get_org_type(d.sorgkindid) }}
+                </td>
+                <td>{{ d.sfcode }}</td>
+                <td>{{ d.sfname }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+<script>
+    // 还原/删除
+    function resetOrgData(action) {
+        var checked_rows = layui.table.checkStatus('datalist');
+        var rows = checked_rows.data;
+        if (rows.length < 1) {
+            layui.layer.alert("请先勾选需要还原的数据！")
+            return;
+        }
+        var rowids = [];
+        for (var i = 0; i < rows.length; i++) {
+            rowids.push(rows[i].sid)
+        }
+        var param = new tlv8.RequestParam();
+        param.set("rowids", rowids.join(","));
+        param.set("action", action);
+        tlv8.XMLHttpRequest("/system/OPM/recycled", param, "POST", true,
+            function (result) {
+                if (result.state == true) {
+                    layui.layer.alert("操作成功!", function () {
+                        window.location.reload();
+                    });
+                } else {
+                    layui.layer.alert(result.msg);
+                }
+            });
+    }
+
+    layui.use('table', function () {
+        var table = layui.table;
+        table.init('datalist',
+            {
+                toolbar: '#list_toolbar',
+                defaultToolbar: ['exports'],
+                height: 'full-20',
+                page: true,
+                limit: {{ limit }},
+                count: {{ count }}
+            }
+        );
+        //头工具栏事件
+        table.on('toolbar(datalist)', function (obj) {
+            switch (obj.event) {
+                case 'refreshData':
+                    window.location.reload();
+                    break;
+                case 'reduction':
+                    resetOrgData('reduction');
+                    break;
+                case 'del':
+                    layui.layer.confirm("数据将被彻底删除，删除后将不能恢复。确定删除吗？", function () {
+                        resetOrgData('delete');
+                    });
+                    break;
+                case 'quickQuery':
+                    window.location.href = "/system/OPM/recycled?search_text=" + $("#query_text").val();
+                    break;
+            }
+        });
+        $("#query_text").keyup(function (event) {
+            if (event.keyCode == 13) {
+                window.location.href = "/system/OPM/recycled?search_text=" + $("#query_text").val();
+            }
+        });
+    });
+</script>
+</html>
