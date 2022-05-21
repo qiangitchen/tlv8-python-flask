@@ -4,18 +4,53 @@
 <div class="layui-fluid">
     <div id="function_tree"></div>
 </div>
-<div id="treeData" style="display: none;">{% print(functions) %}</div>
-<script>
+<div id="treeData" style="display: none;">{{ functions }}</div>
+<script type="text/javascript">
+    var checkData = new Map();
     layui.use('tree', function () {
         var tree = layui.tree;
-
         //渲染
-        var inst1 = tree.render({
+        tree.render({
                 elem: '#function_tree',
-                data: window.eval("(" + $("#treeData").text() + ")")
+                id: 'functionTree',
+                showCheckbox: true,
+                data: window.eval($("#treeData").text()),
+                oncheck: function (obj) {
+                    //console.log(obj)
+                    setCheckedData(obj.data, obj.checked);
+                }
             }
         );
     });
+
+    //设置选择数据
+    function setCheckedData(data, checked) {
+        if (data.url && data.url != "") {
+            if (checked) {
+                checkData.put(data.url, {
+                    label: data.title,
+                    process: data.process,
+                    activity: data.activity,
+                    url: data.url
+                });
+            } else {
+                checkData.remove(data.url);
+            }
+        } else if (data.children && data.children.length > 0) {
+            for (var i = 0; i < data.children.length; i++) {
+                setCheckedData(data.children[i], checked);
+            }
+        }
+    }
+
+    //对话框确认
+    function dailogEngin() {
+        if (checkData.isEmpty()) {
+            layui.layer.alert("请勾选功能！");
+            return false;
+        }
+        return checkData;
+    }
 </script>
 </body>
 </html>

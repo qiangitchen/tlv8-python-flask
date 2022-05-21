@@ -6,8 +6,7 @@ from sqlalchemy import or_, and_, not_
 from app import db
 from app.sa.forms import LoginForm, OrgForm, PersonForm
 from app.sa.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission
-from app.menus.functiontree import functions
-from app.menus.menuutils import get_process_name, get_process_full
+from app.menus.menuutils import get_process_name, get_process_full, get_function_tree
 from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, guid, get_org_type
 from app.sa.persons import get_person_info
 from app.sa.onlineutils import set_online, clear_online
@@ -761,4 +760,4 @@ def permission_list():
 @system.route("/dialog/functionTreeSelect")
 @user_login
 def function_tree_select():
-    return render_template("system/dialog/functionTreeSelect.html", functions=functions)
+    return render_template("system/dialog/functionTreeSelect.html", functions=get_function_tree())

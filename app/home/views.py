@@ -3,7 +3,7 @@ import app.menus.functiontree
 from . import home
 from flask import render_template, url_for, redirect, session, send_file
 from app.common.captcha import generate_captcha
-from app.menus.menuutils import get_function_tree
+from app.menus.menuutils import get_function_menu
 from app.sa.views import user_login
 import json
 
@@ -48,7 +48,7 @@ def init_menu():
     logos['image'] = url_for("static", filename="portal/images/logo.png")
     logos['href'] = ""
     rdata['logoInfo'] = logos
-    rdata['menuInfo'] = get_function_tree()
+    rdata['menuInfo'] = get_function_menu()
     return json.dumps(rdata, ensure_ascii=False)
 
 

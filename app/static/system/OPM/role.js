@@ -72,13 +72,12 @@ function addPermission() {
 
 function cocationCallback(data) {
     // alert("ok"+data);//确定回传
+    var values = [];
     var kSet = data.keySet();
     for (k in kSet) {
-        var rData = data.get(kSet[k]);
-        var sLabels = rData.label;
-        var sprocess = rData.process;
-        var sactivity = rData.activity;
+        values.push(data.get(kSet[k]));
     }
+    console.log(JSON.stringify(values));
 }
 
 

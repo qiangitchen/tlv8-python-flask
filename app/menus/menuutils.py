@@ -9,6 +9,39 @@ from app.menus.functiontree import functions
 
 # 获取功能菜单树
 def get_function_tree():
+    tree = list()
+    for mm in functions:
+        item = dict()
+        item['title'] = mm['title']
+        item['icon'] = mm['icon']
+        item['fname'] = mm['title']
+        item['children'] = get_function_tree_child(mm)
+        tree.append(item)
+    return tree
+
+
+# 获取功能菜单树-子
+def get_function_tree_child(item):
+    if 'child' not in item:
+        return []
+    child = list()
+    for it in item['child']:
+        m = dict()
+        m['title'] = it['title']
+        if 'icon' in it:
+            m['icon'] = it['icon']
+        m['fname'] = item['title'] + '/' + it['title']
+        if 'href' in it:
+            m['url'] = it['href']
+            m['process'] = it['process']
+            m['activity'] = it['activity']
+        m['children'] = get_function_tree_child(it)
+        child.append(m)
+    return child
+
+
+# 获取功能菜单
+def get_function_menu():
     return functions
 
 
