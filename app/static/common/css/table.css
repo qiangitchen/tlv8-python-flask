@@ -1,0 +1,31 @@
+.layui-table tr {
+    background-color: #ffffff;
+}
+
+.layui-table[lay-even] tr:nth-child(even) {
+    background-color: #f6f6f6;
+}
+
+.layui-table[lay-even] tr:nth-child(even).active {
+    background-color: #dff0d8;
+}
+
+.layui-table tr.active {
+    background-color: #dff0d8;
+}
+
+.layui-table tr:hover {
+    background-color: #fefefe;
+}
+
+.layui-table[lay-even] tr:nth-child(even):hover {
+    background-color: #f0f0f0;
+}
+
+.layui-table tr.active:hover {
+    background-color: #d0e9c6;
+}
+
+.layui-table[lay-even] tr:nth-child(even).active:hover {
+    background-color: #d0e9c6;
+}

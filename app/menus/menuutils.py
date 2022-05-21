@@ -7,6 +7,11 @@ from app.menus.functiontree import functions
 """
 
 
+# 获取功能菜单树
+def get_function_tree():
+    return functions
+
+
 # 获取url对应的功能名称
 def get_process_name(url):
     for menu in functions:

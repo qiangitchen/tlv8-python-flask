@@ -111,10 +111,10 @@ function pageLoad() {
             {field: 'sid', title: 'ID', hide: true}
             , {field: 'no', title: '序号', width: 60, unresize: true, align: 'center'}
             , {field: 'scode', title: '编号', width: 80}
-            , {field: 'sname', title: '名称', width: 150}
+            , {field: 'sname', title: '名称', width: 200}
             , {field: 'sdescription', title: '描述'}
-            , {field: 'sfcode', title: '全编号', width: 200}
-            , {field: 'sfname', title: '全名称', width: 200}
+            , {field: 'sfcode', title: '全编号'}
+            , {field: 'sfname', title: '全名称'}
             , {fixed: 'right', title: '操作', toolbar: '#actionBar', width: 490}
         ]]
         , limit: 20
@@ -249,7 +249,7 @@ function resetPassword(data) {
 function assignPsmData() {
     hideMenu();
     tlv8.portal.dailog.openDailog('分配人员',
-        "/system/OPM/organization/SelectChPsm?rowid="
+        "/system/dialog/SelectChPsm?rowid="
         + currenttreeID, 800, 700, assign_dailogcallback);
 }
 

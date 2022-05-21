@@ -1,0 +1,169 @@
+<html lang="zh_CN">
+{% include "common/table_page_head.html" %}
+<script type="text/javascript" src="{{ url_for('static',filename='system/OPM/role.js',v='1.0.20220521') }}"></script>
+<body style="overflow: hidden;">
+<div class="layui-fluid" style="background: #dddddd; padding: 20px;">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md6">
+            <div class="layui-card">
+                <div class="layui-card-header">角色列表</div>
+                <div class="layui-card-body" style="height: 89%; padding: 1px;">
+                    <script type="text/html" id="list_toolbar">
+                        <div class="layui-btn-container" style="padding-top: 1px;">
+                            <div style='float:left; height: 30px;'>
+                                <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="addData"
+                                        id="addOrgItem"><span
+                                        class='glyphicon glyphicon-plus'></span>&nbsp;新增
+                                </button>
+                                <button class="layui-btn layui-btn-sm" lay-event="refreshData"><span
+                                        class='glyphicon glyphicon-repeat'></span>&nbsp;刷新
+                                </button>
+                                <button class="layui-btn layui-btn-sm layui-btn-primary" lay-event="sortData">↑↓&nbsp;排序
+                                </button>
+                            </div>
+                            <div class='input-group input-group-sm' style='float:left; width:280px; height: 30px;'>
+                                <input type="text" id="search_role" placeholder="快速查询..." class='form-control'>
+                                <span class='input-group-btn'>
+                                    <button class='btn btn-default' lay-event="quickQuery"><span
+                                            class='glyphicon glyphicon-search'></span>查询</button>
+                                </span>
+                            </div>
+                        </div>
+                    </script>
+                    <script type="text/html" id="actionBar">
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+                    </script>
+                    <table class="layui-table"
+                           lay-data="{height:'full-120',url:'/system/OPM/roleList', page:true, even:true, id:'role_list', toolbar:'#list_toolbar'}"
+                           lay-filter="role_list">
+                        <thead>
+                        <tr>
+                            <th lay-data="{field:'no', width:60}">序号</th>
+                            <th lay-data="{field:'sid', hide:true}">ID</th>
+                            <th lay-data="{field:'sname', width:200}">角色名称</th>
+                            <th lay-data="{field:'scode', width:100}">角色编号</th>
+                            <th lay-data="{field:'srolekind', width:100}">角色类型</th>
+                            <th lay-data="{field:'sdescription'}">描述</th>
+                            <th lay-data="{toolbar:'#actionBar', width:120}">操作</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md6">
+            <div class="layui-card">
+                <div class="layui-card-header">功能权限</div>
+                <div class="layui-card-body" style="height: 89%; padding: 1px;">
+                    <script type="text/html" id="perm_toolbar">
+                        <div class="layui-btn-container" style="padding-top: 1px;">
+                            <div style='float:left; height: 30px;'>
+                                <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="addData"
+                                        id="addOrgItem"><span
+                                        class='glyphicon glyphicon-plus'></span>&nbsp;新增
+                                </button>
+                                <button class="layui-btn layui-btn-sm" lay-event="refreshData"><span
+                                        class='glyphicon glyphicon-repeat'></span>&nbsp;刷新
+                                </button>
+                                <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="deleteData"><span
+                                        class='layui-icon layui-icon-delete'></span>&nbsp;删除
+                                </button>
+                            </div>
+                            <div class='input-group input-group-sm' style='float:left; width:280px; height: 30px;'>
+                                <input type="text" id="search_perm" placeholder="快速查询..." class='form-control'>
+                                <span class='input-group-btn'>
+                                    <button class='btn btn-default' lay-event="quickQuery"><span
+                                            class='glyphicon glyphicon-search'></span>查询</button>
+                                </span>
+                            </div>
+                        </div>
+                    </script>
+                    <table class="layui-table"
+                           lay-data="{height:'full-120',url:'/system/OPM/PermissionList?permission_kind=0', page:true, even:true, id:'perm_list', toolbar:'#perm_toolbar'}"
+                           lay-filter="perm_list">
+                        <thead>
+                        <tr>
+                            <th lay-data="{checkbox:true}"></th>
+                            <th lay-data="{field:'no', width:60}">序号</th>
+                            <th lay-data="{field:'sid', hide:true}">ID</th>
+                            <th lay-data="{field:'sactivityfname'}">功能名称</th>
+                            <th lay-data="{field:'sprocess'}">功能模块</th>
+                            <th lay-data="{field:'sactivity', width:150}">功能标识</th>
+                            <th lay-data="{field:'sdescription'}">描述</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!--
+            <div class="layui-card">
+                <div class="layui-card-header">动作权限</div>
+                <div class="layui-card-body" style="height: 40%; padding: 1px;">
+                </div>
+            </div>
+            -->
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    layui.use('table', function () {
+        var table = layui.table;
+        //头工具栏事件
+        table.on('toolbar(role_list)', function (obj) {
+            switch (obj.event) {
+                case 'addData':
+                    addRoleData();
+                    break;
+                case 'refreshData':
+                    reloadList();
+                    break;
+                case 'sortData':
+                    sortAction();
+                    break;
+                case 'quickQuery':
+                    reloadList();
+                    break;
+            }
+        });
+        //监听行工具事件
+        table.on('tool(role_list)', function (obj) {
+            //console.log(obj)
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                editRoleData(data);
+            }
+            if (obj.event === 'del') {
+                delRoleData(data);
+            }
+        });
+        //触发行单击事件
+        table.on('row(role_list)', function (obj) {
+            //console.log(obj.tr) //得到当前行元素对象
+            //console.log(obj.data) //得到当前行数据
+            obj.tr.parent().find('tr').removeClass('active')
+            obj.tr.addClass('active') //选中行加特殊背景颜色
+            currentRole = obj.data;
+            loadPermission(currentRole);
+        });
+        //头工具栏事件（权限）
+        table.on('toolbar(perm_list)', function (obj) {
+            switch (obj.event) {
+                case 'addData':
+                    addPermission();
+                    break;
+                case 'refreshData':
+                    loadPermission(currentRole);
+                    break;
+                case 'deleteData':
+                    deletePermission();
+                    break;
+                case 'quickQuery':
+                    loadPermission(currentRole);
+                    break;
+            }
+        });
+    });
+</script>
+</html>

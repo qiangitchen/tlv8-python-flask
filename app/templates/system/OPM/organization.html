@@ -121,8 +121,8 @@
 
         //监听行工具事件
         table.on('tool(orglist)', function (obj) {
+            //console.log(obj)
             var data = obj.data;
-            console.log(obj)
             if (obj.event === 'edit') {
                 editOrgData(data);
             }

@@ -5,9 +5,10 @@ from flask import session, redirect, url_for, render_template, request
 from sqlalchemy import or_, and_, not_
 from app import db
 from app.sa.forms import LoginForm, OrgForm, PersonForm
-from app.sa.models import SAOrganization, SAPerson, SALogs
+from app.sa.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission
+from app.menus.functiontree import functions
 from app.menus.menuutils import get_process_name, get_process_full
-from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, get_org_type
+from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, guid, get_org_type
 from app.sa.persons import get_person_info
 from app.sa.onlineutils import set_online, clear_online
 from app.sa.orgutils import can_move_to, up_child_org_path
@@ -255,6 +256,8 @@ def org_edit():
             model = SAOrganization.query.filter_by(sid=data['sid']).first()
             if not model:
                 model = SAOrganization()
+            else:
+                model.version = model.version + 1
         else:
             model = SAOrganization()
         if data['sparent'] and data['sparent'] != "":
@@ -320,6 +323,8 @@ def psm_edit():
                 return json.dumps(rdata, ensure_ascii=False)
         else:
             parent_org = SAOrganization.query.filter_by(sid=org.sparent).first()
+            org.version = org.version + 1
+            person.version = person.version + 1
         try:
             person.scode = data['scode']
             person.sname = data['sname']
@@ -442,10 +447,10 @@ def psm_list():
 
 
 # 选择人员（多选）
-@system.route("/OPM/organization/SelectChPsm")
+@system.route("/dialog/SelectChPsm")
 @user_login
 def select_ch_psm():
-    return render_template("system/OPM/dialog/SelectChPsm.html")
+    return render_template("system/dialog/SelectChPsm.html")
 
 
 # 分配人员
@@ -672,3 +677,88 @@ def recycled():
                            page_data=page_data, search_text=search_text,
                            create_icon=create_icon,
                            get_org_type=get_org_type)
+
+
+# 角色管理
+@system.route("/OPM/role")
+@user_login
+def role():
+    return render_template("system/OPM/role.html")
+
+
+# 角色数据列表
+@system.route("/OPM/roleList")
+@user_login
+def role_list():
+    rdata = dict()
+    rdata['code'] = 0
+    role_query = SARole.query
+    search_role = url_decode(request.args.get('search_role', ''))
+    if search_role and search_role != '':
+        role_query = role_query.filter(or_(SARole.scode.ilike('%' + search_role + '%'),
+                                           SARole.sname.ilike('%' + search_role + '%')))
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    count = role_query.count()
+    rdata['count'] = count
+    page_data = role_query.order_by(SARole.ssequence.asc()).paginate(page, limit)
+    no = 1
+    data = list()
+    for d in page_data.items:
+        row_data = dict()
+        row_data['no'] = no
+        row_data['sid'] = d.sid
+        row_data['sname'] = d.sname
+        row_data['scode'] = d.scode
+        row_data['srolekind'] = d.srolekind
+        row_data['sdescription'] = d.sdescription
+        data.append(row_data)
+        no += 1
+    rdata['data'] = data
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 角色权限数据列表
+@system.route("/OPM/PermissionList")
+@user_login
+def permission_list():
+    rdata = dict()
+    rdata['code'] = 0
+    role_id = request.args.get('role_id')
+    permission_kind = request.args.get('permission_kind', 0)
+    data_query = SAPermission.query.filter_by(spermissionkind=permission_kind, spermissionroleid=role_id)
+    search_perm = url_decode(request.args.get('search_perm', ''))
+    if search_perm and search_perm != '':
+        data_query = data_query.filter(or_(SAPermission.sprocess.ilike('%' + search_perm + '%'),
+                                           SAPermission.sactivityfname.ilike('%' + search_perm + '%'),
+                                           SAPermission.sactivity.ilike('%' + search_perm + '%'),
+                                           SAPermission.sdescription.ilike('%' + search_perm + '%'),
+                                           SAPermission.sactionsnames.ilike('%' + search_perm + '%')))
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    count = data_query.count()
+    rdata['count'] = count
+    page_data = data_query.order_by(SAPermission.ssequence.asc()).paginate(page, limit)
+    no = 1
+    data = list()
+    for d in page_data.items:
+        row_data = dict()
+        row_data['no'] = no
+        row_data['sid'] = d.sid
+        row_data['sactivityfname'] = d.sactivityfname
+        row_data['sprocess'] = d.sprocess
+        row_data['sactivity'] = d.sactivity
+        row_data['sactionsnames'] = d.sactionsnames
+        row_data['sactions'] = d.sactions
+        row_data['sdescription'] = d.sdescription
+        data.append(row_data)
+        no += 1
+    rdata['data'] = data
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 功能树选择
+@system.route("/dialog/functionTreeSelect")
+@user_login
+def function_tree_select():
+    return render_template("system/dialog/functionTreeSelect.html", functions=functions)

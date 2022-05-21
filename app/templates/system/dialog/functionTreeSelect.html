@@ -1,0 +1,21 @@
+<html lang="zh_CN">
+{% include "common/tree_page_head.html" %}
+<body>
+<div class="layui-fluid">
+    <div id="function_tree"></div>
+</div>
+<div id="treeData" style="display: none;">{% print(functions) %}</div>
+<script>
+    layui.use('tree', function () {
+        var tree = layui.tree;
+
+        //渲染
+        var inst1 = tree.render({
+                elem: '#function_tree',
+                data: window.eval("(" + $("#treeData").text() + ")")
+            }
+        );
+    });
+</script>
+</body>
+</html>
