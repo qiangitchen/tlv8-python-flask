@@ -5,3 +5,7 @@ from flask import Blueprint
 system = Blueprint("sa", __name__)
 
 import app.sa.views
+
+"""
+系统管理模块
+"""
