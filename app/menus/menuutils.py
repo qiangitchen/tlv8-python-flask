@@ -14,7 +14,8 @@ def get_function_tree():
         item = dict()
         item['title'] = mm['title']
         item['icon'] = mm['icon']
-        item['fname'] = mm['title']
+        item['fullname'] = '/' + mm['title']
+        mm['fullname'] = '/' + mm['title']
         item['children'] = get_function_tree_child(mm)
         tree.append(item)
     return tree
@@ -30,7 +31,8 @@ def get_function_tree_child(item):
         m['title'] = it['title']
         if 'icon' in it:
             m['icon'] = it['icon']
-        m['fname'] = item['title'] + '/' + it['title']
+        m['fullname'] = item['fullname'] + '/' + it['title']
+        it['fullname'] = item['fullname'] + '/' + it['title']
         if 'href' in it:
             m['url'] = it['href']
             m['process'] = it['process']

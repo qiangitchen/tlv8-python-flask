@@ -81,7 +81,7 @@ class SAPermission(db.Model):
     sactions = db.Column(db.Text, doc='动作（多个逗号分割）')
     spermissionkind = db.Column(db.Integer, nullable=False, default=0, doc='权限类型（0：功能权限、1：动作权限）')
     sdescription = db.Column(db.String(2048), doc='描述')
-    ssequence = db.Column(db.Integer, doc='排序序号')
+    ssequence = db.Column(db.Integer, default=1, doc='排序序号')
     svalidstate = db.Column(db.Integer, default=1, doc='状态（0：禁用，1：正常，-1：删除）')
     version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
 

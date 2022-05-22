@@ -1,0 +1,80 @@
+<html lang="zh_CN">
+{% include "common/form_page_head.html" %}
+<body>
+<div class="layui-fluid" style="padding-top: 20px;">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form id="org_create_form" class="layui-form">
+                <div style="display: none;">
+                    {{ form.sid(value=model.sid) }}
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width: 100px;">角色名称</label>
+                    <div class="layui-input-block">
+                        {{ form.sname(value=nul2em(model.sname)) }}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width: 100px;">角色编号</label>
+                    <div class="layui-input-block">
+                        {{ form.scode(value=nul2em(model.scode)) }}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width: 100px;">角色类型</label>
+                    <div class="layui-input-block">
+                        {{ form.srolekind(value=nul2em(model.srolekind)) }}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width: 100px;">角色描述</label>
+                    <div class="layui-input-block">
+                        {{ form.sdescription(value=nul2em(model.sdescription)) }}
+                    </div>
+                </div>
+                <div style="display: none;">
+                    {{ form.csrf_token }}
+                    {{ form.submit }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    layui.use('form', function () {
+        form = layui.form;
+        operator = '{{ operator }}';
+        form.on('submit(mainform)', function (data) {
+            //console.log(JSON.stringify(data.field));
+            $.ajax({
+                url: "/system/OPM/role/editRole?operator=" + operator + "&rowid={{ rowid }}",
+                type: "post",
+                async: true,
+                data: data.field,
+                dataType: "json",
+                success: function (re, textStatus) {
+                    if (re.state == true) {
+                        layui.layer.alert("保存成功！", function () {
+                            tlv8.portal.dailog.dailogEngin();
+                        });
+                    } else {
+                        layui.layer.alert("保存失败：" + re.msg);
+                    }
+                }
+            });
+            return false;
+        });
+        if (operator == "edit") {
+            $("#srolekind").val($("#srolekind").attr('value'));
+            layui.form.render("select");
+        }
+    });
+
+    // 单击确定对话框
+    function dailogEngin() {
+        $("#submit").click();
+        return false;
+    }
+</script>
+</html>

@@ -247,3 +247,55 @@ class PersonForm(FlaskForm):
             "lay-filter": "mainform"
         }
     )
+
+
+# 角色表单
+class RoleForm(FlaskForm):
+    sid = StringField(
+        render_kw={
+            "style": "display:none",
+        }
+    )
+    scode = StringField(
+        validators=[
+            DataRequired("编号不能为空！")
+        ],
+        description="编号",
+        render_kw={
+            "class": "layui-input",
+            "lay-verify": "required",
+            "type": "text",
+            "placeholder": "请输入编号！",
+        }
+    )
+    sname = StringField(
+        validators=[
+            DataRequired("名称不能为空！")
+        ],
+        description="名称",
+        render_kw={
+            "class": "layui-input",
+            "lay-verify": "required",
+            "type": "text",
+            "placeholder": "请输入名称！",
+        }
+    )
+    srolekind = SelectField(
+        label="角色分类",
+        choices=['业务功能', '流程权限', '系统管理']
+    )
+    sdescription = TextAreaField(
+        description="描述",
+        render_kw={
+            "class": "layui-textarea",
+            "style": "min-height:40px;"
+        }
+    )
+    submit = SubmitField(
+        '提交保存',
+        render_kw={
+            "class": "layui-btn",
+            "lay-submit": "",
+            "lay-filter": "mainform"
+        }
+    )

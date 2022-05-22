@@ -4,7 +4,11 @@ var currentRole = {};
  * 添加角色
  */
 function addRoleData() {
-
+    tlv8.portal.dailog.openDailog("添加角色",
+        "/system/OPM/role/editRole?operator=new", "500", "400",
+        function (r) {
+            reloadList();
+        });
 }
 
 /**
@@ -13,9 +17,10 @@ function addRoleData() {
 function reloadList() {
     var search_role = $("#search_role").val();
     layui.table.reload('role_list', {
-        url: '/system/OPM/roleList?search_role=' + J_u_encode(search_role),
+        url: '/system/OPM/role/roleList?search_role=' + J_u_encode(search_role),
         done: function (res, curr, count) {
             $("#search_role").val(search_role);
+            loadPermission({});
         }
     });
 }
@@ -32,7 +37,11 @@ function sortAction() {
  * @param dtaa
  */
 function editRoleData(data) {
-
+    tlv8.portal.dailog.openDailog("编辑角色",
+        "/system/OPM/role/editRole?operator=edit&rowid=" + data.sid, "500", "400",
+        function (r) {
+            reloadList();
+        });
 }
 
 /**
@@ -40,7 +49,19 @@ function editRoleData(data) {
  * @param dtaa
  */
 function delRoleData(data) {
-
+    layui.layer.confirm('角色删除后不可恢复，确认删除吗？', function () {
+        var param = new tlv8.RequestParam();
+        param.set("rowid", data.sid);
+        tlv8.XMLHttpRequest("/system/OPM/role/deleteRole", param, "post", true,
+            function (r) {
+                if (r.state == true) {
+                    layui.layer.alert("删除成功！");
+                    reloadList();
+                } else {
+                    layui.layer.alert(r.msg);
+                }
+            });
+    });
 }
 
 /**
@@ -50,7 +71,7 @@ function delRoleData(data) {
 function loadPermission(roleData) {
     var search_perm = $("#search_perm").val();
     layui.table.reload('perm_list', {
-        url: '/system/OPM/PermissionList?permission_kind=0&role_id=' + roleData.sid + '&search_perm=' + J_u_encode(search_perm),
+        url: '/system/OPM/role/PermissionList?permission_kind=0&role_id=' + roleData.sid + '&search_perm=' + J_u_encode(search_perm),
         done: function (res, curr, count) {
             $("#search_perm").val(search_perm);
         }
@@ -77,7 +98,19 @@ function cocationCallback(data) {
     for (k in kSet) {
         values.push(data.get(kSet[k]));
     }
-    console.log(JSON.stringify(values));
+    //console.log(JSON.stringify(values));
+    var param = new tlv8.RequestParam();
+    param.set("rowid", currentRole.sid);
+    param.set("values", JSON.stringify(values));
+    tlv8.XMLHttpRequest("/system/OPM/role/AssignPermissions", param, "post", true,
+        function (r) {
+            if (r.state == true) {
+                layui.layer.alert("添加权限成功！");
+                loadPermission(currentRole);
+            } else {
+                layui.layer.alert(r.msg);
+            }
+        });
 }
 
 
@@ -91,4 +124,19 @@ function deletePermission() {
         layui.layer.alert("请先勾选需要删除的数据！")
         return;
     }
+    var values = [];
+    for (var i = 0; i < rows.length; i++) {
+        values.push(rows[i].sid);
+    }
+    var param = new tlv8.RequestParam();
+    param.set("values", values.join(","));
+    tlv8.XMLHttpRequest("/system/OPM/role/CancelPermissions", param, "post", true,
+        function (r) {
+            if (r.state == true) {
+                layui.layer.alert("删除成功！");
+                loadPermission(currentRole);
+            } else {
+                layui.layer.alert(r.msg);
+            }
+        });
 }

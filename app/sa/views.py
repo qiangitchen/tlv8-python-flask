@@ -4,7 +4,7 @@ from . import system
 from flask import session, redirect, url_for, render_template, request
 from sqlalchemy import or_, and_, not_
 from app import db
-from app.sa.forms import LoginForm, OrgForm, PersonForm
+from app.sa.forms import LoginForm, OrgForm, PersonForm, RoleForm
 from app.sa.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission
 from app.menus.menuutils import get_process_name, get_process_full, get_function_tree
 from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, guid, get_org_type
@@ -686,7 +686,7 @@ def role():
 
 
 # 角色数据列表
-@system.route("/OPM/roleList")
+@system.route("/OPM/role/roleList")
 @user_login
 def role_list():
     rdata = dict()
@@ -717,8 +717,54 @@ def role_list():
     return json.dumps(rdata, ensure_ascii=False)
 
 
+# 编辑角色数据
+@system.route("/OPM/role/editRole", methods=["GET", "POST"])
+@user_login
+def edit_role():
+    rowid = request.args.get('rowid')
+    operator = request.args.get('operator')
+    model = SARole.query.filter_by(sid=rowid).first()
+    form = RoleForm()
+    if form.validate_on_submit():
+        rdata = dict()
+        data = form.data
+        if not model:
+            model = SARole()
+        model.sname = data['sname']
+        model.scode = data['scode']
+        model.srolekind = data['srolekind']
+        model.sdescription = data['sdescription']
+        db.session.add(model)
+        db.session.commit()
+        rdata['state'] = True
+        return json.dumps(rdata, ensure_ascii=False)
+    return render_template("system/OPM/dialog/editRole.html", nul2em=nul2em,
+                           model=model, form=form,
+                           operator=operator, rowid=rowid)
+
+
+# 删除角色数据
+@system.route("/OPM/role/deleteRole", methods=["POST"])
+@user_login
+def delete_role():
+    rdata = dict()
+    rowid = request.form.get('rowid')
+    model = SARole.query.filter_by(sid=rowid).first()
+    if model:
+        perm = SAPermission.query.filter_by(spermissionroleid=model.sid).all()
+        for p in perm:  # 删除角色需要同时删除角色授权
+            db.session.delete(p)
+        db.session.delete(model)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = '指定的角色id不存在！'
+    return json.dumps(rdata, ensure_ascii=False)
+
+
 # 角色权限数据列表
-@system.route("/OPM/PermissionList")
+@system.route("/OPM/role/PermissionList")
 @user_login
 def permission_list():
     rdata = dict()
@@ -761,3 +807,50 @@ def permission_list():
 @user_login
 def function_tree_select():
     return render_template("system/dialog/functionTreeSelect.html", functions=get_function_tree())
+
+
+# 分配功能权限
+@system.route("/OPM/role/AssignPermissions", methods=["GET", "POST"])
+@user_login
+def assign_permissions():
+    rdata = dict()
+    rowid = url_decode(request.form.get('rowid'))
+    values = url_decode(request.form.get('values'))
+    sa_role = SARole.query.filter_by(sid=rowid).first()
+    if sa_role:
+        per = eval(values)
+        i = 1
+        for p in per:
+            permission = SAPermission(spermissionroleid=sa_role.sid)
+            permission.sprocess = p['process']
+            permission.sactivityfname = p['fullname']
+            permission.sactivity = p['activity']
+            permission.sdescription = p['url']
+            permission.ssequence = i
+            db.session.add(permission)
+            i += 1
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['state'] = '指定的角色ID错误！'
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 取消（删除）功能权限
+@system.route("/OPM/role/CancelPermissions", methods=["GET", "POST"])
+@user_login
+def cancel_permissions():
+    rdata = dict()
+    try:
+        values = url_decode(request.form.get('values'))
+        ids = values.split(',')
+        for sid in ids:
+            permission = SAPermission.query.filter_by(sid=sid).first()
+            db.session.delete(permission)
+        db.session.commit()
+        rdata['state'] = True
+    except Exception as e:
+        rdata['state'] = False
+        rdata['msg'] = '操作异常：' + str(e)
+    return json.dumps(rdata, ensure_ascii=False)

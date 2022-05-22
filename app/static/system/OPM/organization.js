@@ -304,7 +304,7 @@ function setMemberOrg(data) {
                     layui.layer.alert("设置成功！");
                     loadList();
                 } else {
-                    alert(r.msg);
+                    layui.layer.alert(r.msg);
                 }
             });
     });
