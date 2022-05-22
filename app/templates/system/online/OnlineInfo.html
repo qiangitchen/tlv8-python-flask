@@ -1,5 +1,5 @@
 <html lang="zh_CN">
-{% include "common/page_head.html" %}
+{% include "common/table_page_head.html" %}
 <body style="overflow: hidden;">
 <div class="layui-fluid">
     <script type="text/html" id="list_toolbar">
@@ -7,14 +7,6 @@
             <div style='float:left; height: 30px;'>
                 <button class="layui-btn layui-btn-sm" lay-event="refreshData"><span
                         class='glyphicon glyphicon-repeat'></span>&nbsp;刷新
-                </button>
-                <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="reduction"
-                        id="addOrgItem"><span
-                        class='layui-icon layui-icon-prev-circle'></span>&nbsp;还原
-                </button>
-                <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="del"
-                        id="addOrgItem"><span
-                        class='layui-icon layui-icon-delete'></span>&nbsp;清除
                 </button>
             </div>
             <div class='input-group input-group-sm' style='float:left; width:280px; height: 30px;'>
@@ -29,27 +21,27 @@
     <table lay-filter="datalist" class="layui-table" id="datalist">
         <thead>
         <tr>
-            <th lay-data="{checkbox:true}"></th>
             <th lay-data="{field: 'sid', hide: true}"></th>
-            <th lay-data="{field:'scode', width:150}">编号</th>
-            <th lay-data="{field:'sname', width:180}">名称</th>
-            <th lay-data="{field:'sorgkindid', width:80}">类型</th>
-            <th lay-data="{field:'sfcode'}">路径编号</th>
-            <th lay-data="{field:'sfname'}">路径名称</th>
+            <th lay-data="{field:'susername', width:150}">用户</th>
+            <th lay-data="{field:'suserfname'}">用户全名称</th>
+            <th lay-data="{field:'sloginip', width:150}">用户IP</th>
+            <th lay-data="{field:'slogindate', width:200}">登录时间</th>
+            <th lay-data="{field:'ssessionid', width:300}">用户唯一标志</th>
+            <th lay-data="{field:'sserviceip', width:150}">服务器IP</th>
+            <th lay-data="{field:'smachinecode', width:320}">机器码</th>
         </tr>
         </thead>
         <tbody>
         {% for d in page_data.items %}
             <tr>
-                <td></td>
                 <td>{{ d.sid }}</td>
-                <td>{{ d.scode }}</td>
-                <td>{{ d.sname }}</td>
-                <td>
-                    <img src="{{ create_icon(d.sorgkindid) }}">&nbsp;{{ get_org_type(d.sorgkindid) }}
-                </td>
-                <td>{{ d.sfcode }}</td>
-                <td>{{ d.sfname }}</td>
+                <td>{{ d.susername }}</td>
+                <td>{{ d.suserfname }}</td>
+                <td>{{ d.sloginip }}</td>
+                <td>{{ d.slogindate }}</td>
+                <td>{{ d.ssessionid }}</td>
+                <td>{{ d.sserviceip }}</td>
+                <td>{{ d.smachinecode }}</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -58,33 +50,6 @@
 </div>
 </body>
 <script type="text/javascript">
-    // 还原/删除
-    function resetOrgData(action) {
-        var checked_rows = layui.table.checkStatus('datalist');
-        var rows = checked_rows.data;
-        if (rows.length < 1) {
-            layui.layer.alert("请先勾选需要还原的数据！")
-            return;
-        }
-        var rowids = [];
-        for (var i = 0; i < rows.length; i++) {
-            rowids.push(rows[i].sid)
-        }
-        var param = new tlv8.RequestParam();
-        param.set("rowids", rowids.join(","));
-        param.set("action", action);
-        tlv8.XMLHttpRequest("/system/OPM/recycled", param, "POST", true,
-            function (result) {
-                if (result.state == true) {
-                    layui.layer.alert("操作成功!", function () {
-                        window.location.reload();
-                    });
-                } else {
-                    layui.layer.alert(result.msg);
-                }
-            });
-    }
-
     layui.use(['table', 'laypage'], function () {
         var table = layui.table;
         var laypage = layui.laypage;
@@ -104,22 +69,14 @@
                 case 'refreshData':
                     window.location.reload();
                     break;
-                case 'reduction':
-                    resetOrgData('reduction');
-                    break;
-                case 'del':
-                    layui.layer.confirm("数据将被彻底删除，删除后将不能恢复。确定删除吗？", function () {
-                        resetOrgData('delete');
-                    });
-                    break;
                 case 'quickQuery':
-                    window.location.href = "/system/OPM/recycled?search_text=" + J_u_encode($("#query_text").val());
+                    window.location.href = "/system/logs?search_text=" + J_u_encode($("#query_text").val());
                     break;
             }
         });
         $("#query_text").keyup(function (event) {
             if (event.keyCode == 13) {
-                window.location.href = "/system/OPM/recycled?search_text=" + J_u_encode($("#query_text").val());
+                window.location.href = "/system/logs?search_text=" + J_u_encode($("#query_text").val());
             }
         });
         //执行一个laypage实例
@@ -135,7 +92,7 @@
                 //console.log(obj.limit); //得到每页显示的条数
                 //首次不执行
                 if (!first) {
-                    window.location.href = "/system/OPM/recycled?page=" + obj.curr + "&limit=" + obj.limit + "&search_text=" + J_u_encode($("#query_text").val());
+                    window.location.href = "/system/logs?page=" + obj.curr + "&limit=" + obj.limit + "&search_text=" + J_u_encode($("#query_text").val());
                 }
             }
         });

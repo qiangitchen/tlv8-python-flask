@@ -268,8 +268,7 @@ function writeLog(ev, actionName, discription) {
     if (window.isWriteLog == false)
         return;
     try {
-        var HTMLhead = document.getElementsByTagName('HEAD')[0];
-        var activateName = HTMLhead.getElementsByTagName("title")[0].innerHTML;
+        var activateName = $("title").text();
         var srcPath = window.location.pathname;
         if (srcPath.indexOf("?") > 0)
             srcPath = srcPath.substring(0, srcPath.indexOf("?"));
@@ -283,6 +282,7 @@ function writeLog(ev, actionName, discription) {
         tlv8.XMLHttpRequest("/system/WriteSystemLogAction", param, "post", true,
             null, true);
     } catch (e) {
+        console.log(e);
     }
 }
 

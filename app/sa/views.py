@@ -5,7 +5,7 @@ from flask import session, redirect, url_for, render_template, request
 from sqlalchemy import or_, and_, not_
 from app import db
 from app.sa.forms import LoginForm, OrgForm, PersonForm, RoleForm
-from app.sa.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize
+from app.sa.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize, SAOnlineInfo
 from app.menus.menuutils import get_process_name, get_process_full, get_function_tree
 from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, guid, get_org_type
 from app.sa.persons import get_person_info, get_curr_person_info
@@ -965,3 +965,39 @@ def authorization_del_role():
         rdata['state'] = False
         rdata['msg'] = '操作异常：' + str(e)
     return json.dumps(rdata, ensure_ascii=False)
+
+
+# 在线用户信息
+@system.route("/online", methods=["GET", "POST"])
+@user_login
+def online_info():
+    data_query = SAOnlineInfo.query
+    search_text = url_decode(request.args.get('search_text', ''))
+    if search_text and search_text != '':
+        data_query = data_query.filter(or_(SAOnlineInfo.susername.ilike('%' + search_text + '%'),
+                                           SAOnlineInfo.suserfname.ilike('%' + search_text + '%'),
+                                           SAOnlineInfo.sloginip.ilike('%' + search_text + '%')))
+    count = data_query.count()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    page_data = data_query.order_by(SAOnlineInfo.slogindate.desc()).paginate(page, limit)
+    return render_template("system/online/OnlineInfo.html", count=count, page=page, limit=limit,
+                           page_data=page_data, search_text=search_text)
+
+
+# 系统（操作）日志
+@system.route("/logs", methods=["GET", "POST"])
+@user_login
+def sys_log():
+    data_query = SALogs.query
+    search_text = url_decode(request.args.get('search_text', ''))
+    if search_text and search_text != '':
+        data_query = data_query.filter(or_(SALogs.sdescription.ilike('%' + search_text + '%'),
+                                           SALogs.sactivityname.ilike('%' + search_text + '%'),
+                                           SALogs.sactionname.ilike('%' + search_text + '%')))
+    count = data_query.count()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    page_data = data_query.order_by(SALogs.screatetime.desc()).paginate(page, limit)
+    return render_template("system/log/SysLog.html", count=count, page=page, limit=limit,
+                           page_data=page_data, search_text=search_text)
