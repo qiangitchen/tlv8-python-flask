@@ -1,0 +1,88 @@
+<html lang="zh_CN">
+{% include "common/tree_page_head.html" %}
+<script type="text/javascript"
+        src="{{ url_for('static',filename='system/OPM/authorization.js',v='1.0.20220522') }}"></script>
+<body onload="pageLoad()">
+<div class="layui-fluid" style="background: #dddddd; padding: 20px;">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md2">
+            <div class="layui-card">
+                <div class="layui-card-header">机构树</div>
+                <div class="layui-card-body" style="height: 89%; padding: 1px;">
+                    <div style="width:100%; height:100%; overflow: hidden;">
+                        <ul id="JtreeView" class="ztree"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md10">
+            <div class="layui-card">
+                <div class="layui-card-header">角色分配</div>
+                <div class="layui-card-body" style="height: 89%; padding: 1px;" id="list_view">
+                    <script type="text/html" id="list_toolbar">
+                        <div class="layui-btn-container" style="padding-top: 1px;">
+                            <div style='float:left; height: 30px;'>
+                                <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="addData"
+                                        id="addOrgItem"><span
+                                        class='glyphicon glyphicon-plus'></span>&nbsp;新增
+                                </button>
+                                <button class="layui-btn layui-btn-sm" lay-event="refreshData"><span
+                                        class='glyphicon glyphicon-repeat'></span>&nbsp;刷新
+                                </button>
+                                <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="deleteData"><span
+                                        class='layui-icon layui-icon-delete'></span>&nbsp;删除
+                                </button>
+                            </div>
+                            <div class='input-group input-group-sm' style='float:left; width:280px; height: 30px;'>
+                                <input type="text" id="query_text" placeholder="快速查询..." class='form-control'>
+                                <span class='input-group-btn'>
+                                    <button class='btn btn-default' lay-event="quickQuery"><span
+                                            class='glyphicon glyphicon-search'></span>查询</button>
+                                </span>
+                            </div>
+                        </div>
+                    </script>
+                    <table class="layui-table" lay-filter="rolelist" lay-data="{height:'full-120',url:'/system/OPM/authorization/dataList', page:true, limit:20, even:true, id:'rolelist', toolbar:'#list_toolbar'}">
+                        <thead>
+                            <th lay-data="{checkbox:true}"></th>
+                            <th lay-data="{field:'no', width:60}">序号</th>
+                            <th lay-data="{field:'sid', hide:true}">ID</th>
+                            <th lay-data="{field:'sauthorizeroleid', width:200}">角色ID</th>
+                            <th lay-data="{field:'sauthorizerolecode', width:100}">角色编号</th>
+                            <th lay-data="{field:'sdescription', width:200}">角色名称</th>
+                            <th lay-data="{field:'sorgfname'}">组织全名称</th>
+                            <th lay-data="{field:'screatorfname'}">创建人</th>
+                            <th lay-data="{field:'screatetime', width:160}">创建时间</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    layui.use('table', function () {
+        var table = layui.table;
+
+        //头工具栏事件
+        table.on('toolbar(rolelist)', function (obj) {
+            switch (obj.event) {
+                case 'addData':
+                    addData();
+                    break;
+                case 'refreshData':
+                    loadList();
+                    break;
+                case 'deleteData':
+                    deleteData();
+                    break;
+                case 'quickQuery':
+                    loadList();
+                    break;
+            }
+        });
+
+    });
+</script>
+</html>

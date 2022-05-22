@@ -105,7 +105,7 @@ function pageLoad() {
         elem: '#orglist'
         , url: '/system/OPM/orgList'
         , toolbar: '#list_toolbar'
-        , height: 'full-100'
+        , height: 'full-120'
         , defaultToolbar: ['exports']
         , cols: [[
             {field: 'sid', title: 'ID', hide: true}

@@ -37,7 +37,7 @@
                         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
                     </script>
                     <table class="layui-table"
-                           lay-data="{height:'full-120',url:'/system/OPM/role/roleList', page:true, even:true, id:'role_list', toolbar:'#list_toolbar'}"
+                           lay-data="{height:'full-120',url:'/system/OPM/role/roleList', page:true, limit:20, even:true, id:'role_list', toolbar:'#list_toolbar'}"
                            lay-filter="role_list">
                         <thead>
                         <tr>
@@ -82,7 +82,7 @@
                         </div>
                     </script>
                     <table class="layui-table"
-                           lay-data="{height:'full-120',url:'/system/OPM/role/PermissionList?permission_kind=0', page:true, even:true, id:'perm_list', toolbar:'#perm_toolbar'}"
+                           lay-data="{height:'full-120',url:'/system/OPM/role/PermissionList?permission_kind=0', page:true, limit:20, even:true, id:'perm_list', toolbar:'#perm_toolbar'}"
                            lay-filter="perm_list">
                         <thead>
                         <tr>

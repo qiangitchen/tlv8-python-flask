@@ -5,7 +5,7 @@ from flask import session, redirect, url_for, render_template, request
 from sqlalchemy import or_, and_, not_
 from app import db
 from app.sa.forms import LoginForm, OrgForm, PersonForm, RoleForm
-from app.sa.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission
+from app.sa.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize
 from app.menus.menuutils import get_process_name, get_process_full, get_function_tree
 from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, guid, get_org_type
 from app.sa.persons import get_person_info
@@ -142,7 +142,10 @@ def org_tree_select():
     params = url_decode(data.get('params', ''))  # 接收的参数需要解码
     param_dict = eval(params)  # 字符串转字典
     others = param_dict.get('other', '').split(',')
-    org_query = SAOrganization.query.filter(SAOrganization.scode != 'SYSTEM', SAOrganization.svalidstate > -1)
+    org_query = SAOrganization.query.filter(SAOrganization.svalidstate > -1)
+    show_system = request.args.get('show_system')
+    if not show_system:
+        org_query = org_query.filter(SAOrganization.scode != 'SYSTEM')
     hide_psm = request.args.get('hide_psm')
     if hide_psm:
         org_query = org_query.filter(SAOrganization.sorgkindid != 'psm')
@@ -848,6 +851,89 @@ def cancel_permissions():
         for sid in ids:
             permission = SAPermission.query.filter_by(sid=sid).first()
             db.session.delete(permission)
+        db.session.commit()
+        rdata['state'] = True
+    except Exception as e:
+        rdata['state'] = False
+        rdata['msg'] = '操作异常：' + str(e)
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 授权管理
+@system.route("/OPM/authorization")
+@user_login
+def authorization():
+    return render_template("system/OPM/authorization.html")
+
+
+# 授权管理-角色列表数据
+@system.route("/OPM/authorization/dataList")
+@user_login
+def authorization_data_list():
+    rdata = dict()
+    rdata['code'] = 0
+    data_query = SAAuthorize.query
+    org_id = request.args.get('org_id')
+    if org_id:
+        data_query = data_query.filter_by(sorgid=org_id)
+    else:
+        data_query = data_query.filter(1 == 2)  # 没有传机构id则不加载数据
+    query_text = url_decode(request.args.get('query_text', ''))
+    if query_text and query_text != '':
+        data_query = data_query.filter(or_(SAAuthorize.sdescription.ilike('%' + query_text + '%'),
+                                           SAAuthorize.sauthorizerolecode.ilike('%' + query_text + '%'),
+                                           SAAuthorize.sauthorizeroleid.ilike('%' + query_text + '%')))
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    count = data_query.count()
+    rdata['count'] = count
+    page_data = data_query.order_by(SAAuthorize.screatetime.desc()).paginate(page, limit)
+    no = 1
+    data = list()
+    for d in page_data.items:
+        row_data = dict()
+        row_data['no'] = no
+        row_data['sid'] = d.sid
+        row_data['sauthorizeroleid'] = d.sauthorizeroleid
+        row_data['sauthorizerolecode'] = d.sauthorizerolecode
+        row_data['sdescription'] = d.sdescription
+        row_data['sorgfname'] = d.sorgfname
+        row_data['screatorfname'] = d.screatorfname
+        row_data['screatetime'] = str(d.screatetime)
+        data.append(row_data)
+        no += 1
+    rdata['data'] = data
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 授权管理-角色列表-对话框
+@system.route("/OPM/authorization/dialog/roleList")
+@user_login
+def authorization_role_list():
+    return render_template("system/OPM/dialog/role-list.html")
+
+
+# 授权管理-添加（分配）角色
+@system.route("/OPM/authorization/addRole", methods=["POST"])
+@user_login
+def authorization_add_role():
+    rdata = dict()
+    try:
+        orgid = url_decode(request.form.get('orgid'))
+        roles = url_decode(request.form.get('roles'))
+        role_list = roles.split(",")
+        org = SAOrganization.query.filter_by(sid=orgid).first()
+        for rid in role_list:
+            role = SARole.query.filter_by(sid=rid).first()
+            authorize = SAAuthorize(sauthorizeroleid=role.sid, sauthorizerolecode=role.scode, sdescription=role.sname)
+            person_info = get_person_info(session['user_id'])
+            authorize.screatorfid = person_info['personfid']
+            authorize.screatorfname = person_info['personfname']
+            authorize.sorgid = org.sid
+            authorize.sorgname = org.sname
+            authorize.sorgfid = org.sfid
+            authorize.sorgfname = org.sfname
+            db.session.add(authorize)
         db.session.commit()
         rdata['state'] = True
     except Exception as e:

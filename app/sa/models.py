@@ -86,6 +86,24 @@ class SAPermission(db.Model):
     version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
 
 
+# 授权信息
+class SAAuthorize(db.Model):
+    __tablename__ = "sa_opauthorize"
+    __table_args__ = {"useexisting": True}
+    sid = db.Column(db.String(32), primary_key=True, default=guid, doc='主键')
+    sorgid = db.Column(db.String(65), nullable=False, index=True, doc='组织id')
+    sorgname = db.Column(db.String(255), doc='组织名称')
+    sorgfid = db.Column(db.String(2048), doc='组织fid')
+    sorgfname = db.Column(db.String(2048), doc='组织全名称')
+    sauthorizeroleid = db.Column(db.String(32), nullable=False, index=True, doc='角色ID')
+    sauthorizerolecode = db.Column(db.String(64), index=True, doc='角色编号')
+    sdescription = db.Column(db.String(1024), doc='角色名称')
+    screatorfid = db.Column(db.String(2048), doc='创建人fid')
+    screatorfname = db.Column(db.String(2048), doc='创建人全名称')
+    screatetime = db.Column(db.DateTime, default=datetime.now, doc='创建时间')
+    version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
+
+
 # 系统日志
 class SALogs(db.Model):
     __tablename__ = "sa_log"

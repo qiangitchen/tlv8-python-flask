@@ -1,0 +1,100 @@
+<html lang="zh_CN">
+{% include "common/table_page_head.html" %}
+<script type="text/javascript"
+        src="{{ url_for('static',filename='system/OPM/dialog/role-list.js',v='1.0.20220522') }}"></script>
+<body style="overflow: hidden;">
+<div class="layui-fluid">
+    <script type="text/html" id="list_toolbar">
+        <div class="layui-btn-container" style="padding-top: 1px;">
+            <div class='input-group input-group-sm' style='float:left; width:280px; height: 30px;'>
+                <input type="text" id="search_role" placeholder="快速查询..." class='form-control'>
+                <span class='input-group-btn'>
+                    <button class='btn btn-default' lay-event="quickQuery"><span
+                            class='glyphicon glyphicon-search'></span>查询</button>
+                </span>
+            </div>
+        </div>
+    </script>
+    <table class="layui-table"
+           lay-data="{height:'full-120',url:'/system/OPM/role/roleList', page:true, even:true, id:'role_list', toolbar:'#list_toolbar', defaultToolbar:[]}"
+           lay-filter="role_list">
+        <thead>
+        <tr>
+            <th lay-data="{checkbox:true}"></th>
+            <th lay-data="{field:'no', width:60}">序号</th>
+            <th lay-data="{field:'sid', hide:true}">ID</th>
+            <th lay-data="{field:'sname', width:180}">角色名称</th>
+            <th lay-data="{field:'scode', width:100}">角色编号</th>
+            <th lay-data="{field:'srolekind', width:100}">角色类型</th>
+            <th lay-data="{field:'sdescription'}">角色描述</th>
+        </tr>
+        </thead>
+    </table>
+    <div style="height:100px;border: 1px solid #eeeeee;">
+        <div style="width:100%;height:30px; line-height: 30px; background:url({{ url_for('static',filename='common/image/toolbar/templete/d_5.gif') }}) repeat-x;">
+            &nbsp;&nbsp;
+            选择列表：
+            &nbsp;&nbsp;
+            <a href="javascript:void(0);" title="单个删除" onclick="deleteBills()">
+                <img src="{{ url_for('static',filename='common/image/toolbar/templete/reset.gif') }}"></img>单个删除
+            </a>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="javascript:void(0);" title="全部清除" onclick="deleteAll()">
+                <img src="{{ url_for('static',filename='common/image/toolbar/templete/reset_all.gif') }}"></img>全部清除
+            </a>
+        </div>
+        <span id="Chtext">
+            </span>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    layui.use('table', function () {
+        var table = layui.table;
+        //头工具栏事件
+        table.on('toolbar(role_list)', function (obj) {
+            switch (obj.event) {
+                case 'quickQuery':
+                    loadList();
+                    break;
+            }
+        });
+        $("#query_text").keyup(function (event) {
+            if (event.keyCode == 13) {
+                loadList();
+            }
+        });
+        //触发行单击事件
+        table.on('row(role_list)', function (obj) {
+            //console.log(obj.tr) //得到当前行元素对象
+            //console.log(obj.data) //得到当前行数据
+            obj.tr.parent().find('tr').removeClass('active')
+            obj.tr.addClass('active') //选中行加特殊背景颜色
+            currentRole = obj.data;
+        });
+        table.on('checkbox(role_list)', function (obj) {
+            //console.log(obj); //当前行的一些常用操作集合
+            //console.log(obj.checked); //当前是否选中状态
+            //console.log(obj.data); //选中行的相关数据
+            //console.log(obj.type); //如果触发的是全选，则为：all，如果触发的是单选，则为：one
+            if (obj.type == 'one') {
+                gridChecked(obj.data, obj.checked);
+            } else {
+                gridCheckedAll(obj.checked);
+            }
+        });
+    });
+
+    function loadList() {
+        var search_role = $("#search_role").val();
+        layui.table.reload('role_list',
+            {
+                url: "/system/OPM/role/roleList?search_role=" + J_u_encode(search_role),
+                done: function (res, curr, count) {
+                    $("#search_role").val(search_role);
+                }
+            }
+        );
+    }
+</script>
+</html>
