@@ -5,7 +5,7 @@ import hashlib
 import os
 from flask import url_for
 from datetime import date, datetime
-from urllib.parse import unquote, unquote_to_bytes
+from urllib.parse import unquote_to_bytes
 
 
 # md5加密

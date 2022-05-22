@@ -43,8 +43,90 @@ def get_function_tree_child(item):
 
 
 # 获取功能菜单
-def get_function_menu():
-    return functions
+def get_function_menu(per):
+    menus = list()
+    for fun in functions:
+        if is_effective(per, fun):
+            item = dict()
+            item['title'] = fun['title']
+            if 'icon' in fun:
+                item['icon'] = fun['icon']
+            if 'child' in fun:
+                item['child'] = get_function_menu_child(per, fun)
+            menus.append(item)
+    return menus
+
+
+# 获取功能菜单-子
+def get_function_menu_child(per, fun):
+    children = list()
+    if 'child' not in fun:
+        return children
+    for m in fun['child']:
+        if is_effective(per, m):
+            item = dict()
+            item['title'] = m['title']
+            if 'icon' in m:
+                item['icon'] = m['icon']
+            if 'href' in m:
+                item['href'] = m['href']
+            if 'process' in m:
+                item['process'] = m['process']
+            if 'activity' in m:
+                item['activity'] = m['activity']
+            if 'child' in m:
+                item['child'] = get_function_menu_child(per, m)
+            children.append(item)
+    return children
+
+
+# 是否显示菜单
+def is_effective(per, item):
+    if 'display' in item:
+        display = item['display']
+        if display == 'hide':
+            return False
+    if 'href' in item:
+        return is_have_author(per, item['process'], item['activity'])
+    if 'child' in item:
+        child = item['child']
+        for ch in child:
+            ih = is_effective(per, ch)
+            if ih:
+                return True
+    return False
+
+
+# 判断功能是否在权限列表中
+def is_have_author(per, process, activity):
+    for p in per:
+        if p['sprocess'] == process and p['sactivity'] == activity:
+            return True
+    return False
+
+
+# 判断功能是否在权限列表中（根据url）
+def is_have_author_url(per, url):
+    for p in per:
+        if p['sdescription'] == url:
+            return True
+        if not is_in_function_tree(url, functions):
+            return True
+    return False
+
+
+# 判断url是否在功能菜单配置中（为了区分动作请求和页面请求）
+def is_in_function_tree(url, menus):
+    for fun in menus:
+        if 'href' in fun:
+            if url == fun['href']:
+                return True
+        if 'child' in fun:
+            child = fun['child']
+            is_in = is_in_function_tree(url, child)
+            if is_in:
+                return True
+    return False
 
 
 # 获取url对应的功能名称

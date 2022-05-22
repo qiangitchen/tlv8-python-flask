@@ -1,9 +1,10 @@
 # _*_ coding: utf-8 _*_
-import app.menus.functiontree
+
 from . import home
 from flask import render_template, url_for, redirect, session, send_file
 from app.common.captcha import generate_captcha
 from app.menus.menuutils import get_function_menu
+from app.sa.persons import get_permission_list
 from app.sa.views import user_login
 import json
 
@@ -48,7 +49,9 @@ def init_menu():
     logos['image'] = url_for("static", filename="portal/images/logo.png")
     logos['href'] = ""
     rdata['logoInfo'] = logos
-    rdata['menuInfo'] = get_function_menu()
+    person_id = session['user_id']
+    permission = get_permission_list(person_id)  # 获取当前用户的权限列表
+    rdata['menuInfo'] = get_function_menu(permission)  # 根据权限获取功能菜单
     return json.dumps(rdata, ensure_ascii=False)
 
 

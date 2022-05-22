@@ -1,8 +1,8 @@
 # _*_ coding: utf-8 _*_
 
 from app import db
-from flask import session
-from app.sa.models import SAOrganization
+from flask import session, request
+from app.sa.models import SAOrganization, SAAuthorize, SAPermission
 
 """
 用户信息（全）
@@ -87,3 +87,38 @@ def get_ogn_info(org):
 # 获取当前登录人信息
 def get_curr_person_info():
     return get_person_info(session['user_id'])
+
+
+# 获取用户的权限列表
+def get_permission_list(psm_id):
+    per = list()
+    org = SAOrganization.query.filter_by(spersonid=psm_id).first()
+    if org:
+        # 授权给自己角色
+        author = SAAuthorize.query.filter_by(sorgid=org.sid).all()
+        for au in author:
+            permission = SAPermission.query.filter_by(spermissionroleid=au.sauthorizeroleid, spermissionkind=0).all()
+            for p in permission:
+                pp = dict()
+                pp['sid'] = p.sid
+                pp['spermissionroleid'] = p.spermissionroleid
+                pp['sprocess'] = p.sprocess
+                pp['sactivity'] = p.sactivity
+                pp['sdescription'] = p.sdescription
+                pp['sactivityfname'] = p.sactivityfname
+                per.append(pp)
+        # 授权给父级角色
+        parent_author = db.session.execute("select * from sa_opauthorize where :orgfid_ like concat(sorgfid,'%')",
+                                           {'orgfid_': org.sfid})
+        for aus in parent_author:
+            permission = SAPermission.query.filter_by(spermissionroleid=aus.sauthorizeroleid, spermissionkind=0).all()
+            for p in permission:
+                pp = dict()
+                pp['sid'] = p.sid
+                pp['spermissionroleid'] = p.spermissionroleid
+                pp['sprocess'] = p.sprocess
+                pp['sactivity'] = p.sactivity
+                pp['sdescription'] = p.sdescription
+                pp['sactivityfname'] = p.sactivityfname
+                per.append(pp)
+    return per
