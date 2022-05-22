@@ -1,6 +1,7 @@
 # _*_ coding: utf-8 _*_
 
 from app import db
+from flask import session
 from app.sa.models import SAOrganization
 
 """
@@ -81,3 +82,8 @@ def get_ogn_info(org):
                 orgcode = sfcode.split('/')[i]
                 orgname = sfname.split('/')[i]
     return orgid, orgcode, orgname
+
+
+# 获取当前登录人信息
+def get_curr_person_info():
+    return get_person_info(session['user_id'])

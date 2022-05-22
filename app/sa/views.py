@@ -8,7 +8,7 @@ from app.sa.forms import LoginForm, OrgForm, PersonForm, RoleForm
 from app.sa.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize
 from app.menus.menuutils import get_process_name, get_process_full, get_function_tree
 from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, guid, get_org_type
-from app.sa.persons import get_person_info
+from app.sa.persons import get_person_info, get_curr_person_info
 from app.sa.onlineutils import set_online, clear_online
 from app.sa.orgutils import can_move_to, up_child_org_path
 from functools import wraps
@@ -708,7 +708,7 @@ def role_list():
     data = list()
     for d in page_data.items:
         row_data = dict()
-        row_data['no'] = no
+        row_data['no'] = no + (page - 1) * limit
         row_data['sid'] = d.sid
         row_data['sname'] = d.sname
         row_data['scode'] = d.scode
@@ -754,6 +754,10 @@ def delete_role():
     rowid = request.form.get('rowid')
     model = SARole.query.filter_by(sid=rowid).first()
     if model:
+        if model.sid == 'RL01':
+            rdata['state'] = False
+            rdata['msg'] = '超管角色不允许删除！'
+            return json.dumps(rdata, ensure_ascii=False)
         perm = SAPermission.query.filter_by(spermissionroleid=model.sid).all()
         for p in perm:  # 删除角色需要同时删除角色授权
             db.session.delete(p)
@@ -791,7 +795,7 @@ def permission_list():
     data = list()
     for d in page_data.items:
         row_data = dict()
-        row_data['no'] = no
+        row_data['no'] = no + (page - 1) * limit
         row_data['sid'] = d.sid
         row_data['sactivityfname'] = d.sactivityfname
         row_data['sprocess'] = d.sprocess
@@ -892,7 +896,7 @@ def authorization_data_list():
     data = list()
     for d in page_data.items:
         row_data = dict()
-        row_data['no'] = no
+        row_data['no'] = no + (page - 1) * limit
         row_data['sid'] = d.sid
         row_data['sauthorizeroleid'] = d.sauthorizeroleid
         row_data['sauthorizerolecode'] = d.sauthorizerolecode
@@ -926,7 +930,7 @@ def authorization_add_role():
         for rid in role_list:
             role = SARole.query.filter_by(sid=rid).first()
             authorize = SAAuthorize(sauthorizeroleid=role.sid, sauthorizerolecode=role.scode, sdescription=role.sname)
-            person_info = get_person_info(session['user_id'])
+            person_info = get_curr_person_info()
             authorize.screatorfid = person_info['personfid']
             authorize.screatorfname = person_info['personfname']
             authorize.sorgid = org.sid
@@ -934,6 +938,27 @@ def authorization_add_role():
             authorize.sorgfid = org.sfid
             authorize.sorgfname = org.sfname
             db.session.add(authorize)
+        db.session.commit()
+        rdata['state'] = True
+    except Exception as e:
+        rdata['state'] = False
+        rdata['msg'] = '操作异常：' + str(e)
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 授权管理-删除（取消）分配角色
+@system.route("/OPM/authorization/deleteRole", methods=["POST"])
+@user_login
+def authorization_del_role():
+    rdata = dict()
+    try:
+        values = url_decode(request.form.get('values'))
+        ids = values.split(',')
+        for sid in ids:
+            permission = SAAuthorize.query.filter_by(sid=sid).first()
+            if 'PSN01@ORG01' == permission.sorgid and 'RL01' == permission.sauthorizeroleid:
+                continue  # 超管用户的授权不能删除-防止误删
+            db.session.delete(permission)
         db.session.commit()
         rdata['state'] = True
     except Exception as e:
