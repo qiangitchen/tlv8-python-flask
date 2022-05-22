@@ -31,15 +31,15 @@ functions = [
               }
          ]},
          {"title": "流程管理", "icon": "layui-icon layui-icon-auz", "child": [
-             {"title": "流程监控",
-              "href": "/system/flow/monitor",
-              "process": "/SA/task/taskCenter/process",
-              "activity": "monitorActivity"
-              },
              {"title": "流程设计",
               "href": "/system/flow/flow_design",
               "process": "/flw/dwr/process",
               "activity": "vml-dwr-editor"
+              },
+             {"title": "流程监控",
+              "href": "/system/flow/monitor",
+              "process": "/SA/task/taskCenter/process",
+              "activity": "monitorActivity"
               }
          ]},
          {"title": "文档管理", "icon": "fa fa-sitemap", "child": [

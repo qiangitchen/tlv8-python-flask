@@ -13,7 +13,9 @@ import json
 @home.route("/")
 @user_login
 def index():
-    return redirect(url_for("home.login"))
+    if "user_id" not in session:
+        return redirect(url_for("home.login"))
+    return redirect(url_for("home.index_page"))
 
 
 @home.route("/captchaimage")

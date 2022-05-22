@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset='utf-8' />
+<title>404 Not Found - 脚本爱好者</title>
+<link rel='stylesheet' type='text/css' href='/css/html-v2.css' />
+<link rel='stylesheet' type='text/css' href='/css/layout-v2.css' />
+<!--[if lt IE 9]><script src='/js/header.js'></script><![endif]-->
+
+</head>
+<body>
+
+<section id="content" style="width:500px;margin:0 auto;margin-top:200px;">
+
+    <article id="page">
+       <h1>Whoops, we can not find this page you are accessing!</h1>
+	   <p>
+			Here are a few links to get back on track:<br />
+			<ol>
+				<li><a href="#" onclick="history.back()">Get Back</a></li>
+				<li><a href="/">Home Page</a></li>
+				<li><a href="/contact/">Contact Us</a></li>
+			</ol>
+	   </p>
+	   <script type="text/javascript" src="/js/ads.js"></script>
+	</article>
+	
+	<nav id="nav">
+		
+	</nav>
+
+	<br style="clear:both;" />
+</section>
+
+</body>
+</html>

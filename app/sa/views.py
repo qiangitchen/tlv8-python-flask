@@ -26,6 +26,7 @@ def user_login(f):
                 per = session['permission']
             else:
                 per = get_permission_list(session['user_id'])
+                session['permission'] = per
             if not is_have_author_url(per, request.path):
                 abort(403)  # 返回没有访问权限的错误
         return f(*args, **kwargs)
@@ -69,6 +70,7 @@ def logout():
     rdata = dict()
     clear_online()
     session.pop("user_id", None)
+    session.pop('permission', None)
     rdata['status'] = True
     return json.dumps(rdata, ensure_ascii=False)
 
@@ -1006,3 +1008,17 @@ def sys_log():
     page_data = data_query.order_by(SALogs.screatetime.desc()).paginate(page, limit)
     return render_template("system/log/SysLog.html", count=count, page=page, limit=limit,
                            page_data=page_data, search_text=search_text)
+
+
+# 流程设计
+@system.route("/flow/flow_design", methods=["GET", "POST"])
+@user_login
+def flow_design():
+    return render_template("system/flow/flow_design.html")
+
+
+# 流程设计-画图
+@system.route("/flow/dwr/svg-dwr-editor", methods=["GET", "POST"])
+@user_login
+def flow_design_editor():
+    return render_template("system/flow/dwr/svg-dwr-editor.html")

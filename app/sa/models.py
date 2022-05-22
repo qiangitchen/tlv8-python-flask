@@ -138,3 +138,35 @@ class SAOnlineInfo(db.Model):
     sserviceip = db.Column(db.String(64), doc='服务器IP')
     smachinecode = db.Column(db.String(100), index=True, doc='机器码-多台服务器集群时用于区分服务器')
     version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
+
+
+# 流程图
+class SAFlowDraw(db.Model):
+    __tablename__ = "sa_flowdrawlg"
+    __table_args__ = {"useexisting": True}
+    sid = db.Column(db.String(32), primary_key=True, default=guid, doc='主键')
+    sfolderid = db.Column(db.String(32), index=True, doc='目录ID')
+    sprocessid = db.Column(db.String(100), nullable=False, unique=True, doc='流程标识')
+    sprocessname = db.Column(db.String(100), doc='流程名称')
+    sdrawlg = db.Column(db.Text, doc='流程图')
+    sprocessacty = db.Column(db.Text, doc='流程环节')
+    screatorid = db.Column(db.String(100), doc='创建人ID')
+    screatorname = db.Column(db.String(100), doc='创建人名称')
+    supdatorid = db.Column(db.String(100), doc='修改人ID')
+    supdatorname = db.Column(db.String(100), doc='修改人名称')
+    screatetime = db.Column(db.DateTime, default=datetime.now, doc='创建时间')
+    supdatetime = db.Column(db.DateTime, doc='修改时间')
+    fenabled = db.Column(db.Integer, default=1, doc='启用状态')
+    version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
+
+
+# 流程图目录
+class SAFlowFolder(db.Model):
+    __tablename__ = "sa_flowfolder"
+    __table_args__ = {"useexisting": True}
+    sid = db.Column(db.String(32), primary_key=True, default=guid, doc='主键')
+    scode = db.Column(db.String(100), doc='编号')
+    sname = db.Column(db.String(100), doc='名称')
+    sparent = db.Column(db.String(32), index=True, doc='父id')
+    sidpath = db.Column(db.String(2048), doc='id路径用于搜索定位')
+    version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
