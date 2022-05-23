@@ -46,6 +46,10 @@ a.toobar_item:active {
     color: #000;
 }
 
+a.toobar_item.checked {
+    background: #e3e3e3;
+}
+
 a.dialog_item {
     margin-top: 2px;
     height: 19px;

@@ -1,11 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+<html lang="zh_CN">
+{% include "common/page_head.html" %}
 <body>
-<iframe src="/system/flow/dwr/svg-dwr-editor" frameborder="0"
-        style="width: 100%; height: 600px; border: none;"></iframe>
+<div class="easyui-layout" fit="true">
+    <div data-options="region:'west',title:'元素',split:true" style="width:300px;padding:5px;text-align:left;"
+         id="leftview">
+        <table class="elements">
+            <tbody id="elementviewer">
+            </tbody>
+        </table>
+    </div>
+    <div data-options="region:'center'" style="overflow: auto; padding: 0px;">
+        <div class="easyui-layout" fit="true">
+            <div data-options="region:'north',split:false,border:false"
+                 style="height:35px; padding: 0px; overflow: hidden;">
+                <a class="toobar_item" style="width: 70px; float: left;"><img
+                        src="{{ url_for('static', filename='common/image/tree/folder.gif') }}"> 打开</a>
+                <a style="float: left;padding: 3px;"><img
+                        src="{{ url_for('static', filename='common/image/toolbar/flw/group.gif') }}"></a>
+                <a class="toobar_item" style="width: 70px; float: left;"><img
+                        src="{{ url_for('static', filename='system/flow/process_icons/select.gif') }}"> 选择</a>
+                <a style="float: left;padding: 3px;"><img
+                        src="{{ url_for('static', filename='common/image/toolbar/flw/group.gif') }}"></a>
+                <a class="toobar_item" style="width: 70px; float: left;"><img
+                        src="{{ url_for('static', filename='system/flow/process_icons/start.png') }}"> 开始</a>
+                <a class="toobar_item" style="width: 70px; float: left;"><img
+                        src="{{ url_for('static', filename='system/flow/process_icons/end.png') }}"> 结束</a>
+                <a style="float: left;padding: 3px;"><img
+                        src="{{ url_for('static', filename='common/image/toolbar/flw/group.gif') }}"></a>
+                <a class="toobar_item" style="width: 100px; float: left;"><img
+                        src="{{ url_for('static', filename='system/flow/process_icons/biz.png') }}"> 活动环节</a>
+                <a style="float: left;padding: 3px;"><img
+                        src="{{ url_for('static', filename='common/image/toolbar/flw/group.gif') }}"></a>
+                <a class="toobar_item" style="width: 100px; float: left;"><img
+                        src="{{ url_for('static', filename='system/flow/process_icons/fork.png') }}"> 条件分支</a>
+                <a style="float: left;padding: 3px;"><img
+                        src="{{ url_for('static', filename='common/image/toolbar/flw/group.gif') }}"></a>
+                <a class="toobar_item" style="width: 100px; float: left;"><img
+                        src="{{ url_for('static', filename='system/flow/process_icons/forward.gif') }}"> 直线连线</a>
+                <a class="toobar_item" style="width: 100px; float: left;"><img
+                        src="{{ url_for('static', filename='system/flow/process_icons/transition.png') }}"> 折线连线</a>
+                <a style="float: left;padding: 3px;"><img
+                        src="{{ url_for('static', filename='common/image/toolbar/flw/group.gif') }}"></a>
+                <a class="toobar_item checked" name="direction" rec="down" style="width: 40px; float: left;"><img
+                        src="{{ url_for('static', filename='system/flow/process_icons/down.png') }}"></a>
+                <a class="toobar_item" name="direction" rec="right" style="width: 40px; float: left;"><img
+                        src="{{ url_for('static', filename='system/flow/process_icons/right.png') }}"></a>
+                <a class="toobar_item" name="direction" rec="up" style="width: 40px; float: left;"><img
+                        src="{{ url_for('static', filename='system/flow/process_icons/up.png') }}"></a>
+                <a class="toobar_item" name="direction" rec="left" style="width: 40px; float: left;"><img
+                        src="{{ url_for('static', filename='system/flow/process_icons/left.png') }}"></a>
+                <a style="float: left;padding: 3px;"><img
+                        src="{{ url_for('static', filename='common/image/toolbar/flw/group.gif') }}"></a>
+                &nbsp;<input class="easyui-switchbutton" data-options="onText:'锁定',offText:'解锁',onChange:lockchange"
+                             checked>
+            </div>
+            <div data-options="region:'center',border:false" style="overflow: auto; padding: 0px;">
+                <iframe src="/system/flow/dwr/svg-dwr-editor" frameborder="0"
+                        style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+    <div data-options="region:'east',title:'属性',split:true" style="width:300px;padding:5px;text-align:left;"
+         id="rightview">
+    </div>
+</div>
 </body>
+<script type="text/javascript">
+    var direction = "down", locked = true;
+    $("a[name='direction']").click(function (e) {
+        $("a[name='direction']").removeClass('checked');
+        $(this).addClass('checked');
+        direction = $(this).attr("rec");
+    });
+
+    function lockchange(checked) {
+        locked = checked;
+    }
+</script>
 </html>
