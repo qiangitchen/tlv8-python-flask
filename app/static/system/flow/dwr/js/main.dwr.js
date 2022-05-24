@@ -2242,7 +2242,7 @@ function Tab() {
 			}
 			if (json.btn) {
 				var btn = document.createElement('img');
-				btn.src = 'img/drop-add.gif';
+				//btn.src = 'img/drop-add.gif';
 				btn.style.border = "1px solid #eee";
 				btn.style.cursor = 'hand';
 				btn.onmouseover = function(event) {
@@ -2289,7 +2289,7 @@ function pageDataInited(sources){
 		try{
 			var j = JSONC.decode(deCode(sources));
 			drow_init(j.id,j.name);
-		}catch(e){
+		}catch(er){
 			alert("模型加载失败!");
 		}
 	}
