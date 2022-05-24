@@ -30,11 +30,31 @@ function Group(id, name) {
 		obj.innerHTML = "";
 		obj.style.cursor = "default";
 		obj.bindClass = this;
-		obj.onmousedown = GroupEvent.mouseDown;
-		obj.onmousemove = GroupEvent.mouseMove;
-		obj.onmouseup = GroupEvent.mouseUp;
-		obj.onkeydown = GroupEvent.keyDown;
-		obj.onkeyup = GroupEvent.keyUp;
+		// obj.onmousedown = GroupEvent.mouseDown;
+		// obj.onmousemove = GroupEvent.mouseMove;
+		// obj.onmouseup = GroupEvent.mouseUp;
+		// obj.onkeydown = GroupEvent.keyDown;
+		// obj.onkeyup = GroupEvent.keyUp;
+		$(obj).unbind("mousedown");
+		$(obj).bind("mousedown", function(event) {
+			GroupEvent.mouseDown(event);
+		});
+		$(obj).unbind("mousemove");
+		$(obj).bind("mousemove", function(event) {
+			GroupEvent.mouseMove(event);
+		});
+		$(obj).unbind("mouseup");
+		$(obj).bind("mouseup", function(event) {
+			GroupEvent.mouseUp(event);
+		});
+		$(document).unbind("keydown");
+		$(document).bind("keydown", function(event) {
+			GroupEvent.keyDown(event);
+		});
+		$(document).unbind("keyup");
+		$(document).bind("keyup", function(event) {
+			GroupEvent.keyUp(event);
+		});
 		this.lineMirror = new Line();
 		this.lineMirror.textFlag = false;
 		this.lineMirror.mirrorFlag = true;
@@ -58,7 +78,7 @@ function Group(id, name) {
 		this.count++;
 		return this.count;
 	};
-	this.point = function(flag,event) {
+	this.point = function(flag, event) {
 		if (flag == 'down') {
 			this.mouseX = GroupEvent.getMouseX(event);
 			this.mouseY = GroupEvent.getMouseY(event);
@@ -75,17 +95,6 @@ function Group(id, name) {
 			if (node.id == ObjID) {
 				res = node;
 				break;
-			}
-		}
-		return res;
-	};
-	this.getNodesById = function(ObjID) {
-		var res = [];
-		var nodeNum = this.nodes.length;
-		for (var i = (nodeNum - 1); i >= 0; i--) {
-			node = this.nodes[i];
-			if (node.id.indexOf(ObjID)>-1) {
-				res.push(node);
 			}
 		}
 		return res;
@@ -162,11 +171,10 @@ function Group(id, name) {
 		var y = GroupEvent.getMouseY(event);
 		var num = this.selectedObj.length;
 		var lineNum = this.lines.length;
-		var line = null;
 		for (var i = 0; i < num; i++) {
 			this.selectedObj[i].move(x, y, this.mouseX, this.mouseY);
 			for (var j = 0; j < lineNum; j++) {
-				line = this.lines[j];
+				var line = this.lines[j];
 				if ((line.fromObj == this.selectedObj[i])
 						|| (line.toObj == this.selectedObj[i])) {
 					line.relink();
@@ -217,9 +225,8 @@ function Group(id, name) {
 	};
 	this.setSelected = function(node) {
 		try {
-			node.setSelected();
 			this.selectedObj.push(node);
-			// alert($(document.body).width());
+			node.setSelected();
 		} catch (e) {
 		}
 	};
@@ -277,14 +284,15 @@ function Group(id, name) {
 		}
 		this.selectedLineFrom = [];
 	};
-	this.drawLineEnd = function(selNode) {
+	this.drawLineEnd = function(selNode, event) {
 		if (selNode != null) {
-			this.drawMirrorLineTo(selNode);
+			this.drawMirrorLineTo(selNode, event);
 			if (this.fuckyou(this.lineMirror.fromObj, this.lineMirror.toObj)) {
 				var line = new PolyLine();
 				line.init();
 				line.setShape(this.lineFlag);
 				line.link(this.lineMirror);
+				ElementList.addLine(line.toJson());
 				this.clearSelected();
 			}
 		}
@@ -295,7 +303,7 @@ function Group(id, name) {
 		this.lineMirror.setTo(this.mouseX, this.mouseY, selObj);
 		this.lineMirror.setDisplay('');
 	};
-	this.drawMirrorLineTo = function(selObj,event) {
+	this.drawMirrorLineTo = function(selObj, event) {
 		var x = GroupEvent.getMouseX(event);
 		var y = GroupEvent.getMouseY(event);
 		this.lineMirror.setTo(x, y, selObj);
@@ -385,10 +393,7 @@ function Group(id, name) {
 	this.clearSelected = function() {
 		var num = this.selectedObj.length;
 		for (var i = 0; i < num; i++) {
-			try{
-				this.selectedObj[i].clearSelected();
-			}catch(e){
-			}
+			this.selectedObj[i].clearSelected();
 		}
 		this.selectedObj = [];
 	};
@@ -421,12 +426,8 @@ function Group(id, name) {
 		for (var i = 0; i < num; i++) {
 			obj = this.nodes[i];
 			if (obj.selected) {
+				ElementList.removeNode(obj);
 				obj.remove();
-				try {
-					document.title = JSON.stringify({action:'EditorCallJava',option:'remove',data:obj.id});
-					//window.EditorCallJava('remove', obj.id);
-				} catch (e) {
-				}
 			} else {
 				arr[count] = obj;
 				count++;
@@ -440,6 +441,7 @@ function Group(id, name) {
 		for (var i = 0; i < num; i++) {
 			obj = this.lines[i];
 			if (obj.selected) {
+				ElementList.removeLine(obj);
 				obj.remove();
 			} else {
 				arr[count] = obj;
@@ -448,6 +450,7 @@ function Group(id, name) {
 		}
 		this.lines = arr;
 		this.selectedObj = [];
+		editModelchange();// 记录变化
 	};
 	this.getSelectedNode = function() {
 		var num = this.nodes.length;
@@ -463,29 +466,10 @@ function Group(id, name) {
 		}
 		return arr;
 	};
-	this.getSelectedLine = function() {
-		var num = this.lines.length;
-		var obj = null;
-		var arr = new Array();
-		var count = 0;
-		for (var i = 0; i < num; i++) {
-			obj = this.lines[i];
-			if (obj.selected) {
-				arr[count] = obj;
-				count++;
-			}
-		}
-		return arr;
-	};
-	this.haveSelected = function() {
-		var selNodes = this.getSelectedNode();
-		var selLines = this.getSelectedLine();
-		return selNodes.length > 0 || selLines.length > 0;
-	};
 	this.setGroupArea = function() {
 		var obj = document.getElementById('group');
-		var maxWidth = 2000;
-		var maxHeight = 2000;
+		var maxWidth = -1;
+		var maxHeight = -1;
 		var num = this.nodes.length;
 		var node = null;
 		for (var i = 0; i < num; i++) {
@@ -529,11 +513,12 @@ function Group(id, name) {
 		return JSONC.encode(json);
 	};
 	this.jsonTo = function(json) {
+		$("#elementviewer").html("");
 		if (!json) {
 			return;
 		}
-		this.id = json.id;
-		this.name = json.name;
+		// this.id = json.id;
+		// this.name = json.name;
 		this.count = json.count;
 		var jNodes = json.nodes;
 		var nodeNum = jNodes.length;
@@ -558,6 +543,7 @@ function Group(id, name) {
 			}
 			node.jsonTo(jNodes[i]);
 			node.init();
+			ElementList.addNode(jNodes[i]);
 		}
 		var jLines = json.lines;
 		var lineNum = jLines.length;
@@ -569,9 +555,8 @@ function Group(id, name) {
 				break;
 			}
 			line.jsonTo(jLines[i]);
+			ElementList.addLine(jLines[i]);
 		}
-		document.title = JSON.stringify({action:'dataInitedCall'});
-		//window.dataInitedCall(JSONC.encode(json));
 	};
 	this.setProp = function(selObj, flag) {
 		var win = document.getElementById('propWin');
@@ -600,6 +585,7 @@ function Group(id, name) {
 		var selLine = this.getEventLine();
 		if (!this.multiSelect) {
 			this.clearSelected();
+			ElementList.clearSelected();
 		}
 		if (selNode != null) {
 			if (selNode.type == "condition") {
@@ -607,6 +593,7 @@ function Group(id, name) {
 			} else {
 				this.setProp(selNode, 'n');
 			}
+			ElementList.selectEle(selNode.id);
 			if (!GroupEvent.isInArr(this.selectedObj, selNode)) {
 				if (!this.ctrlKey) {
 					this.multiSelect = false;
@@ -630,6 +617,7 @@ function Group(id, name) {
 			}
 		} else if (selLine != null) {
 			this.setProp(selLine[selLine.length - 1], 'l');
+			ElementList.selectEle(selLine[selLine.length - 1].id);
 			for (var i = 0; i < selLine.length; i++) {
 				if (!GroupEvent.isInArr(this.selectedObj, selLine[i])) {
 					if (!this.ctrlKey) {
@@ -670,6 +658,7 @@ function Group(id, name) {
 			if (!this.ctrlKey) {
 				this.clearSelected();
 				this.drawMirrorNodeStart();
+				ElementList.clearSelected();
 			}
 		}
 	};
@@ -678,11 +667,7 @@ var GroupEvent = {
 	mouseDown : function(event) {
 		var group = document.getElementById('group');
 		var Love = group.bindClass;
-		try{
-			document.selection.empty();
-		}catch (e) {
-		}
-		Love.point('down',event);
+		Love.point('down', event);
 		Love.eventStart(event);
 		return false;
 	},
@@ -698,10 +683,10 @@ var GroupEvent = {
 				Love.moveSelectedLine(event);
 				break;
 			case "drawline":
-				Love.drawMirrorLineTo(null,event);
+				Love.drawMirrorLineTo(null, event);
 				break;
 			case "moveline":
-				Love.moveLine(null,event);
+				Love.moveLine(event);
 				break;
 			case "blankdown":
 				Love.drawMirrorNode(event);
@@ -715,7 +700,7 @@ var GroupEvent = {
 		var group = document.getElementById('group');
 		var Love = group.bindClass;
 		if (Love.action != null) {
-			Love.point('up',event);
+			Love.point('up');
 			var selNode = Love.getEventNode('up');
 			switch (Love.action) {
 			case "nodedown":
@@ -738,20 +723,7 @@ var GroupEvent = {
 		}
 		Love.setGroupArea();
 		Love.action = null;
-		document.title = JSON.stringify({action:'designChangeCall'});
-		//window.designChangeCall(Love.toJson());
-		var selectedNode = Love.getSelectedNode();
-		var selectedLine = Love.getSelectedLine();
-		if (selectedNode.length == 1) {
-			document.title = JSON.stringify({action:'selectedCall',data:selectedNode[0].id});
-			//window.selectedCall(JSONC.encode(selectedNode[0].toJson()));
-		} else if (selectedLine.length == 1) {
-			document.title = JSON.stringify({action:'selectedCall',data:selectedLine[0].id});
-			//window.selectedCall(JSONC.encode(selectedLine[0].toJson()));
-		} else {
-			document.title = JSON.stringify({action:'selectedCall',data:'cancel'});
-			//window.selectedCall("cancel");
-		}
+		editModelchange();// 记录变化
 		return false;
 	},
 	keyDown : function(event) {
@@ -761,29 +733,39 @@ var GroupEvent = {
 		if (event.ctrlKey)
 			Love.ctrlKey = true;
 		switch (event.keyCode) {
-		case 46:// Delete
+		case 46:// 'Delete'
 			Love.removeSelected();
 			break;
-		case 65:// a[A]
+		case 65:// 'a'
 			if (event.ctrlKey) {
 				Love.selectAll();
 				Love.multiSelect = true;
 				window.event.returnValue = false;
-				return false;
 			}
 			break;
-		/*
-		 * case 83:// s[S] if (window.event.ctrlKey) { // MenuAction.save(); }
-		 * break;
-		 */
-		case 40:// ↓
+		case 83:// 's'
+			if (event.ctrlKey) {
+				MenuAction.save();
+			}
+			break;
+		case 89:// 'y'
+			if (event.ctrlKey) {
+				OperationHistory.redo();
+			}
+			break;
+		case 90:// 'z'
+			if (event.ctrlKey) {
+				OperationHistory.undo();
+			}
+			break;
+		case 40://'↓'
 			if (Love.slock) {
 				return true;
 			}
-			if (Love.selectedObj.length>0) {
+			if (Love.selectedObj) {
 				var num = Love.selectedObj.length;
-				var lineNum = Love.lines.length;
-				var line = null;
+				//var lineNum = Love.lines.length;
+				//var line = null;
 				for (var i = 0; i < num; i++) {
 					try {
 						var o_t = Love.selectedObj[i].top;
@@ -796,14 +778,14 @@ var GroupEvent = {
 				return false;
 			}
 			break;
-		case 38:// ↑
+		case 38://'↑'
 			if (Love.slock) {
 				return true;
 			}
-			if (Love.selectedObj.length>0) {
+			if (Love.selectedObj) {
 				var num = Love.selectedObj.length;
-				var lineNum = Love.lines.length;
-				var line = null;
+				//var lineNum = Love.lines.length;
+				//var line = null;
 				for (var i = 0; i < num; i++) {
 					try {
 						var o_t = Love.selectedObj[i].top;
@@ -816,14 +798,14 @@ var GroupEvent = {
 				return false;
 			}
 			break;
-		case 39:// →
+		case 39://'→'
 			if (Love.slock) {
 				return true;
 			}
-			if (Love.selectedObj.length>0) {
+			if (Love.selectedObj) {
 				var num = Love.selectedObj.length;
-				var lineNum = Love.lines.length;
-				var line = null;
+				//var lineNum = Love.lines.length;
+				//var line = null;
 				for (var i = 0; i < num; i++) {
 					try {
 						var o_l = Love.selectedObj[i].left;
@@ -836,14 +818,14 @@ var GroupEvent = {
 				return false;
 			}
 			break;
-		case 37:// ←
+		case 37://'←'
 			if (Love.slock) {
 				return true;
 			}
-			if (Love.selectedObj.length>0) {
+			if (Love.selectedObj) {
 				var num = Love.selectedObj.length;
-				var lineNum = Love.lines.length;
-				var line = null;
+				//var lineNum = Love.lines.length;
+				//var line = null;
 				for (var i = 0; i < num; i++) {
 					try {
 						var o_l = Love.selectedObj[i].left;
@@ -862,9 +844,7 @@ var GroupEvent = {
 	keyUp : function(event) {
 		var group = document.getElementById('group');
 		var Love = group.bindClass;
-		Love.ctrlKey = false;
-		document.title = JSON.stringify({action:'designChangeCall'});
-		//window.designChangeCall(Love.toJson());
+		Love.ctrlKey = !!event.ctrlKey;
 	},
 	getX : function(x) {
 		return (x + document.body.scrollLeft);
@@ -875,17 +855,17 @@ var GroupEvent = {
 	getMouseX : function(event) {
 		var e = event || window.event;
 		if (e.pageX) {
-			return e.pageX + document.getElementById("drawView").scrollLeft;
+			return e.pageX + $("#drawView").scrollLeft() - $("#drawView").offset().left;
 		} else {
-			return e.clientX + document.body.scrollLeft - document.body.clientLeft + document.getElementById("drawView").scrollLeft;
+			return e.clientX + document.body.scrollLeft - document.body.clientLeft + $("#drawView").scrollLeft() - $("#drawView").offset().left;
 		}
 	},
 	getMouseY : function(event) {
 		var e = event || window.event;
 		if (e.pageY) {
-			return e.pageY + document.getElementById("drawView").scrollTop;
+			return e.pageY + $("#drawView").scrollTop() - $("#drawView").offset().top;
 		} else {
-			return e.clientY + document.body.scrollTop - document.body.clientTop + document.getElementById("drawView").scrollTop;
+			return e.clientY + document.body.scrollTop - document.body.clientTop + $("#drawView").scrollTop() - $("#drawView").offset().top;
 		}
 	},
 	isIE : function() {
@@ -951,6 +931,9 @@ var GroupEvent = {
 	}
 };
 
+/*
+ * 编辑器菜单
+ */
 function Menu() {
 	this.id = 'menu';
 	this.left = 0;
@@ -963,16 +946,20 @@ function Menu() {
 	this.x = -1;
 	this.y = -1;
 	this.img = new Array('folder.gif', 'save.gif', 'start.gif', 'end.gif',
-			'node.gif', 'member.gif', 'fork.gif', 'forward.gif',
-			'drop-yes.gif', 'delete.gif', 'grid.gif', 'checkvalidity.gif');
-	this.text = new Array('打开', '保存', '开始环节', '结束环节', '环节（长方形）', '环节（图片）',
-			'条件分支', '路径（直线）', '路径（折线）', '删除', '网格', '帮助');
+			'node.gif', 'fork.gif', 'forward.gif',// 'member.gif',
+			'drop-yes.gif', 'delete.gif', //'grid.gif', 
+			'lock.png',
+			'checkvalidity.gif');
+	this.text = new Array('打开', '保存', '开始环节', '结束环节', '环节（长方形）', // '环节（图片）',
+	'条件分支', '路径（直线）', '路径（折线）', '删除',// '网格', 
+	'锁定', '帮助');
 	this.action = new Array('MenuAction.open()', 'MenuAction.save()',
 			'MenuAction.start()', 'MenuAction.end()', 'MenuAction.nodeRect()',
-			'MenuAction.nodeImg()', 'MenuAction.fork()',
-			'if(MenuAction.line(true)) MenuAction.changeStyle(this)',
-			'if(MenuAction.polyline(true)) MenuAction.changeStyle(this)',
-			'MenuAction.remove()', 'MenuAction.grid()', 'MenuAction.showHelp()');
+			'MenuAction.fork()',// 'MenuAction.nodeImg()',
+			'if(MenuAction.line()) MenuAction.changeStyle(this)',
+			'if(MenuAction.polyline()) MenuAction.changeStyle(this)',
+			'MenuAction.remove()',// 'MenuAction.grid()',
+			'MenuAction.sLock(this)', 'MenuAction.showHelp()');
 	this.init = function() {
 		var toolObj = document.getElementById('tool');
 		toolObj.innerHTML = "";
@@ -980,7 +967,7 @@ function Menu() {
 		toolObj.appendChild(obj);
 		toolObj.appendChild(this.createMenu());
 		obj.id = 'movebar';
-		obj.bindClass = this;
+		obj.bindClass = this; 
 		this.obj = obj;
 		obj.onmousedown = MenuEvent.mouseDown;
 		obj.onmousemove = MenuEvent.mouseMove;
@@ -1065,7 +1052,10 @@ var MenuEvent = {
 	mouseDown : function(event) {
 		var menu = document.getElementById('movebar');
 		var menuClass = menu.bindClass;
-		menu.setCapture();
+		try {
+			menu.setCapture();
+		} catch (e) {
+		}
 		menuClass.down(event);
 	},
 	mouseMove : function(event) {
@@ -1078,38 +1068,52 @@ var MenuEvent = {
 		var menu = document.getElementById('movebar');
 		var menuClass = menu.bindClass;
 		menuClass.up(event);
-		try{
+		try {
 			menu.releaseCapture();
-			document.getElementById('group').focus();
-		}catch(e){
+		} catch (e) {
 		}
+		document.getElementById('group').focus();
 	}
 };
+
+function flowdrowopenback(rdata) {
+	var param = new tlv8.RequestParam();
+	param.set("processID", rdata.id);
+	tlv8.XMLHttpRequest("flowloadIocusXAction", param, "post", true,
+			function(r) {
+				if (r.data.flag == "false") {
+					alert(r.data.message);
+					return false;
+				} else {
+					var resData = JSONC.decode(r.data.data);
+					drow_init(rdata.id, rdata.name, resData.jsonStr);
+					OperationHistory.init();
+					var group = document.getElementById('group');
+					var Love = group.bindClass;
+					window.modeljson = Love.toJson();
+				}
+			});
+}
+
 var MenuAction = {
 	open : function() {
-		justep.yn.portal.dailog.openDailog("打开流程",
-				"/flw/dwr/dialog/process-select.html", 666, 350,
-				function(rdata) {
-					drow_init(rdata.id, rdata.name, rdata.jsonStr);
-				});
+		$("#propWin").hide();
+		var url = "/flw/dwr/dialog/process-select.html";
+		tlv8.portal.dailog.openDailog("打开流程", url, 826, 410,
+				flowdrowopenback);
 	},
 	save : function() {
 		var group = document.getElementById('group');
 		var Love = group.bindClass;
-		// clipboardData.setData("Text", Love.toJson());
-		var param = new justep.yn.RequestParam();
+		var param = new tlv8.RequestParam();
 		param.set("sprocessid", Love.id);
 		param.set("sprocessname", Love.name);
 		param.set("sdrawlg", document.getElementById("group").innerHTML);
 		param.set("sprocessacty", Love.toJson().toString().encodeSpechars());
-		justep.yn.XMLHttpRequest("saveFlowDrawLGAction", param, "post", true,
+		tlv8.XMLHttpRequest("saveFlowDrawLGAction", param, "post", true,
 				function(r) {
 					sAlert("保存成功!");
 				});
-	},
-	adposation : "down",
-	setAdposation : function(sw) {
-		MenuAction.adposation = sw;
 	},
 	autoLine : function(n) { // 自动连线
 		var groupObj = document.getElementById('group');
@@ -1119,50 +1123,23 @@ var MenuAction = {
 			var snode;
 			if (sldNode.length > 0) {
 				snode = sldNode[sldNode.length - 1];
-				var asw = MenuAction.adposation;
 				var l, t;
-				if (asw == "down") {
-					if (snode.type == "node") {
-						if (n.type == "end") {
-							l = snode.left + (snode.width / 2) - 20;
-							t = snode.top + snode.height + 20;
-						} else {
-							l = snode.left;
-							t = snode.top + snode.height + 20;
-						}
+				if (snode.type == "node") {
+					if (n.type == "end") {
+						l = parseInt(snode.obj.style.left)
+								+ (parseInt(snode.obj.style.width) / 2) - 20;
+						t = parseInt(snode.obj.style.top)
+								+ parseInt(snode.obj.style.height) + 20;
 					} else {
-						l = snode.left - snode.width + 10;
-						t = snode.top + snode.height + 20;
+						l = parseInt(snode.obj.style.left);
+						t = parseInt(snode.obj.style.top)
+								+ parseInt(snode.obj.style.height) + 20;
 					}
-				} else if (asw == "right") {
-					if (snode.type == "node") {
-						t = snode.top;
-						l = snode.left + snode.width + 20;
-					} else {
-						t = snode.top;
-						l = snode.left + snode.width + 20;
-					}
-				} else if (asw == "left") {
-					if (snode.type == "node") {
-						t = snode.top;
-						l = snode.left - snode.width - 20;
-					} else {
-						t = snode.top;
-						l = snode.left - snode.width - 20;
-					}
-				} else if (asw == "up") {
-					if (snode.type == "node") {
-						if (n.type == "end") {
-							l = snode.left + (snode.width / 2) - 20;
-							t = snode.top - snode.height - 20;
-						} else {
-							l = snode.left;
-							t = snode.top - snode.height - 20;
-						}
-					} else {
-						l = snode.left - (snode.width) + 10;
-						t = snode.top - snode.height - 20;
-					}
+				} else {
+					l = parseInt(snode.obj.style.left)
+							- (parseInt(snode.obj.style.width)) + 10;
+					t = parseInt(snode.obj.style.top)
+							+ parseInt(snode.obj.style.height) + 20;
 				}
 				n.left = l;
 				n.top = t;
@@ -1174,6 +1151,7 @@ var MenuAction = {
 					fromObj : snode,
 					toObj : n
 				});
+				ElementList.addLine(ln.toJson());
 			} else {
 				n.init();
 			}
@@ -1185,77 +1163,53 @@ var MenuAction = {
 	start : function() {
 		var n = new NodeOval();
 		n.setName("开始");
-		// n.init();
 		this.autoLine(n);
-		document.title = JSON.stringify({action:'EditorCallJava',option:'add',data:JSONC.encode(n.toJson())});
-		//window.EditorCallJava('add', JSONC.encode(n.toJson()));
-		var groupObj = document.getElementById('group');
-		var Love = groupObj.bindClass;
-		document.title = JSON.stringify({action:'designChangeCall'});
-		//window.designChangeCall(Love.toJson());
+		ElementList.addNode(n.toJson());
 	},
 	end : function() {
 		var n = new NodeOval();
 		n.setType('end');
 		n.setName("结束");
-		// n.init();
 		this.autoLine(n);
-		document.title = JSON.stringify({action:'EditorCallJava',option:'add',data:JSONC.encode(n.toJson())});
-		//window.EditorCallJava('add', JSONC.encode(n.toJson()));
-		var groupObj = document.getElementById('group');
-		var Love = groupObj.bindClass;
-		document.title = JSON.stringify({action:'designChangeCall'});
-		//window.designChangeCall(Love.toJson());
+		ElementList.addNode(n.toJson());
 	},
-	nodeRect : function() {
+	nodeRect : function() {// 添加矩形环节
 		var n = new Node();
-		// n.init();
 		this.autoLine(n);
-		document.title = JSON.stringify({action:'EditorCallJava',option:'add',data:JSONC.encode(n.toJson())});
-		//window.EditorCallJava('add', JSONC.encode(n.toJson()));
-		var groupObj = document.getElementById('group');
-		var Love = groupObj.bindClass;
-		document.title = JSON.stringify({action:'designChangeCall'});
-		//window.designChangeCall(Love.toJson());
+		ElementList.addNode(n.toJson());
 	},
-	nodeImg : function() {
+	nodeImg : function() {// 添加图形环节
 		var n = new NodeImg();
-		n.init();
-		document.title = JSON.stringify({action:'EditorCallJava',option:'add',data:JSONC.encode(n.toJson())});
-		//window.EditorCallJava('add', JSONC.encode(n.toJson()));
-		var groupObj = document.getElementById('group');
-		var Love = groupObj.bindClass;
-		document.title = JSON.stringify({action:'designChangeCall'});
-		//window.designChangeCall(Love.toJson());
+		this.autoLine(n);
+		ElementList.addNode(n.toJson());
 	},
 	fork : function() {
 		var n = new Condition();
-		// n.init();
-		this.autoLine(n);
-		document.title = JSON.stringify({action:'EditorCallJava',option:'add',data:JSONC.encode(n.toJson())});
-		//window.EditorCallJava('add', JSONC.encode(n.toJson()));
-		var groupObj = document.getElementById('group');
-		var Love = groupObj.bindClass;
-		document.title = JSON.stringify({action:'designChangeCall'});
-		//window.designChangeCall(Love.toJson());
+		n.init();
+		// this.autoLine(n);
+		ElementList.addNode(n.toJson());
 	},
-	line : function(cansele) {
+	line : function() {
 		var group = document.getElementById('group');
 		var Love = group.bindClass;
-		if (cansele) {
+		if (Love.lineFlag == null) {
 			Love.lineFlag = 'line';
-		} else {
+		} else if (Love.lineFlag == 'line') {
 			Love.lineFlag = null;
+		} else {
+			return false;
 		}
 		return true;
 	},
-	polyline : function(cansele) {
+	polyline : function() {
 		var group = document.getElementById('group');
 		var Love = group.bindClass;
-		if (cansele) {
+		if (Love.lineFlag == null) {
 			Love.lineFlag = 'polyline';
-		} else {
+		} else if (Love.lineFlag == 'polyline') {
 			Love.lineFlag = null;
+		} else {
+			return false;
 		}
 		return true;
 	},
@@ -1263,8 +1217,6 @@ var MenuAction = {
 		var group = document.getElementById('group');
 		var Love = group.bindClass;
 		Love.removeSelected();
-		document.title = JSON.stringify({action:'designChangeCall'});
-		//window.designChangeCall(Love.toJson());
 	},
 	grid : function() {
 		var obj = document.body.style.backgroundImage;
@@ -1272,6 +1224,18 @@ var MenuAction = {
 			document.body.style.backgroundImage = 'url(img/bg.jpg)';
 		else
 			document.body.style.backgroundImage = '';
+	},
+	sLock : function(obj) {
+		var group = document.getElementById('group');
+		var Love = group.bindClass;
+		var imgSrc = (Love.slock) ? "img/lock.gif" : "img/unlock.gif";
+		//$(obj).find("img").attr("src", imgSrc);
+		Love.slock = (!Love.slock);
+		if(Love.slock){
+			$(obj).html("&nbsp;<img src='img/lock.png'>锁定");
+		}else{
+			$(obj).html("&nbsp;<img src='img/unlock.png'>解锁");
+		}
 	},
 	setLock : function(lockstate) {
 		var group = document.getElementById('group');
@@ -1291,7 +1255,7 @@ var MenuAction = {
 		obj.style.backgroundColor = '';
 	},
 	showHelp : function() {
-		var w = new Window();
+		var w = new HelpWindow();
 		w.show();
 	}
 };
@@ -1300,91 +1264,124 @@ var MenuAction = {
  * 选择执行页面
  */
 function selectexePage() {
-	/*
-	 * justep.yn.portal.dailog.openDailog("选择执行页面",
-	 * "/system/role/func-tree-select.html", "300", "300", function(data) { var
-	 * win = document.getElementById('propWin'); var kSet = data.keySet(); var
-	 * sURL; for (k in kSet) { sURL = kSet[k]; }
-	 * document.getElementById(win.type + '_p_exepage').value = sURL; });
-	 */
+	var url = "/flw/dwr/dialog/func-tree-select.html";
+	tlv8.portal.dailog.openDailog("选择执行页面", url, 300, 360, function(data) {
+		if (data) {
+			var win = document.getElementById('propWin');
+			$("#" + win.type + '_p_exepage').val(data.surl);
+		}
+	});
 }
+
 /*
  * 选择执行人
  */
 function selectexePerson() {
-	/*
-	 * justep.yn.portal.dailog .openDailog( "选择执行人",
-	 * "/comon/SelectDialogPsn/SelectChPsm.html", "500", "400", function(data) {
-	 * var win = document.getElementById('propWin');
-	 * document.getElementById(win.type + '_p_roleID').innerHTML = data.id;
-	 * document.getElementById(win.type + '_p_role').innerHTML = data.name; });
-	 */
+	var url = "/comon/SelectDialogPsn/SelectChPsm.html";
+	tlv8.portal.dailog.openDailog("选择执行人", url, 600, 420, function(data) {
+		if (data) {
+			var win = document.getElementById('propWin');
+			$("#" + win.type + '_p_roleID').html(data.id);
+			$("#" + win.type + '_p_role').html(data.name);
+		}
+	});
 }
+
 /*
  * 环节标题
  */
 function selectexeLabel() {
-	/*
-	 * var win = document.getElementById('propWin'); var Olexpression =
-	 * document.getElementById(win.type + '_p_label').value; if (Olexpression) {
-	 * Olexpression = justep.yn.encodeURIComponent(Olexpression.toString()
-	 * .decodeSpechars()); } else { Olexpression = ""; } var url =
-	 * "/flw/dwr/dialog/expression-editer.html?Olexpression=" + Olexpression;
-	 * justep.yn.portal.dailog.openDailog("环节标题-表达式编辑器", url, 700, 460,
-	 * function( data) { try { $("#" + win.type + '_p_label').val(data ? data :
-	 * ""); } catch (e) { } });
-	 */
+	var win = document.getElementById('propWin');
+	var Olexpression = document.getElementById(win.type + '_p_label').value;
+	if (Olexpression) {
+		Olexpression = tlv8.encodeURIComponent(Olexpression.toString()
+				.decodeSpechars());
+	} else {
+		Olexpression = "";
+	}
+	var url = "/flw/dwr/dialog/expression-editer.html?Olexpression="
+			+ Olexpression;
+	tlv8.portal.dailog.openDailog("环节标题-表达式编辑器", url, 700, 460, function(
+			data) {
+		try {
+			$("#" + win.type + '_p_label').val(data ? data : "");
+		} catch (e) {
+		}
+	});
 }
+
 /*
  * 选择执行人范围
  */
 function selectRange() {
-	/*
-	 * var win = document.getElementById('propWin'); var Olexpression =
-	 * document.getElementById(win.type + '_p_group').innerHTML; if
-	 * (Olexpression) { Olexpression =
-	 * justep.yn.encodeURIComponent(Olexpression.toString() .decodeSpechars()); }
-	 * else { Olexpression = ""; } justep.yn.portal.dailog .openDailog(
-	 * "表达式编辑器", "/flw/dwr/dialog/expression-editer.html?Olexpression=" +
-	 * Olexpression, "600", "450", function(data) { try {
-	 * document.getElementById(win.type + '_p_group').innerHTML = data ? data :
-	 * ""; } catch (e) { } });
-	 */
+	var win = document.getElementById('propWin');
+	var Olexpression = document.getElementById(win.type + '_p_group').innerHTML;
+	if (Olexpression) {
+		Olexpression = tlv8.encodeURIComponent(Olexpression.toString()
+				.decodeSpechars());
+	} else {
+		Olexpression = "";
+	}
+	var url = "/flw/dwr/dialog/expression-editer.html?Olexpression="
+			+ Olexpression;
+	tlv8.portal.dailog.openDailog("执行人范围-表达式编辑器", url, 700, 460, function(
+			data) {
+		try {
+			$("#" + win.type + '_p_group').html(data ? data : "");
+		} catch (e) {
+		}
+	});
 }
 
 // 转发规则
 function selectRangeTran() {
-	/*
-	 * var win = document.getElementById('propWin'); var Olexpression =
-	 * document.getElementById(win.type + '_r_transe').innerHTML; if
-	 * (Olexpression) { Olexpression =
-	 * justep.yn.encodeURIComponent(Olexpression.toString() .decodeSpechars()); }
-	 * else { Olexpression = ""; } var url =
-	 * "/flw/dwr/dialog/expression-editer.html?Olexpression=" + Olexpression;
-	 * justep.yn.portal.dailog.openDailog("转发规则-表达式编辑器", url, 700, 460,
-	 * function( data) { try { $("#" + win.type + '_r_transe').html(data ? data :
-	 * ""); } catch (e) { } });
-	 */
+	var win = document.getElementById('propWin');
+	var Olexpression = document.getElementById(win.type + '_r_transe').innerHTML;
+	if (Olexpression) {
+		Olexpression = tlv8.encodeURIComponent(Olexpression.toString()
+				.decodeSpechars());
+	} else {
+		Olexpression = "";
+	}
+	var url = "/flw/dwr/dialog/expression-editer.html?Olexpression="
+			+ Olexpression;
+	tlv8.portal.dailog.openDailog("转发规则-表达式编辑器", url, 700, 460, function(
+			data) {
+		try {
+			$("#" + win.type + '_r_transe').html(data ? data : "");
+		} catch (e) {
+		}
+	});
 }
 
 /*
  * 编辑条件表达式
  */
 function selectConditionExpression() {
-	/*
-	 * var win = document.getElementById('propWin'); var Olexpression =
-	 * document.getElementById(win.type + '_p_expression').value; if
-	 * (Olexpression) { Olexpression =
-	 * justep.yn.encodeURIComponent(Olexpression.toString() .decodeSpechars()); }
-	 * else { Olexpression = ""; } justep.yn.portal.dailog .openDailog(
-	 * "表达式编辑器",
-	 * "/flw/dwr/dialog/expression-editer.html?operatType=condition&Olexpression=" +
-	 * Olexpression, "600", "450", function(data) { try {
-	 * document.getElementById(win.type + '_p_expression').value = data ? data :
-	 * ""; } catch (e) { } });
-	 */
+	var win = document.getElementById('propWin');
+	var Olexpression = document.getElementById(win.type + '_p_expression').value;
+	if (Olexpression) {
+		Olexpression = tlv8.encodeURIComponent(Olexpression.toString()
+				.decodeSpechars());
+	} else {
+		Olexpression = "";
+	}
+	var url = "/flw/dwr/dialog/expression-editer.html?operatType=condition&Olexpression="
+			+ Olexpression;
+	tlv8.portal.dailog.openDailog("转发规则-表达式编辑器", url, 700, 460, function(
+			data) {
+		try {
+			$("#" + win.type + '_p_expression').val(data ? data : "");
+		} catch (e) {
+		}
+	});
 };
 
+function test() {
+	alert('测试');
+};
+function clickCheckBox() {
+};
 var Prop = {
 	nodes : [ [ {
 		subject : '环节ID',
@@ -1640,10 +1637,10 @@ var Prop = {
 			for (var j = 0; j < obj.length; j++) {
 				switch (obj[j].text) {
 				case 'span':
-					$("#"+obj[j].id).html('');
+					$("#" + obj[j].id).html('');
 					break;
 				default:
-					$("#"+obj[j].id).val('');
+					$("#" + obj[j].id).val('');
 					break;
 				}
 			}
@@ -1653,10 +1650,10 @@ var Prop = {
 			for (var j = 0; j < obj.length; j++) {
 				switch (obj[j].text) {
 				case 'span':
-					$("#"+obj[j].id).html('');
+					$("#" + obj[j].id).html('');
 					break;
 				default:
-					$("#"+obj[j].id).val('');
+					$("#" + obj[j].id).val('');
 					break;
 				}
 			}
@@ -1677,10 +1674,10 @@ var Prop = {
 				var v = null;
 				switch (obj[j].text) {
 				case 'span':
-					v = $("#"+obj[j].id).html();
+					v = document.getElementById(obj[j].id).innerHTML;
 					break;
 				default:
-					v = $("#"+obj[j].id).val();
+					v = document.getElementById(obj[j].id).value;
 					break;
 				}
 				if (v) {
@@ -1740,7 +1737,6 @@ JSONC = new function() {
 				self = this;
 				break;
 			}
-			;
 			if (rc.test(self)) {
 				try {
 					result = e("(".concat(self, ")"));
@@ -1757,7 +1753,6 @@ JSONC = new function() {
 				throw new Error("bad data");
 			}
 		}
-		;
 		return result;
 	};
 	this.encode = function() {
@@ -1801,12 +1796,10 @@ JSONC = new function() {
 						result[i++] = '"'.concat(key.replace(rs, s).replace(ru,
 								u), '":', tmp);
 				}
-				;
 				result = "{".concat(result.join(","), "}");
 				break;
 			}
 		}
-		;
 		return result;
 	};
 	this.toDate = function() {
@@ -1884,7 +1877,6 @@ JSONC = new function() {
 				return 1;
 			}
 		}
-		;
 		return $(Array) && $(Object);
 	};
 	try {
@@ -1895,10 +1887,10 @@ JSONC = new function() {
 	}
 };
 
-function Window() {
+function HelpWindow() {
 	this.id = 'propWin';
 	this.left = 100;
-	this.top = 30;
+	this.top = 50;
 	this.height = 300;
 	this.width = 400;
 	this.title = '帮助';
@@ -1908,19 +1900,16 @@ function Window() {
 	this.obj = null;
 	this.objBody = null;
 	this.init = function() {
-		try {
-			document.getElementById("propWin").parentNode.removeChild(document
-					.getElementById("propWin"));
-		} catch (e) {
-		}
-		// var toolObj = document.getElementById('tool');
+		$("#propWin").remove();
+		//var toolObj = document.getElementById('typeviewer');//tool
 		var win = document.createElement('div');
+		//toolObj.appendChild(win);
 		document.body.appendChild(win);
 		this.obj = win;
 		win.bindClass = this;
 		win.id = this.id;
 		win.style.position = 'absolute';
-		win.style.left = this.left;
+		win.style.left = ($(document.body).width() - 450) + "px";
 		win.style.top = this.top;
 		win.style.width = this.width;
 		win.className = 'x-window';
@@ -1942,9 +1931,19 @@ function Window() {
 		s += '</div> ';
 		s += '</div> ';
 		s += '</div>';
+		evnmap = new Map();
 		win.appendChild(this.createTop());
 		win.appendChild(this.createMiddle());
 		win.appendChild(this.createBottom());
+		if (!evnmap.isEmpty()) {
+			var keys = evnmap.keySet();
+			for (var i = 0; i < keys.length; i++) {
+				var events = evnmap.get(keys[i]);
+				for ( var k in events) {
+					J$(keys[i])[events[k].id] = events[k].action;
+				}
+			}
+		}
 	};
 	this.creatDomConditionSelect = function(obj) {
 		var group = document.getElementById('group');
@@ -1976,18 +1975,24 @@ function Window() {
 		var c = document.createElement('div');
 		c.className = 'x-window-tc';
 		r.appendChild(c);
-		c.pid = this.id;
-		c.onmousedown = WindowEvent.mouseDown;
-		c.onmousemove = WindowEvent.mouseMove;
-		c.onmouseup = WindowEvent.mouseUp;
+		$(c).attr('pid', this.id);
+		$(c).bind("mousedown", function(e) {
+			WindowEvent.mouseDown(e, this);
+		});
+		$(c).bind("mousemove", function(e) {
+			WindowEvent.mouseMove(e, this);
+		});
+		$(c).bind("mouseup", function(e) {
+			WindowEvent.mouseUp(e, this);
+		});
 		var closeObj = document.createElement('div');
 		closeObj.className = 'x-tool-close';
 		c.appendChild(closeObj);
-		closeObj.pid = this.id;
-		closeObj.onclick = function() {
-			var p = document.getElementById(this.pid);
+		$(closeObj).attr('pid', this.id);
+		$(closeObj).click(function() {
+			var p = document.getElementById($(this).attr("pid"));
 			p.style.display = 'none';
-		};
+		});
 		var title = document.createElement('span');
 		title.innerHTML = this.title;
 		this.obj.t = title;
@@ -2041,11 +2046,11 @@ function Window() {
 		c.className = 'x-window-bc';
 		r.appendChild(c);
 		var ba = document.createElement('button');
-		ba.pid = this.id;
+		$(ba).attr('pid', this.id);
 		c.appendChild(ba);
-		ba.className = 'btn';
-		ba.value = '应用';
-		ba.onclick = function() {
+		ba.className = 'btn btn-info btn-sm';
+		$(ba).text('应用');
+		$(ba).click(function() {
 			var win = document.getElementById('propWin');
 			var obj = win.selected;
 			if (obj) {
@@ -2056,21 +2061,23 @@ function Window() {
 				if (type == "n") {
 					obj.id = $("#" + type + '_p_id').val();
 				}
-				obj.name = document.getElementById(type + '_p_name').value;
+				obj.name = $("#" + type + '_p_name').val();
 				if (obj.textObj)
 					obj.textObj.innerHTML = obj.name;
 				obj.obj.title = obj.name;
+				ElementList.reloadEle();
+				ElementList.selectEle(obj.id);
 			}
-		};
+		});
 		var b = document.createElement('button');
-		b.pid = this.id;
+		$(b).attr('pid', this.id);
 		c.appendChild(b);
-		b.className = 'btn';
-		b.value = '关闭';
-		b.onclick = function() {
-			var p = document.getElementById(this.pid);
+		b.className = 'btn btn-default btn-sm';
+		$(b).text('关闭');
+		$(b).click(function() {
+			var p = document.getElementById($(this).attr("pid"));
 			p.style.display = 'none';
-		};
+		});
 		return l;
 	};
 	this.show = function() {
@@ -2088,9 +2095,25 @@ function Window() {
 		} catch (e) {
 		}
 	};
+	this.getMouseX = function(event) {
+		var e = event || window.event;
+		if (e.pageX) {
+			return e.pageX;
+		} else {
+			return e.clientX + document.body.scrollLeft - document.body.clientLeft;
+		}
+	};
+	this.getMouseY = function(event) {
+		var e = event || window.event;
+		if (e.pageY) {
+			return e.pageY;
+		} else {
+			return e.clientY + document.body.scrollTop - document.body.clientTop;
+		}
+	};
 	this.down = function(event) {
-		var x = GroupEvent.getMouseX(event);
-		var y = GroupEvent.getMouseY(event);
+		var x = this.getMouseX(event);
+		var y = this.getMouseY(event);
 		x = GroupEvent.getX(x);
 		y = GroupEvent.getY(y);
 		this.x = x - this.obj.offsetLeft;
@@ -2099,8 +2122,8 @@ function Window() {
 	};
 	this.move = function(event) {
 		if (this.selected) {
-			var x = GroupEvent.getMouseX(event);
-			var y = GroupEvent.getMouseY(event);
+			var x = this.getMouseX(event);
+			var y = this.getMouseY(event);
 			this.left = GroupEvent.getX(x) - this.x;
 			this.top = GroupEvent.getY(y) - this.y;
 			this.obj.style.left = this.left + 'px';
@@ -2120,23 +2143,26 @@ function Window() {
 	};
 };
 var WindowEvent = {
-	mouseDown : function(event) {
-		var win = document.getElementById(this.pid);
-		this.setCapture();
+	mouseDown : function(e, obj) {
+		var win = document.getElementById($(obj).attr("pid"));
+		try {
+			obj.setCapture();
+		} catch (er) {
+		}
 		var winClass = win.bindClass;
-		winClass.down(event);
+		winClass.down(e);
 	},
-	mouseMove : function(event) {
-		var win = document.getElementById(this.pid);
+	mouseMove : function(e, obj) {
+		var win = document.getElementById($(obj).attr("pid"));
 		var winClass = win.bindClass;
-		winClass.move(event);
+		winClass.move(e);
 		return false;
 	},
-	mouseUp : function(event) {
-		var win = document.getElementById(this.pid);
+	mouseUp : function(e, obj) {
+		var win = document.getElementById($(obj).attr("pid"));
 		var winClass = win.bindClass;
-		winClass.up(event);
-		this.releaseCapture();
+		winClass.up(e);
+		//obj.releaseCapture();
 		document.getElementById('group').focus();
 	}
 };
@@ -2178,6 +2204,8 @@ function TabPanel() {
 		tab.bObj.className = 'x-tab-panel-body-show';
 	};
 };
+
+var evnmap = new Map();
 function Tab() {
 	this.obj = null;
 	this.bObj = null;
@@ -2210,93 +2238,133 @@ function Tab() {
 		this.createBody(bObj, content);
 	};
 	this.createBody = function(pobj, content) {
+		var btnmap = new Map();
+		var bodyHtml = '<table style="width:100%;table-layout:fixed;">';
 		for (var i = 0; i < content.length; i++) {
 			var json = content[i];
-			var obj = document.createElement('div');
-			pobj.appendChild(obj);
-			var hObj = document.createElement('span');
-			obj.appendChild(hObj);
-			hObj.innerHTML = json.subject + '：';
-			hObj.style.width = '120px';
-			hObj.style.textAlign = 'center';
-			var bObj = document.createElement(json.text);
-			obj.appendChild(bObj);
-			bObj.id = json.id;
-			bObj.className = 'x-form-field';
+			bodyHtml += '<tr><td style="width:120px;text-align:center;">'
+					+ '<span>' + json.subject + ': </span></td>';
+			bodyHtml += '<td><' + json.text + ' class="x-form-field" id="'
+					+ json.id + '" style="width:100%;" ';
 			switch (json.text) {
 			case 'select':
+				bodyHtml += ">";
 				for (var j = 0; j < json.options.length; j++) {
-					bObj.options[j] = new Option(json.options[j].text,
-							json.options[j].id);
+					bodyHtml += '<option value="' + json.options[j].id + '">'
+							+ json.options[j].text + '</option>';
 				}
 				break;
 			case 'textarea':
-				bObj.rows = 6;
+				bodyHtml += ' rows="6">';
 				break;
 			default:
 			}
+			bodyHtml += '</' + json.text + '></td>';
 			if (json.Events) {
-				for ( var k in json.Events) {
-					bObj[json.Events[k].id] = json.Events[k].action;
-				}
+				evnmap.put(json.id, json.Events);
 			}
 			if (json.btn) {
-				var btn = document.createElement('img');
-				//btn.src = 'img/drop-add.gif';
-				btn.style.border = "1px solid #eee";
-				btn.style.cursor = 'hand';
-				btn.onmouseover = function(event) {
-					this.style.border = "1px solid gray";
-				};
-				btn.onmouseout = function(event) {
-					this.style.border = "1px solid #eee";
-				};
-				btn.onclick = json.btn.click;
-				obj.appendChild(btn);
+				bodyHtml += '<td style="width:30px;text-align:center;"><img id="'
+						+ json.id
+						+ '_btn" src="/static/system/flow/dwr/images/drop-add.gif"'
+						+ ' style="border:1px solid #eee;cursor:pointer;" '
+						+ ' onmouseover="this.style.border = \'1px solid gray\';" '
+						+ ' onmouseout="this.style.border = \'1px solid #eee\';" ></img></td>';
+				btnmap.put(json.id + "_btn", json.btn.click);
+			}else{
+				bodyHtml += '<td style="width:30px;text-align:center;"></td>';
 			}
+			bodyHtml += '</tr>';
 		}
+		bodyHtml += '</table>';
+		$(pobj).append($(bodyHtml));
+		$(pobj).find("img").each(function() {
+			if (btnmap.containsKey(this.id)) {
+				$(this).bind("click", btnmap.get(this.id));
+			}
+		});
 	};
 }
 
-function drow_init(processID, processName, json) {
-	var g = new Group(processID, processName);
-	g.init(); // 初始化画布
-	g.setGroupArea();
-	// var m = new Menu();
-	// m.init();//初始化菜单
-	var w = new Window();
-	w.left = screen.availWidth - 430;
-	w.init();// 初始化提示窗
-	w.hide();
-
-	// 加载流程图
-	if (json && typeof json == "string") {
-		// json = json.toString().decodeSpechars();
-		var j = JSONC.decode(json);
-		g.jsonTo(j);
-	} else if (json) {
-		g.jsonTo(json);
-	} else {
-		// window.dataInitedCall("empty");
+var ElementList = {};
+ElementList.addNode = function(json){
+	var n = $("<tr nodeid='"+json.id+"'></tr>");
+	if(json.type=="start"){
+		n.append("<td class='nimg'><img src='/static/system/flow/process_icons/start.png'></td>");
+	}else if(json.type=="end"){
+		n.append("<td class='nimg'><img src='/static/system/flow/process_icons/end.png'></td>");
+	}else if(json.type=="condition"){
+		n.append("<td class='nimg'><img src='/static/system/flow/process_icons/fork.png'></td>");
+	}else{
+		n.append("<td class='nimg'><img src='/static/system/flow/process_icons/biz.png'></td>");
 	}
-}
-
-function pageDataInited(sources){
-	try{
-		var j = JSONC.decode(deCode(sources));
-		drow_init(j.id,j.name,j);
-	}catch(e){
-		try{
-			var j = JSONC.decode(deCode(sources));
-			drow_init(j.id,j.name);
-		}catch(er){
-			alert("模型加载失败!");
-		}
+	n.append("<td>"+json.name+"</td>");
+	$("#elementviewer").append(n);
+	n.get(0).data = json;
+	n.click(function(){
+		var o = this;
+		$("#elementviewer").find("tr.active").removeClass("active");
+		$(o).addClass("active");
+		var d = o.data;
+		selectSinglNodeById(d.id);
+	});
+};
+ElementList.removeNode = function(node){
+	$("#elementviewer").find("tr[nodeid='"+node.id+"']").remove();
+};
+ElementList.addLine = function(json){
+	var n = $("<tr nodeid='"+json.id+"'></tr>");
+	if(json.shape=="polyline"){
+		n.append("<td class='nimg'><img src='/static/system/flow/process_icons/transition.png'></td>");
+	}else{
+		n.append("<td class='nimg'><img src='/static/system/flow/process_icons/forward.gif'></td>");
+	}
+	n.append("<td>"+json.name + "[" + json.from + "->" + json.to + "]" +"</td>");
+	$("#elementviewer").append(n);
+	n.get(0).data = json;
+	n.click(function(){
+		var o = this;
+		$("#elementviewer").find("tr.active").removeClass("active");
+		$(o).addClass("active");
+		var d = o.data;
+		selectSinglNodeById(d.id);
+	});
+};
+ElementList.chageText = function(json){
+	var tr = $("#elementviewer").find("tr[nodeid='"+json.id+"']");
+	if(json.type=="line"){
+		$(tr.find("td").get(1)).text(json.name + "[" + json.from + "->" + json.to + "]");
+	}else{
+		$(tr.find("td").get(1)).text(json.name);
 	}
 };
-function lookResourse(){
-	window.EditorCallJava("回调测试... ...");
+ElementList.removeLine = function(line){
+	$("#elementviewer").find("tr[nodeid='"+line.id+"']").remove();
 };
+ElementList.selectEle = function(id){
+	var enode = $("#elementviewer").find("tr[nodeid='"+id+"']");
+	enode.addClass("active");
+	var stop = enode.offset().top + $("#leftview").scrollTop() - ($(document.body).height()/2);
+	$("#leftview").animate({scrollTop:stop}, 10);
+};
+ElementList.clearSelected = function(){
+	$("#elementviewer").find("tr.active").removeClass("active");
+};
+ElementList.reloadEle = function(){
+	$("#elementviewer").html("");
+	var groupObj = document.getElementById('group');
+	var Love = groupObj.bindClass;
+	var json = JSONC.decode(Love.toJson());
+	var nodes = json.nodes;
+	for(var i=0; i<nodes.length; i++){
+		ElementList.addNode(nodes[i]);
+	}
+	var lines = json.lines;
+	for(var i=0; i<lines.length; i++){
+		ElementList.addLine(lines[i]);
+	}
+};
+
 function selectSinglNodeById(nodeid){
 	var groupObj = document.getElementById('group');
 	var Love = groupObj.bindClass;
@@ -2307,6 +2375,11 @@ function selectSinglNodeById(nodeid){
 		node.obj.focus();
 		// ‘焦点’移动到元素位置
 		$("#drawView").animate({scrollTop:node.top - ($(document.body).height()/2) + "px",scrollLeft:node.left - ($(document.body).width()/2) + "px"}, 10);
+		if (node.type == "condition") {
+			Love.setProp(node, 'c');
+		} else {
+			Love.setProp(node, 'n');
+		}
 		return;
 	}
 	var line = Love.getLineById(nodeid);
@@ -2317,128 +2390,27 @@ function selectSinglNodeById(nodeid){
 		line.toObj.obj.focus();
 		// ‘焦点’移动到元素位置
 		$("#drawView").animate({scrollTop:line.fromObj.top - ($(document.body).height()/2) + "px",scrollLeft:line.fromObj.left - ($(document.body).width()/2) + "px"}, 10);
+		Love.setProp(line, 'l');
 	}
-};
-function removeSinglNodeById(nodeid){
-	var groupObj = document.getElementById('group');
-	var Love = groupObj.bindClass;
-	var node = Love.getNodeById(nodeid);
-	if(node){
-		Love.clearSelected();
-		Love.setSelected(node);
-		// node.remove();
-		Love.removeSelected();
-	}
-	var line = Love.getLineById(nodeid);
-	if(line){
-		Love.clearSelected();
-		Love.setSelected(line);
-		Love.removeSelected();
-	}
-	document.title = JSON.stringify({action:'designChangeCall'});
-	//window.designChangeCall(Love.toJson());
-};	
-function setSelObjectProperty(objid,properStr){
-	var groupObj = document.getElementById('group');
-	var Love = groupObj.bindClass;
-	var node = Love.getNodeById(objid);
-	properStr = deCode(properStr);
-	if(node!=null){
-		node.property = JSONC.decode(properStr);
-	}else{
-		var line = Love.getLineById(objid);
-		if(line!=null){
-			line.property = JSONC.decode(properStr);
-		}
-	}
-	document.title = JSON.stringify({action:'designChangeCall'});
-	//window.designChangeCall(Love.toJson());
-};
-function setSelObjectName(objid,newname){
-	var groupObj = document.getElementById('group');
-	var Love = groupObj.bindClass;
-	var node = Love.getNodeById(objid);
-	newname = deCode(newname);
-	if(node!=null){
-		node.name = newname;
-		if (node.textObj)
-			node.textObj.innerHTML = newname;
-		node.obj.title = newname;
-	}else{
-		var line = Love.getLineById(objid);
-		if(line!=null){
-			line.name = newname;
-			if (line.textObj)
-			line.textObj.innerHTML = newname;
-			line.obj.title = newname;
-		}
-	}
-	document.title = JSON.stringify({action:'designChangeCall'});
-	//window.designChangeCall(Love.toJson());
-};
-function JavaCreatDomConditionSelect(objid){
-	var group = document.getElementById('group');
-	var Love = group.bindClass;
-	var Lines = Love.lines;
-	var optionsArray = new Array();
-	for ( var i in Lines) {
-		if (Lines[i].fromObj.id == objid) {
-			var djson = {
-				id : Lines[i].toObj.id,
-				name : Lines[i].toObj.name
-			};
-			optionsArray.push(djson);
-		}
-	}
-	document.title = JSON.stringify({action:'EditorCallJava',option:'setDomConditionSelect',data:JSONC.encode(optionsArray)});
-	//window.EditorCallJava('setDomConditionSelect',JSONC.encode(optionsArray));
-	return JSONC.encode(optionsArray);
-};
-function JavaevIsselected(){
-	var group = document.getElementById('group');
-	var Love = group.bindClass;
-	document.title = JSON.stringify({action:'EditorCallJava',option:'setDeleteActionEnable',data:(Love.getSelectedNode().length>0 || Love.getSelectedLine().length>0)});
-	//window.EditorCallJava("setDeleteActionEnable", Love.getSelectedNode().length>0 || Love.getSelectedLine().length>0);
-};
-function JavaparseNode(jsonstr){
-	var groupObj = document.getElementById('group');
-	var Love = groupObj.bindClass;
-	var json = JSONC.decode(jsonstr);
-	var hasnodelen = Love.getNodesById(json.id).length;
-	if(hasnodelen > 0){
-		json.id = json.id + "_" + hasnodelen;
-	}
-	json.name = json.name + "_" + hasnodelen;
-	switch (json.shape) {
-	case 'img': {
-		node = new NodeImg();
-		break;
-	}
-	case 'oval': {
-		node = new NodeOval();
-		break;
-	}
-	case 'shape': {
-		node = new Condition();
-		break;
-	}
-	default:
-		node = new Node();
-		break;
-	}
-	node.jsonTo(json);
-	node.left = Love.mouseX;
-	node.top = Love.mouseY;
-	node.init();
-	document.title = JSON.stringify({action:'EditorCallJava',option:'add',data:JSONC.encode(node.toJson())});
-	//window.EditorCallJava('add', JSONC.encode(node.toJson()));
-	document.title = JSON.stringify({action:'designChangeCall'});
-	//window.designChangeCall(Love.toJson());
-};
+}
 
-function getPageDataJson(){
-	var groupObj = document.getElementById('group');
-	var Love = groupObj.bindClass;
-	var jsonstr = Love.toJson();
-	return jsonstr;
+function drow_init(processID, processName, json) {
+	var g = new Group(processID, processName);
+	g.init(); // 初始化画布
+	g.setGroupArea();
+	//var m = new Menu();
+	//m.init();// 初始化菜单
+	var w = new HelpWindow();
+	w.left = screen.availWidth - 430;
+	w.init();// 初始化提示窗
+	w.hide();
+
+	// 加载流程图
+	if (json && typeof json == "string") {
+		json = json.toString().decodeSpechars();
+		var j = JSONC.decode(json);
+		g.jsonTo(j);
+	} else if (json) {
+		g.jsonTo(json);
+	}
 }

@@ -1,6 +1,39 @@
-<html lang="zh_CN">
-{% include "common/page_head.html" %}
-<body>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-store, must-revalidate">
+    <meta HTTP-EQUIV="expires" CONTENT="Thu, 01 Jan 1970 00:00:01 GMT">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1,IE=Edge">
+    <title>{action:''}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui/themes/default/easyui.css') }}"></link>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui/themes/icon.css') }}"></link>
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap/css/bootstrap.min.css') }}" media="all">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap/css/justified.css') }}" media="all">
+    <link rel="stylesheet" href="{{ url_for('static',filename='layui/css/layui.css') }}" media="all">
+    <link rel="stylesheet" href="{{ url_for('static',filename='common/css/table.css') }}" media="all">
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='common/css/toolbar.main.css') }}"></link>
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='system/flow/dwr/css/main.dwr.css') }}"/>
+    <script type="text/javascript" src="{{ url_for('static',filename='common/js/jquery/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='common/js/json2.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='common/js/main.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='system/flow/dwr/res/js/dojo.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='system/flow/dwr/res/js/_base.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='system/flow/dwr/res/js/shape.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='system/flow/dwr/res/js/path.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='system/flow/dwr/res/js/vml.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='system/flow/dwr/spec/dist/svg.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='system/flow/dwr/res/js/graphic.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui/jquery.easyui.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui/locale/easyui-lang-zh_CN.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='layui/layui.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='system/flow/dwr/js/operationhistory.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='system/flow/dwr/js/main.dwr.js') }}"></script>
+</head>
+<body onload="Prop.clear();document.getElementById('group').focus();" unselectable="on"
+      onselectstart="return false;">
 <div class="easyui-layout" fit="true">
     <div data-options="region:'west',title:'元素',split:true" style="width:300px;padding:5px;text-align:left;"
          id="leftview">
@@ -17,46 +50,52 @@
                         src="{{ url_for('static', filename='common/image/tree/folder.gif') }}"> 打开</a>
                 <a style="float: left;padding: 3px;"><img
                         src="{{ url_for('static', filename='common/image/toolbar/flw/group.gif') }}"></a>
-                <a class="toobar_item" style="width: 70px; float: left;" onclick="design.MenuAction.line(false);"><img
+                <a class="toobar_item" style="width: 70px; float: left;" onclick="MenuAction.line(false);"><img
                         src="{{ url_for('static', filename='system/flow/process_icons/select.gif') }}"> 选择</a>
                 <a style="float: left;padding: 3px;"><img
                         src="{{ url_for('static', filename='common/image/toolbar/flw/group.gif') }}"></a>
-                <a class="toobar_item" style="width: 70px; float: left;" onclick="design.MenuAction.start();"><img
+                <a class="toobar_item" style="width: 70px; float: left;" onclick="MenuAction.start();"><img
                         src="{{ url_for('static', filename='system/flow/process_icons/start.png') }}"> 开始</a>
-                <a class="toobar_item" style="width: 70px; float: left;" onclick="design.MenuAction.end();"><img
+                <a class="toobar_item" style="width: 70px; float: left;" onclick="MenuAction.end();"><img
                         src="{{ url_for('static', filename='system/flow/process_icons/end.png') }}"> 结束</a>
                 <a style="float: left;padding: 3px;"><img
                         src="{{ url_for('static', filename='common/image/toolbar/flw/group.gif') }}"></a>
-                <a class="toobar_item" style="width: 100px; float: left;" onclick="design.MenuAction.nodeRect();"><img
+                <a class="toobar_item" style="width: 100px; float: left;" onclick="MenuAction.nodeRect();"><img
                         src="{{ url_for('static', filename='system/flow/process_icons/biz.png') }}"> 活动环节</a>
                 <a style="float: left;padding: 3px;"><img
                         src="{{ url_for('static', filename='common/image/toolbar/flw/group.gif') }}"></a>
-                <a class="toobar_item" style="width: 100px; float: left;" onclick="design.MenuAction.fork();"><img
+                <a class="toobar_item" style="width: 100px; float: left;" onclick="MenuAction.fork();"><img
                         src="{{ url_for('static', filename='system/flow/process_icons/fork.png') }}"> 条件分支</a>
                 <a style="float: left;padding: 3px;"><img
                         src="{{ url_for('static', filename='common/image/toolbar/flw/group.gif') }}"></a>
-                <a class="toobar_item" style="width: 100px; float: left;" onclick="design.MenuAction.line(true);"><img
+                <a class="toobar_item" style="width: 100px; float: left;" onclick="MenuAction.line(true);"><img
                         src="{{ url_for('static', filename='system/flow/process_icons/forward.gif') }}"> 直线连线</a>
-                <a class="toobar_item" style="width: 100px; float: left;" onclick="design.MenuAction.polyline(true);"><img
+                <a class="toobar_item" style="width: 100px; float: left;"
+                   onclick="MenuAction.polyline(true);"><img
                         src="{{ url_for('static', filename='system/flow/process_icons/transition.png') }}"> 折线连线</a>
                 <a style="float: left;padding: 3px;"><img
                         src="{{ url_for('static', filename='common/image/toolbar/flw/group.gif') }}"></a>
-                <a class="toobar_item checked" name="direction" rec="down" style="width: 40px; float: left;" onclick="design.MenuAction.setAdposation('down');"><img
+                <a class="toobar_item checked" name="direction" rec="down" style="width: 40px; float: left;"
+                   onclick="MenuAction.setAdposation('down');"><img
                         src="{{ url_for('static', filename='system/flow/process_icons/down.png') }}"></a>
-                <a class="toobar_item" name="direction" rec="right" style="width: 40px; float: left;" onclick="design.MenuAction.setAdposation('right');"><img
+                <a class="toobar_item" name="direction" rec="right" style="width: 40px; float: left;"
+                   onclick="MenuAction.setAdposation('right');"><img
                         src="{{ url_for('static', filename='system/flow/process_icons/right.png') }}"></a>
-                <a class="toobar_item" name="direction" rec="up" style="width: 40px; float: left;" onclick="design.MenuAction.setAdposation('up');"><img
+                <a class="toobar_item" name="direction" rec="up" style="width: 40px; float: left;"
+                   onclick="MenuAction.setAdposation('up');"><img
                         src="{{ url_for('static', filename='system/flow/process_icons/up.png') }}"></a>
-                <a class="toobar_item" name="direction" rec="left" style="width: 40px; float: left;" onclick="design.MenuAction.setAdposation('left');"><img
+                <a class="toobar_item" name="direction" rec="left" style="width: 40px; float: left;"
+                   onclick="MenuAction.setAdposation('left');"><img
                         src="{{ url_for('static', filename='system/flow/process_icons/left.png') }}"></a>
                 <a style="float: left;padding: 3px;"><img
                         src="{{ url_for('static', filename='common/image/toolbar/flw/group.gif') }}"></a>
                 &nbsp;<input class="easyui-switchbutton" data-options="onText:'锁定',offText:'解锁',onChange:lockchange"
                              checked>
             </div>
-            <div data-options="region:'center',border:false" style="overflow: auto; padding: 0px;">
-                <iframe src="/system/flow/dwr/svg-dwr-editor" frameborder="0"
-                        style="width: 100%; height: 100%; border: none;" id="designFrame"></iframe>
+            <div data-options="region:'center',border:false" id="drawView"
+                 style="-moz-user-select:none; background:url({{ url_for('static',filename='system/flow/dwr/images/bg.jpg') }});">
+                <div id="group" onselectstart="return false;" unselectable="on"
+                     style="-moz-user-select:none; position: relative; overflow: hidden;"></div>
             </div>
         </div>
     </div>
@@ -64,6 +103,17 @@
          id="rightview">
     </div>
 </div>
+<!-- SVG 箭头线绘制 -->
+<svg id="isvg">
+    <defs>
+        <marker id="idArrow"
+                viewBox="0 0 20 20" refX="0" refY="10"
+                markerUnits="strokeWidth" markerWidth="8" markerHeight="10"
+                orient="auto">
+            <path d="M 0 0 L 20 10 L 0 20 z" fill="purple" stroke="black"/>
+        </marker>
+    </defs>
+</svg>
 </body>
 <script type="text/javascript">
     var direction = "down", locked = true;
@@ -75,14 +125,9 @@
 
     function lockchange(checked) {
         locked = checked;
-        design.MenuAction.setLock(locked);
+        MenuAction.setLock(locked);
     }
 
-    var design;
-    $("#designFrame").load(function () {
-        design = this.contentWindow;
-        var flowJson = {'id': new UUID().toString(), 'name': 'newFlow'};
-        design.pageDataInited(enCode(JSON.stringify(flowJson)));
-    });
+    drow_init("test1","演示流程");
 </script>
 </html>

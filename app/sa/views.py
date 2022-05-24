@@ -1021,4 +1021,4 @@ def flow_design():
 @system.route("/flow/dwr/svg-dwr-editor", methods=["GET", "POST"])
 @user_login
 def flow_design_editor():
-    return render_template("system/flow/dwr/svg-dwr-editor.html")
+    return render_template("system/flow/dwr/../templates/system/flow/svg-dwr-editor.html")

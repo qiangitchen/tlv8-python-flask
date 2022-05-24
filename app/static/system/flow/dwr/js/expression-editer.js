@@ -21,7 +21,7 @@ ExpressionEditer.insertText = function(str) {
 	} else {
 		obj.value += str;
 	}
-}
+};
 
 /*
  * 快速加入
@@ -29,7 +29,7 @@ ExpressionEditer.insertText = function(str) {
  */
 ExpressionEditer.quick_func_exp = function(obj) {
 	ExpressionEditer.insertText(obj.name);
-}
+};
 
 /*
  * 添加
@@ -48,21 +48,21 @@ ExpressionEditer.addExpression = function() {
 	}
 	sExpression += ")";
 	ExpressionEditer.insertText(sExpression);
-}
+};
 
 /*
  * 清空表达式
  */
 ExpressionEditer.clearExpression = function() {
 	document.getElementById("epressionEditerArea").innerHTML = "";
-}
+};
 
 /*
  * 检查表达式
  */
 ExpressionEditer.checkExpression = function() {
-	mAlert("检查通过.");
-}
+	$.messager.alert("提示","检查通过.");
+};
 
 /*
  * 树配置
@@ -86,11 +86,11 @@ var setting = {
 	}
 };
 function initExpTree() {
-	var param = new justep.yn.RequestParam();
-	var r = justep.yn.XMLHttpRequest("GetExpressionTreeAction", param, "post",
+	var param = new tlv8.RequestParam();
+	var r = tlv8.XMLHttpRequest("GetExpressionTreeAction", param, "post",
 			true, function(r) {
 				try {
-					zNodes = eval("(" + r.data.data + ")");
+					zNodes = r.data;
 					folderTree = $.fn.zTree.init($("#FlowFoldertreeNode"),
 							setting, zNodes);
 				} catch (e) {
@@ -116,13 +116,14 @@ function TreeonClick(event, treeId, treeNode, clickFlag) {
 	if (treeNode.param) {
 		paramList = new Array();
 		var params = treeNode.param.split(",");
+		var paramvalues = treeNode.paramvalue.split(",");
 		for ( var i = 0; i < params.length; i++) {
 			var djson = {};
 			if (params[i] && params[i] != "") {
 				djson.Name = params[i];
 				var pvalue = "";
 				try {
-					pvalue = treeNode.paramvalue.split(",")[i];
+					pvalue = paramvalues[i];
 				} catch (e) {
 				}
 				djson.Value = pvalue;
@@ -143,9 +144,9 @@ $(document)
 					initExpTree();
 					paramGrid = new simpleGrid();
 					paramGrid.init("parameterList");
-					var operatType = justep.yn.RequestURLParam
+					var operatType = tlv8.RequestURLParam
 							.getParam("operatType");
-					var Olexpression = justep.yn.RequestURLParam
+					var Olexpression = tlv8.RequestURLParam
 							.getParam("Olexpression");
 					if (!operatType) {
 						document.getElementById("itemForm").disabled = true;
@@ -155,7 +156,7 @@ $(document)
 						});
 					}
 					if (Olexpression) {
-						document.getElementById("epressionEditerArea").value = justep.yn
+						document.getElementById("epressionEditerArea").value = tlv8
 								.decodeURIComponent(Olexpression);
 					}
 				});
@@ -168,5 +169,5 @@ function dailogEngin() {
 	if (reData)
 		return reData;
 	else
-		return true;
+		return "";
 }
