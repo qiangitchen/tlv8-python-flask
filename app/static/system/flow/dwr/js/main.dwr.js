@@ -252,7 +252,7 @@ function Group(id, name) {
         var num = this.selectedLineTo.length;
         if (selNode != null) {
             for (var i = 0; i < num; i++) {
-                if (this.fuckyou(this.selectedLineTo[i].fromObj, selNode)) {
+                if (this.connect(this.selectedLineTo[i].fromObj, selNode)) {
                     this.selectedLineTo[i].setTo(this.mouseEndX,
                         this.mouseEndY, selNode);
                     this.selectedLineTo[i].relink();
@@ -269,7 +269,7 @@ function Group(id, name) {
         num = this.selectedLineFrom.length;
         if (selNode != null) {
             for (var i = 0; i < num; i++) {
-                if (this.fuckyou(selNode, this.selectedLineFrom[i].toObj)) {
+                if (this.connect(selNode, this.selectedLineFrom[i].toObj)) {
                     this.selectedLineFrom[i].setFrom(this.mouseEndX,
                         this.mouseEndY, selNode);
                     this.selectedLineFrom[i].relink();
@@ -287,7 +287,7 @@ function Group(id, name) {
     this.drawLineEnd = function (selNode, event) {
         if (selNode != null) {
             this.drawMirrorLineTo(selNode, event);
-            if (this.fuckyou(this.lineMirror.fromObj, this.lineMirror.toObj)) {
+            if (this.connect(this.lineMirror.fromObj, this.lineMirror.toObj)) {
                 var line = new PolyLine();
                 line.init();
                 line.setShape(this.lineFlag);
@@ -373,7 +373,7 @@ function Group(id, name) {
         }
         return res;
     };
-    this.fuckyou = function (fromObj, toObj) {
+    this.connect = function (fromObj, toObj) {
         var res = true;
         if (fromObj == toObj) {
             res = false;
@@ -588,8 +588,11 @@ function Group(id, name) {
             ElementList.clearSelected();
         }
         if (selNode != null) {
+            parent.console.log(selNode);
             if (selNode.type == "condition") {
                 this.setProp(selNode, 'c');
+            } else if (selNode.type == "start" || selNode.type == "end") {
+                this.setProp(selNode, 's');
             } else {
                 this.setProp(selNode, 'n');
             }
@@ -855,7 +858,7 @@ var GroupEvent = {
     getMouseX: function (event) {
         var e = event || window.event;
         if (e.pageX) {
-            return e.pageX + $("#drawView").scrollLeft() - $("#drawView").offset().left;
+            return e.pageX + $("#drawView").scrollLeft() - $("#drawView").offset().left - 5;
         } else {
             return e.clientX + document.body.scrollLeft - document.body.clientLeft + $("#drawView").scrollLeft() - $("#drawView").offset().left;
         }
@@ -931,189 +934,19 @@ var GroupEvent = {
     }
 };
 
-/*
- * 编辑器菜单
+/**
+ * 按钮动作定义
+ * @type {{over: MenuAction.over, setLock: MenuAction.setLock, nodeImg: MenuAction.nodeImg, line: (function(*): boolean), sLock: MenuAction.sLock, save: MenuAction.save, start: MenuAction.start, nodeRect: MenuAction.nodeRect, remove: MenuAction.remove, out: MenuAction.out, setAdposation: MenuAction.setAdposation, fork: MenuAction.fork, adposation: string, grid: MenuAction.grid, showHelp: MenuAction.showHelp, changeStyle: MenuAction.changeStyle, end: MenuAction.end, open: MenuAction.open, autoLine: MenuAction.autoLine, polyline: (function(*): boolean)}}
  */
-function Menu() {
-    this.id = 'menu';
-    this.left = 0;
-    this.top = 0;
-    this.height = 30;
-    this.width = 300;
-    this.selected = false;
-    this.obj = null;
-    this.menuObj = null;
-    this.x = -1;
-    this.y = -1;
-    this.img = new Array('folder.gif', 'save.gif', 'start.gif', 'end.gif',
-        'node.gif', 'fork.gif', 'forward.gif',// 'member.gif',
-        'drop-yes.gif', 'delete.gif', //'grid.gif',
-        'lock.png',
-        'checkvalidity.gif');
-    this.text = new Array('打开', '保存', '开始环节', '结束环节', '环节（长方形）', // '环节（图片）',
-        '条件分支', '路径（直线）', '路径（折线）', '删除',// '网格',
-        '锁定', '帮助');
-    this.action = new Array('MenuAction.open()', 'MenuAction.save()',
-        'MenuAction.start()', 'MenuAction.end()', 'MenuAction.nodeRect()',
-        'MenuAction.fork()',// 'MenuAction.nodeImg()',
-        'if(MenuAction.line()) MenuAction.changeStyle(this)',
-        'if(MenuAction.polyline()) MenuAction.changeStyle(this)',
-        'MenuAction.remove()',// 'MenuAction.grid()',
-        'MenuAction.sLock(this)', 'MenuAction.showHelp()');
-    this.init = function () {
-        var toolObj = document.getElementById('tool');
-        toolObj.innerHTML = "";
-        var obj = document.createElement('div');
-        toolObj.appendChild(obj);
-        toolObj.appendChild(this.createMenu());
-        obj.id = 'movebar';
-        obj.bindClass = this;
-        this.obj = obj;
-        obj.onmousedown = MenuEvent.mouseDown;
-        obj.onmousemove = MenuEvent.mouseMove;
-        obj.onmouseup = MenuEvent.mouseUp;
-        obj.style.position = 'absolute';
-        obj.style.left = this.left;
-        obj.style.top = this.top;
-        var td = document.createElement('div');
-        td.innerHTML = '&nbsp;&nbsp;';
-        obj.appendChild(td);
-    };
-    this.hide = function () {
-        try {
-            document.getElementById("movebar").style.display = "none";
-        } catch (e) {
-        }
-    };
-    this.createMenu = function () {
-        var obj = document.createElement('div');
-        this.menuObj = obj;
-        obj.id = this.id;
-        obj.style.position = 'absolute';
-        obj.style.height = this.height;
-        obj.style.left = this.left;
-        obj.style.top = this.top;
-        var tobj = document.createElement('table');
-        obj.appendChild(tobj);
-        var tb = document.createElement('tbody');
-        tobj.appendChild(tb);
-        var tr = document.createElement('tr');
-        tb.appendChild(tr);
-        var td = null;
-        for (var i = 0; i < this.img.length; i++) {
-            td = document.createElement('td');
-            tr.appendChild(td);
-            td.innerHTML = '<span onmousemove="MenuAction.over(this)" onmouseout="MenuAction.out(this)" onclick="'
-                + this.action[i]
-                + '">&nbsp;<img src="img/'
-                + this.img[i]
-                + '"/>'
-                + this.text[i]
-                + '</span><img src="img/grid-blue-split.gif"/>';
-        }
-        return obj;
-    };
-    this.down = function (event) {
-        var x = GroupEvent.getMouseX(event);
-        var y = GroupEvent.getMouseY(event);
-        x = GroupEvent.getX(x);
-        y = GroupEvent.getY(y);
-        this.x = x - this.obj.offsetLeft;
-        this.y = y - this.obj.offsetTop;
-        this.selected = true;
-    };
-    this.move = function (event) {
-        if (this.selected) {
-            var x = GroupEvent.getMouseX(event);
-            var y = GroupEvent.getMouseY(event);
-            this.left = GroupEvent.getX(x) - this.x;
-            this.top = GroupEvent.getY(y) - this.y;
-            this.obj.style.left = this.left + 'px';
-            this.obj.style.top = this.top + 'px';
-            this.menuObj.style.left = (this.left) + 'px';
-            this.menuObj.style.top = this.top + 'px';
-        }
-    };
-    this.up = function () {
-        this.selected = false;
-        if (this.left < 0) {
-            this.left = 0;
-            this.obj.style.left = this.left + 'px';
-            this.menuObj.style.left = (this.left) + 'px';
-        }
-        if (this.top < 0) {
-            this.top = 0;
-            this.obj.style.top = this.top + 'px';
-            this.menuObj.style.top = this.top + 'px';
-        }
-    };
-};
-var MenuEvent = {
-    mouseDown: function (event) {
-        var menu = document.getElementById('movebar');
-        var menuClass = menu.bindClass;
-        try {
-            menu.setCapture();
-        } catch (e) {
-        }
-        menuClass.down(event);
-    },
-    mouseMove: function (event) {
-        var menu = document.getElementById('movebar');
-        var menuClass = menu.bindClass;
-        menuClass.move(event);
-        return false;
-    },
-    mouseUp: function (event) {
-        var menu = document.getElementById('movebar');
-        var menuClass = menu.bindClass;
-        menuClass.up(event);
-        try {
-            menu.releaseCapture();
-        } catch (e) {
-        }
-        document.getElementById('group').focus();
-    }
-};
-
-function flowdrowopenback(rdata) {
-    var param = new tlv8.RequestParam();
-    param.set("processID", rdata.id);
-    tlv8.XMLHttpRequest("flowloadIocusXAction", param, "post", true,
-        function (r) {
-            if (r.data.flag == "false") {
-                alert(r.data.message);
-                return false;
-            } else {
-                var resData = JSONC.decode(r.data.data);
-                drow_init(rdata.id, rdata.name, resData.jsonStr);
-                OperationHistory.init();
-                var group = document.getElementById('group');
-                var Love = group.bindClass;
-                window.modeljson = Love.toJson();
-            }
-        });
-}
-
 var MenuAction = {
     open: function () {
         $("#propWin").hide();
-        var url = "/flw/dwr/dialog/process-select.html";
-        tlv8.portal.dailog.openDailog("打开流程", url, 826, 410,
-            flowdrowopenback);
+        openFlow();
     },
     save: function () {
         var group = document.getElementById('group');
         var Love = group.bindClass;
-        var param = new tlv8.RequestParam();
-        param.set("sprocessid", Love.id);
-        param.set("sprocessname", Love.name);
-        param.set("sdrawlg", document.getElementById("group").innerHTML);
-        param.set("sprocessacty", Love.toJson().toString().encodeSpechars());
-        tlv8.XMLHttpRequest("saveFlowDrawLGAction", param, "post", true,
-            function (r) {
-                sAlert("保存成功!");
-            });
+        saveFlowData(Love);
     },
     adposation: "down",
     setAdposation: function (sw) {
@@ -1246,12 +1079,15 @@ var MenuAction = {
         Love.removeSelected();
         ElementList.reloadEle();
     },
-    grid: function () {
-        var obj = document.body.style.backgroundImage;
-        if (obj == '')
-            document.body.style.backgroundImage = 'url(img/bg.jpg)';
-        else
-            document.body.style.backgroundImage = '';
+    grid: function (o) {
+        var obj = document.getElementById("drawView").style.backgroundImage;
+        if (obj == '') {
+            document.getElementById("drawView").style.backgroundImage = 'url(/static/system/flow/dwr/images/bg.jpg)';
+            $(o).addClass('checked');
+        } else {
+            document.getElementById("drawView").style.backgroundImage = '';
+            $(o).removeClass('checked');
+        }
     },
     sLock: function (obj) {
         var group = document.getElementById('group');
@@ -1288,130 +1124,22 @@ var MenuAction = {
     }
 };
 
-/*
- * 选择执行页面
+
+/**
+ * 节点属性定义
+ * @type {{nodes: ([{subject: string, id: string, text: string},{subject: string, id: string, text: string},{subject: string, id: string, text: string, btn: {hide: boolean, click: selectexePage}},{subject: string, id: string, text: string, btn: {hide: boolean, click: selectexeLabel}},{subject: string, id: string, text: string}]|[{subject: string, id: string, text: string, btn: {hide: boolean, click: selectRange}},{subject: string, id: string, text: string, btn: {hide: boolean, click: selectexePerson}},{subject: string, id: string, text: string, btn: {hide: boolean, click: selectexePerson}},{subject: string, options: [{text: string, id: string},{text: string, id: string},{text: string, id: string}], id: string, text: string},{subject: string, options: [{text: string, id: string},{text: string, id: string}], id: string, text: string}]|[{subject: string, options: [{text: string, id: string},{text: string, id: string}], id: string, text: string},{subject: string, id: string, text: string},{subject: string, id: string, text: string},{subject: string, id: string, text: string, btn: {hide: boolean, click: selectRangeTran}},{subject: string, id: string, text: string}]|[{subject: string, id: string, text: string},{subject: string, id: string, text: string}]|[{subject: string, id: string, text: string},{subject: string, id: string, text: string},{subject: string, id: string, text: string},{subject: string, id: string, text: string},{subject: string, id: string, text: string}])[], panels: [{flag: string, id: string, type: number, title: string, body: string},{flag: string, tabs: [{val: number, id: string, type: string}], id: string, type: number, title: string},{flag: string, tabs: [{val: number, id: string, type: string},{val: number, id: string, type: string},{val: number, id: string, type: string},{val: number, id: string, type: string},{val: number, id: string, type: string}], id: string, type: number, title: string},{flag: string, tabs: [{val: number, id: string, type: string}], id: string, type: number, title: string},{flag: string, tabs: [{val: number, id: string, type: string}], id: string, type: number, title: string}], setProperty: (function(*): *[]), clear: Prop.clear, roct: [{subject: string, id: string, text: string},{subject: string, id: string, text: string}][], conditions: [{subject: string, id: string, text: string},{subject: string, id: string, text: string},{subject: string, id: string, text: string, btn: {hide: boolean, click: selectConditionExpression}},{Events: [{action: action, id: string}], subject: string, options: *[], id: string, text: string},{Events: [{action: action, id: string}], subject: string, options: *[], id: string, text: string}][], lines: [{subject: string, id: string, text: string},{subject: string, id: string, text: string},{subject: string, id: string, text: string},{subject: string, id: string, text: string}][]}}
  */
-function selectexePage() {
-    var url = "/flw/dwr/dialog/func-tree-select.html";
-    tlv8.portal.dailog.openDailog("选择执行页面", url, 300, 360, function (data) {
-        if (data) {
-            var win = document.getElementById('propWin');
-            $("#" + win.type + '_p_exepage').val(data.surl);
-        }
-    });
-}
-
-/*
- * 选择执行人
- */
-function selectexePerson() {
-    var url = "/comon/SelectDialogPsn/SelectChPsm.html";
-    tlv8.portal.dailog.openDailog("选择执行人", url, 600, 420, function (data) {
-        if (data) {
-            var win = document.getElementById('propWin');
-            $("#" + win.type + '_p_roleID').html(data.id);
-            $("#" + win.type + '_p_role').html(data.name);
-        }
-    });
-}
-
-/*
- * 环节标题
- */
-function selectexeLabel() {
-    var win = document.getElementById('propWin');
-    var Olexpression = document.getElementById(win.type + '_p_label').value;
-    if (Olexpression) {
-        Olexpression = tlv8.encodeURIComponent(Olexpression.toString()
-            .decodeSpechars());
-    } else {
-        Olexpression = "";
-    }
-    var url = "/flw/dwr/dialog/expression-editer.html?Olexpression="
-        + Olexpression;
-    tlv8.portal.dailog.openDailog("环节标题-表达式编辑器", url, 700, 460, function (
-        data) {
-        try {
-            $("#" + win.type + '_p_label').val(data ? data : "");
-        } catch (e) {
-        }
-    });
-}
-
-/*
- * 选择执行人范围
- */
-function selectRange() {
-    var win = document.getElementById('propWin');
-    var Olexpression = document.getElementById(win.type + '_p_group').innerHTML;
-    if (Olexpression) {
-        Olexpression = tlv8.encodeURIComponent(Olexpression.toString()
-            .decodeSpechars());
-    } else {
-        Olexpression = "";
-    }
-    var url = "/flw/dwr/dialog/expression-editer.html?Olexpression="
-        + Olexpression;
-    tlv8.portal.dailog.openDailog("执行人范围-表达式编辑器", url, 700, 460, function (
-        data) {
-        try {
-            $("#" + win.type + '_p_group').html(data ? data : "");
-        } catch (e) {
-        }
-    });
-}
-
-// 转发规则
-function selectRangeTran() {
-    var win = document.getElementById('propWin');
-    var Olexpression = document.getElementById(win.type + '_r_transe').innerHTML;
-    if (Olexpression) {
-        Olexpression = tlv8.encodeURIComponent(Olexpression.toString()
-            .decodeSpechars());
-    } else {
-        Olexpression = "";
-    }
-    var url = "/flw/dwr/dialog/expression-editer.html?Olexpression="
-        + Olexpression;
-    tlv8.portal.dailog.openDailog("转发规则-表达式编辑器", url, 700, 460, function (
-        data) {
-        try {
-            $("#" + win.type + '_r_transe').html(data ? data : "");
-        } catch (e) {
-        }
-    });
-}
-
-/*
- * 编辑条件表达式
- */
-function selectConditionExpression() {
-    var win = document.getElementById('propWin');
-    var Olexpression = document.getElementById(win.type + '_p_expression').value;
-    if (Olexpression) {
-        Olexpression = tlv8.encodeURIComponent(Olexpression.toString()
-            .decodeSpechars());
-    } else {
-        Olexpression = "";
-    }
-    var url = "/flw/dwr/dialog/expression-editer.html?operatType=condition&Olexpression="
-        + Olexpression;
-    tlv8.portal.dailog.openDailog("转发规则-表达式编辑器", url, 700, 460, function (
-        data) {
-        try {
-            $("#" + win.type + '_p_expression').val(data ? data : "");
-        } catch (e) {
-        }
-    });
-};
-
-function test() {
-    alert('测试');
-};
-
-function clickCheckBox() {
-};
 var Prop = {
+    roct: [[{
+        subject: 'ID',
+        id: 's_p_id',
+        text: 'input'
+    }, {
+        subject: '名称',
+        id: 's_p_name',
+        text: 'input'
+    }
+    ]],
     nodes: [[{
         subject: '环节ID',
         id: 'n_p_id',
@@ -1443,7 +1171,7 @@ var Prop = {
     }], [{
         subject: '群组',
         id: 'n_p_group',
-        text: 'span',
+        text: 'input',
         btn: {
             click: selectRange,
             hide: true
@@ -1451,7 +1179,7 @@ var Prop = {
     }, {
         subject: '处理人ID',
         id: 'n_p_roleID',
-        text: 'span',
+        text: 'input',
         btn: {
             click: selectexePerson,
             hide: true
@@ -1459,7 +1187,7 @@ var Prop = {
     }, {
         subject: '处理人',
         id: 'n_p_role',
-        text: 'span',
+        text: 'input',
         btn: {
             click: selectexePerson,
             hide: true
@@ -1490,22 +1218,6 @@ var Prop = {
             id: 'branch'
         }]
     }], [{
-        subject: '流程控制者',
-        id: 'n_p_in',
-        text: 'input'
-    }, {
-        subject: '回退环节',
-        id: 'n_p_back',
-        text: 'input'
-    }, {
-        subject: '转发规则',
-        id: 'n_r_transe',
-        text: 'span',
-        btn: {
-            click: selectRangeTran,
-            hide: true
-        }
-    }, {
         subject: '流转确认',
         id: 'n_t_queryt',
         text: 'select',
@@ -1516,6 +1228,26 @@ var Prop = {
             text: '否',
             id: 'no'
         }]
+    }, {
+        subject: '回退环节',
+        id: 'n_p_back',
+        text: 'input'
+    }, {
+        subject: '通知环节',
+        id: 'n_p_note',
+        text: 'input'
+    }, {
+        subject: '转发规则',
+        id: 'n_r_transe',
+        text: 'input',
+        btn: {
+            click: selectRangeTran,
+            hide: true
+        }
+    }, {
+        subject: '流程控制者',
+        id: 'n_p_in',
+        text: 'input'
     }], [{
         subject: '办理时限',
         id: 'n_p_time',
@@ -1614,6 +1346,16 @@ var Prop = {
                 + '3.ctrl+a，全选。<br>4.按住ctrl，鼠标选中对象，可以多选。<br>5.delete，删除选中对象。<br>6.使用鼠标多选<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;鼠标点击空白处不释放，拖拽鼠标，会出现一个长方形虚框，虚框的范围随着鼠标移动而变化，虚框范围内的对象将被选中。'
                 + '<br>'
         }, {
+            flag: 's',
+            id: 's_prop_panel',
+            type: 1,
+            title: '标识',
+            tabs: [{
+                id: '常规',
+                val: 0,
+                type: 'roct'
+            }]
+        }, {
             flag: 'n',
             id: 'n_prop_panel',
             type: 1,
@@ -1690,6 +1432,8 @@ var Prop = {
     },
     setProperty: function (type) {
         var objs = null;
+        if (type == 's')
+            objs = this.roct;
         if (type == 'n')
             objs = this.nodes;
         else if (type == 'c')
@@ -1746,7 +1490,10 @@ String.prototype.decodeSpechars = function () {
     return str;
 };
 
-JSONC = new function () {
+/**
+ * 流程数据处理（类似json）
+ */
+var JSONC = new function () {
     this.decode = function () {
         var filter, result, self, tmp;
         if ($$("toString")) {
@@ -1922,6 +1669,10 @@ JSONC = new function () {
     }
 };
 
+/**
+ * 属性框控制（默认：帮助）
+ * @constructor
+ */
 function HelpWindow() {
     this.id = 'propWin';
     this.left = 100;
@@ -1936,41 +1687,15 @@ function HelpWindow() {
     this.objBody = null;
     this.init = function () {
         $("#propWin").remove();
-        //var toolObj = document.getElementById('typeviewer');//tool
         var win = document.createElement('div');
-        //toolObj.appendChild(win);
-        // document.body.appendChild(win);
         document.getElementById("rightview").appendChild(win);
         this.obj = win;
         win.bindClass = this;
         win.id = this.id;
         win.style.position = 'relative';
-        // win.style.position = 'absolute';
-        // win.style.left = ($(document.body).width() - 450) + "px";
-        // win.style.top = this.top;
-        // win.style.width = this.width;
         win.style.width = "100%";
         win.style.height = "100%";
         win.className = 'layui-card';
-        // win.className = 'x-window';
-        // var s = '<div class="x-window-tl">';
-        // s += '<div class="x-window-tr"> ';
-        // s += '<div id="a1" class="x-window-tc"><div class="x-tool-close"></div><span>标题</span>';
-        // s += '</div> ';
-        // s += ' </div> ';
-        // s += '</div> ';
-        // s += '<div class="x-window-ml"> ';
-        // s += ' <div class="x-window-mr"> ';
-        // s += ' <div class="x-window-mc"> ';
-        // s += ' </div> ';
-        // s += ' </div> ';
-        // s += '</div> ';
-        // s += '<div class="x-window-bl"> ';
-        // s += '<div class="x-window-br"> ';
-        // s += '<div class="x-window-bc"> ';
-        // s += '</div> ';
-        // s += '</div> ';
-        // s += '</div>';
         evnmap = new Map();
         win.appendChild(this.createTop());
         win.appendChild(this.createMiddle());
@@ -2007,33 +1732,8 @@ function HelpWindow() {
         }
     };
     this.createTop = function () {
-        // var l = document.createElement('div');
-        // l.className = 'x-window-tl';
-        // var r = document.createElement('div');
-        // r.className = 'x-window-tr';
-        // l.appendChild(r);
         var c = document.createElement('div');
         c.className = 'layui-card-header';
-        // c.className = 'x-window-tc';
-        // r.appendChild(c);
-        // $(c).attr('pid', this.id);
-        // $(c).bind("mousedown", function (e) {
-        //     WindowEvent.mouseDown(e, this);
-        // });
-        // $(c).bind("mousemove", function (e) {
-        //     WindowEvent.mouseMove(e, this);
-        // });
-        // $(c).bind("mouseup", function (e) {
-        //     WindowEvent.mouseUp(e, this);
-        // });
-        // var closeObj = document.createElement('div');
-        // closeObj.className = 'x-tool-close';
-        // c.appendChild(closeObj);
-        // $(closeObj).attr('pid', this.id);
-        // $(closeObj).click(function () {
-        //     var p = document.getElementById($(this).attr("pid"));
-        //     p.style.display = 'none';
-        // });
         var title = document.createElement('span');
         title.innerHTML = this.title;
         this.obj.t = title;
@@ -2064,19 +1764,11 @@ function HelpWindow() {
             }
         });
         return c;
-        // return l;
     };
     this.createMiddle = function () {
-        // var l = document.createElement('div');
-        // l.className = 'x-window-ml';
-        // var r = document.createElement('div');
-        // r.className = 'x-window-mr';
-        // l.appendChild(r);
         var c = document.createElement('div');
         c.className = 'layui-card-body';
         c.style = "padding:0px";
-        // c.className = 'x-window-mc';
-        // r.appendChild(c);
         for (var i = 0; i < Prop.panels.length; i++) {
             var panel = document.createElement('div');
             panel.id = Prop.panels[i].id;
@@ -2094,31 +1786,23 @@ function HelpWindow() {
                         .init(
                             Prop.panels[i].tabs[j].id,
                             Prop[Prop.panels[i].tabs[j].type][Prop.panels[i].tabs[j].val]);
-                    // tabs.appendFuck(tab);
-                    // panel.appendChild(tab.bObj);
                     tabs.ulObj.appendChild(tab.obj);
                     if (j == 0)
                         tabs.setSelected(tab);
                 }
             } else {
+                panel.style.padding = "10px";
                 panel.innerHTML = Prop.panels[i].body;
             }
         }
         return c;
-        // return l;
     };
     this.createBottom = function () {
         var l = document.createElement('div');
         l.className = 'layui-card';
-        // l.className = 'x-window-bl';
-        // var r = document.createElement('div');
-        // r.className = 'x-window-br';
-        // l.appendChild(r);
         var c = document.createElement('div');
         c.className = 'layui-card-header';
         c.style = 'padding:5px;text-align:center;';
-        // c.className = 'x-window-bc';
-        // r.appendChild(c);
         l.appendChild(c);
         var ba = document.createElement('button');
         $(ba).attr('pid', this.id);
@@ -2144,15 +1828,6 @@ function HelpWindow() {
                 ElementList.selectEle(obj.id);
             }
         });
-        // var b = document.createElement('button');
-        // $(b).attr('pid', this.id);
-        // c.appendChild(b);
-        // b.className = 'btn btn-default btn-sm';
-        // $(b).text('关闭');
-        // $(b).click(function () {
-        //     var p = document.getElementById($(this).attr("pid"));
-        //     p.style.display = 'none';
-        // });
         return l;
     };
     this.show = function () {
@@ -2170,78 +1845,12 @@ function HelpWindow() {
         } catch (e) {
         }
     };
-    this.getMouseX = function (event) {
-        var e = event || window.event;
-        if (e.pageX) {
-            return e.pageX;
-        } else {
-            return e.clientX + document.body.scrollLeft - document.body.clientLeft;
-        }
-    };
-    this.getMouseY = function (event) {
-        var e = event || window.event;
-        if (e.pageY) {
-            return e.pageY;
-        } else {
-            return e.clientY + document.body.scrollTop - document.body.clientTop;
-        }
-    };
-    this.down = function (event) {
-        var x = this.getMouseX(event);
-        var y = this.getMouseY(event);
-        x = GroupEvent.getX(x);
-        y = GroupEvent.getY(y);
-        this.x = x - this.obj.offsetLeft;
-        this.y = y - this.obj.offsetTop;
-        this.selected = true;
-    };
-    this.move = function (event) {
-        if (this.selected) {
-            var x = this.getMouseX(event);
-            var y = this.getMouseY(event);
-            this.left = GroupEvent.getX(x) - this.x;
-            this.top = GroupEvent.getY(y) - this.y;
-            this.obj.style.left = this.left + 'px';
-            this.obj.style.top = this.top + 'px';
-        }
-    };
-    this.up = function () {
-        this.selected = false;
-        if (this.left < 3) {
-            this.left = 10;
-            this.obj.style.left = this.left + 'px';
-        }
-        if (this.top < 3) {
-            this.top = 3;
-            this.obj.style.top = this.top + 'px';
-        }
-    };
-};
-var WindowEvent = {
-    mouseDown: function (e, obj) {
-        var win = document.getElementById($(obj).attr("pid"));
-        try {
-            obj.setCapture();
-        } catch (er) {
-        }
-        var winClass = win.bindClass;
-        winClass.down(e);
-    },
-    mouseMove: function (e, obj) {
-        var win = document.getElementById($(obj).attr("pid"));
-        var winClass = win.bindClass;
-        winClass.move(e);
-        return false;
-    },
-    mouseUp: function (e, obj) {
-        var win = document.getElementById($(obj).attr("pid"));
-        var winClass = win.bindClass;
-        winClass.up(e);
-        //obj.releaseCapture();
-        document.getElementById('group').focus();
-    }
-};
+}
 
+/**
+ * 节点属性组
+ * @constructor
+ */
 function TabPanel() {
     this.tabs = [];
     this.obj = null;
@@ -2249,9 +1858,7 @@ function TabPanel() {
     this.selected = null;
     this.init = function () {
         var obj = document.createElement('table');
-        // var obj = document.createElement('div');
         obj.className = 'layui-table';
-        // obj.className = 'x-tab-panel-header';
         obj.bindClass = this;
         thead = document.createElement('thead');
         thead_tr = document.createElement('tr');
@@ -2272,14 +1879,6 @@ function TabPanel() {
         body_tr.appendChild(body_td);
         tbody.appendChild(body_tr);
         obj.appendChild(tbody);
-        // var wrapObj = document.createElement('div');
-        // wrapObj.className = 'x-tab-strip-top';
-        // obj.appendChild(wrapObj);
-        // var topObj = document.createElement('div');
-        // topObj.className = 'x-tab-strip-wrap';
-        // wrapObj.appendChild(topObj);
-        // var ulObj = document.createElement('ul');
-        // topObj.appendChild(ulObj);
         this.obj = obj;
         this.ulObj = body_td;
     };
@@ -2292,24 +1891,23 @@ function TabPanel() {
         if (!tab) {
             tab = this.tabs[0];
         }
-        // if (this.selected) {
-        //     this.selected.obj.className = '';
-        //     this.selected.bObj.className = 'x-tab-panel-body';
-        // }
         this.selected = tab;
-        // tab.obj.className = 'x-tab-strip-active';
-        // tab.bObj.className = 'x-tab-panel-body-show';
     };
 };
 
 var evnmap = new Map();
 
+/**
+ * 属性分项
+ * @constructor
+ */
 function Tab() {
     this.obj = null;
     this.bObj = null;
     this.init = function (title, content) {
         var obj = document.createElement('table');
         obj.className = "layui-table";
+        $(obj).attr("lay-size","sm");
         // var obj = document.createElement('li');
         obj.bindClass = this;
         this.obj = obj;
@@ -2319,34 +1917,11 @@ function Tab() {
         top_td.innerHTML = title;
         top_tr.appendChild(top_td);
         obj.appendChild(top_tr);
-        // obj.onclick = function () {
-        //     var tabsClass = this.pObj.bindClass;
-        //     tabsClass.selected.obj.className = '';
-        //     tabsClass.selected.bObj.className = 'x-tab-panel-body';
-        //     tabsClass.selected = this.bindClass;
-        //     this.className = 'x-tab-strip-active';
-        //     this.bObj.className = 'x-tab-panel-body-show';
-        // };
-        // var l = document.createElement('div');
-        // l.className = 'x-tab-left';
-        // obj.appendChild(l);
-        // var r = document.createElement('div');
-        // r.className = 'x-tab-right';
-        // l.appendChild(r);
-        // var c = document.createElement('div');
-        // c.className = 'x-tab-middle';
-        // r.appendChild(c);
-        // c.innerHTML = title;
-        // var bObj = document.createElement('div');
-        // bObj.className = 'x-tab-panel-body';
-        // this.bObj = bObj;
-        // this.obj.bObj = bObj;
-        // this.createBody(bObj, content);
         this.createBody(obj, content);
     };
     this.createBody = function (pobj, content) {
         var btnmap = new Map();
-        var bodyHtml = "";//'<table style="width:100%;table-layout:fixed;">';
+        var bodyHtml = "";
         for (var i = 0; i < content.length; i++) {
             var json = content[i];
             bodyHtml += '<tr><td style="width:120px;">'
@@ -2362,7 +1937,7 @@ function Tab() {
                     }
                     break;
                 case 'textarea':
-                    bodyHtml += ' rows="6">';
+                    bodyHtml += ' rows="1">';
                     break;
                 default:
             }
@@ -2379,11 +1954,10 @@ function Tab() {
                     + ' onmouseout="this.style.border = \'1px solid #eee\';" ></img></td>';
                 btnmap.put(json.id + "_btn", json.btn.click);
             } else {
-                bodyHtml += '<td style="width:30px;text-align:center;"></td>';
+                bodyHtml += '<td style="width:30px;text-align:center;">&nbsp;</td>';
             }
             bodyHtml += '</tr>';
         }
-        //bodyHtml += '</table>';
         $(pobj).append($(bodyHtml));
         $(pobj).find("img").each(function () {
             if (btnmap.containsKey(this.id)) {
@@ -2393,17 +1967,21 @@ function Tab() {
     };
 }
 
+/**
+ * 元素列表控制
+ * @type {{}}
+ */
 var ElementList = {};
 ElementList.addNode = function (node) {
     var n = $("<tr nodeid='" + node.id + "'></tr>");
     if (node.type == "start") {
-        n.append("<td class='nimg'><img src='/static/system/flow/process_icons/start.png'></td>");
+        n.append("<td class='nimg'><img src='/static/system/flow/dwr/process_icons/start.png'></td>");
     } else if (node.type == "end") {
-        n.append("<td class='nimg'><img src='/static/system/flow/process_icons/end.png'></td>");
+        n.append("<td class='nimg'><img src='/static/system/flow/dwr/process_icons/end.png'></td>");
     } else if (node.type == "condition") {
-        n.append("<td class='nimg'><img src='/static/system/flow/process_icons/fork.png'></td>");
+        n.append("<td class='nimg'><img src='/static/system/flow/dwr/process_icons/fork.png'></td>");
     } else {
-        n.append("<td class='nimg'><img src='/static/system/flow/process_icons/biz.png'></td>");
+        n.append("<td class='nimg'><img src='/static/system/flow/dwr/process_icons/biz.png'></td>");
     }
     n.append("<td>" + node.name + "</td>");
     $("#elementviewer").append(n);
@@ -2422,9 +2000,9 @@ ElementList.removeNode = function (node) {
 ElementList.addLine = function (line) {
     var n = $("<tr nodeid='" + line.id + "'></tr>");
     if (line.shape == "polyline") {
-        n.append("<td class='nimg'><img src='/static/system/flow/process_icons/transition.png'></td>");
+        n.append("<td class='nimg'><img src='/static/system/flow/dwr/process_icons/transition.png'></td>");
     } else {
-        n.append("<td class='nimg'><img src='/static/system/flow/process_icons/forward.gif'></td>");
+        n.append("<td class='nimg'><img src='/static/system/flow/dwr/process_icons/forward.gif'></td>");
     }
     n.append("<td>" + line.name + "[" + line.fromObj.name + "->" + line.toObj.name + "]" + "</td>");
     $("#elementviewer").append(n);
@@ -2478,6 +2056,10 @@ ElementList.reloadEle = function () {
     }
 };
 
+/**
+ * 选中指定id的节点
+ * @param nodeid
+ */
 function selectSinglNodeById(nodeid) {
     var groupObj = document.getElementById('group');
     var Love = groupObj.bindClass;
@@ -2493,6 +2075,8 @@ function selectSinglNodeById(nodeid) {
         }, 10);
         if (node.type == "condition") {
             Love.setProp(node, 'c');
+        } else if (node.type == "start" || node.type == "end") {
+            Love.setProp(node, 's');
         } else {
             Love.setProp(node, 'n');
         }
@@ -2513,16 +2097,19 @@ function selectSinglNodeById(nodeid) {
     }
 }
 
+/**
+ * 画布初始化方法
+ * @param processID
+ * @param processName
+ * @param json
+ */
 function drow_init(processID, processName, json) {
     var g = new Group(processID, processName);
     g.init(); // 初始化画布
     g.setGroupArea();
-    //var m = new Menu();
-    //m.init();// 初始化菜单
+
     var w = new HelpWindow();
-    // w.left = screen.availWidth - 430;
     w.init();// 初始化提示窗
-    // w.hide();
 
     // 加载流程图
     if (json && typeof json == "string") {

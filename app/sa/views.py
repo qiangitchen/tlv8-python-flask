@@ -6,6 +6,7 @@ from sqlalchemy import or_
 from app import db
 from app.sa.forms import LoginForm, OrgForm, PersonForm, RoleForm
 from app.sa.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize, SAOnlineInfo
+from app.sa.models import SAFlowDraw, SAFlowFolder
 from app.menus.menuutils import get_process_name, get_process_full, get_function_tree, is_have_author_url
 from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, guid, get_org_type
 from app.sa.persons import get_person_info, get_curr_person_info, get_permission_list
@@ -1014,11 +1015,161 @@ def sys_log():
 @system.route("/flow/flow_design", methods=["GET", "POST"])
 @user_login
 def flow_design():
-    return render_template("system/flow/flow_design.html")
+    return render_template("system/flow/dwr/flow_design.html")
 
 
-# 流程设计-画图
-@system.route("/flow/dwr/svg-dwr-editor", methods=["GET", "POST"])
+# 流程设计-流程选择对话框
+@system.route("/flow/dwr/dialog/processSelect", methods=["GET", "POST"])
 @user_login
-def flow_design_editor():
-    return render_template("system/flow/dwr/../templates/system/flow/svg-dwr-editor.html")
+def process_select():
+    return render_template("system/flow/dwr/dialog/processSelect.html")
+
+
+# 加载流程目录树
+@system.route("/flow/dwr/dialog/TreeSelectAction", methods=["GET", "POST"])
+@user_login
+def flow_folder_tree():
+    rdata = dict()
+    data = request.form
+    params = url_decode(data.get('params', ''))  # 接收的参数需要解码
+    param_dict = eval(params)  # 字符串转字典
+    others = param_dict.get('other', '').split(',')
+    org_query = SAFlowFolder.query
+    currenid = data.get('currenid')
+    if currenid:
+        org_query = org_query.filter(SAFlowFolder.sparent == currenid)
+    else:
+        org_query = org_query.filter(or_(SAFlowFolder.sparent.is_(None), SAFlowFolder.sparent == 'root'))
+    orgs = org_query.all()
+    json_result = list()
+    if not currenid:
+        root_item = dict()
+        root_item['id'] = 'root'
+        root_item['name'] = '根目录'
+        root_item['sidpath'] = '/root'
+        root_item['isParent'] = True
+        json_result.append(root_item)
+    for org in orgs:
+        item = dict()
+        item['id'] = getattr(org, param_dict['id'])
+        item['name'] = getattr(org, param_dict['name'])
+        item['parent'] = getattr(org, param_dict['parent'])
+        for o in others:
+            item[o] = getattr(org, o)
+        item['isParent'] = True
+        json_result.append(item)
+    rdata['jsonResult'] = json_result
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 流程目录树-搜索
+@system.route("/flow/dwr/dialog/QuickTreeAction", methods=["GET", "POST"])
+@user_login
+def flow_folder_tree_quick():
+    rdata = dict()
+    data = request.form
+    quicktext = url_decode(data.get('quicktext', ''))
+    path = url_decode(data.get('path', ''))
+    org_query = SAFlowFolder.query
+    org_query = org_query.filter(
+        or_(SAFlowFolder.sid.ilike(quicktext), SAFlowFolder.scode.ilike('%' + quicktext + '%'),
+            SAFlowFolder.sname.ilike('%' + quicktext + '%')))
+    orgs = org_query.all()
+    json_result = list()
+    for org in orgs:
+        item = dict()
+        item[path] = getattr(org, path)
+        json_result.append(item)
+    rdata['jsonResult'] = json_result
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 流程目录树-添加节点
+@system.route("/flow/dwr/dialog/insertflwFolderAction", methods=["GET", "POST"])
+@user_login
+def flow_folder_tree_add():
+    rdata = dict()
+    data = request.form
+    id = url_decode(data.get('id', ''))
+    pid = url_decode(data.get('pid', ''))
+    scode = url_decode(data.get('scode', ''))
+    name = url_decode(data.get('name', ''))
+    sidpath = url_decode(data.get('sidpath', ''))
+    folder = SAFlowFolder(sid=id, scode=scode, sname=name, sparent=pid, sidpath=sidpath)
+    db.session.add(folder)
+    db.session.commit()
+    rdata['state'] = True
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 流程目录树-节点编辑
+@system.route("/flow/dwr/dialog/editflwFolderAction", methods=["GET", "POST"])
+@user_login
+def flow_folder_tree_edit():
+    rdata = dict()
+    data = request.form
+    id = url_decode(data.get('id', ''))
+    name = url_decode(data.get('name', ''))
+    folder = SAFlowFolder.query.filter_by(sid=id).first()
+    if folder:
+        folder.sname = name
+        db.session.add(folder)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 流程目录树-节点删除
+@system.route("/flow/dwr/dialog/deleteflwFolderAction", methods=["GET", "POST"])
+@user_login
+def flow_folder_tree_del():
+    rdata = dict()
+    data = request.form
+    id = url_decode(data.get('id', ''))
+    sidpath = url_decode(data.get('sidpath'))
+    folder = SAFlowFolder.query.filter_by(sid=id).first()
+    if folder:
+        db.session.delete(folder)
+        db.session.execute("delete from sa_flowfolder where sidpath like :sidpath_", {'sidpath_': str(sidpath) + '%'})
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 流程设计-流程选择-流程数据列表
+@system.route("/flow/dwr/dialog/dataList", methods=["GET", "POST"])
+@user_login
+def process_list():
+    rdata = dict()
+    rdata['code'] = 0
+    data_query = SAFlowDraw.query
+    sparent = request.args.get('sparent')
+    if sparent:
+        data_query = data_query.filter(SAFlowDraw.sfolderid == sparent)
+    search_text = url_decode(request.args.get('search_text', ''))
+    if search_text and search_text != '':
+        data_query = data_query.filter(or_(SAFlowDraw.sprocessid.ilike('%' + search_text + '%'),
+                                           SAFlowDraw.sprocessname.ilike('%' + search_text + '%')))
+    count = data_query.count()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    rdata['count'] = count
+    page_data = data_query.order_by(SAFlowDraw.screatetime.desc()).paginate(page, limit)
+    no = 1
+    data = list()
+    for d in page_data.items:
+        row_data = dict()
+        row_data['no'] = no + (page - 1) * limit
+        row_data['sid'] = d.sid
+        row_data['sprocessid'] = d.sprocessid
+        row_data['sprocessname'] = d.sprocessname
+        row_data['screatorname'] = d.screatorname
+        row_data['screatetime'] = d.screatetime
+        data.append(row_data)
+        no += 1
+    rdata['data'] = data
+    return json.dumps(rdata, ensure_ascii=False)
