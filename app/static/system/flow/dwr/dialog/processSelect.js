@@ -23,15 +23,15 @@ var setting = {
     },
     async: {
         enable: true,
-        url: "TreeSelectAction",
+        url: "/system/flow/dwr/dialog/TreeSelectAction",
         autoParam: ["id=currenid"],
         type: "post"
     },
     isquickPosition: {
         enable: true, // 是否有快速查询框
-        url: "QuickTreeAction",
+        url: "/system/flow/dwr/dialog/QuickTreeAction",
         quickCells: "scode,sname",// 用于快速查询的字段
-        path: "SIDPATH"// 查询路径字段
+        path: "sidpath"// 查询路径字段
     },
     edit: {
         enable: true,
@@ -83,7 +83,7 @@ function addHoverDom(treeId, treeNode) {
             param.set("scode", newCode);
             param.set("name", newName);
             param.set("sidpath", newSIDPATH);
-            var r = tlv8.XMLHttpRequest("insertflwFolderAction", param,
+            var r = tlv8.XMLHttpRequest("/system/flow/dwr/dialog/insertflwFolderAction", param,
                 "post", true, null);
             zTree.addNodes(treeNode, {
                 id: newid,
@@ -120,7 +120,7 @@ function afterEditName(event, treeId, treeNode) {
     var param = new tlv8.RequestParam();
     param.set("id", treeNode.id);
     param.set("name", treeNode.name);
-    var r = tlv8.XMLHttpRequest("editflwFolderAction", param, "post",
+    var r = tlv8.XMLHttpRequest("/system/flow/dwr/dialog/editflwFolderAction", param, "post",
         true, null);
 }
 
@@ -139,7 +139,7 @@ function onRemove(e, treeId, treeNode) {
     param.set("id", treeNode.id);
     param.set("name", treeNode.name);
     param.set("sidpath", treeNode.sidpath);
-    var r = tlv8.XMLHttpRequest("deleteflwFolderAction", param, "post",
+    var r = tlv8.XMLHttpRequest("/system/flow/dwr/dialog/deleteflwFolderAction", param, "post",
         true, function () {
             //clear_draw_board();
         });

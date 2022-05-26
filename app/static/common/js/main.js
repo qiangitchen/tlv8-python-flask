@@ -202,7 +202,6 @@ tlv8.XMLHttpRequest = function (actionName, param, post, ayn, callBack,
             }
         }
     }
-    actionName = (actionName.startWith(cpath) ? actionName : (cpath + "/" + actionName));
     try {
         var rs;
         var hideModelState = function () {
