@@ -13,12 +13,11 @@ function flowdrowopenback(rdata) {
     param.set("processID", rdata.id);
     tlv8.XMLHttpRequest("/system/flow/dwr/flowloadIocusXAction", param, "post", true,
         function (r) {
-            if (r.data.flag == "false") {
-                alert(r.data.message);
+            if (r.state == false) {
+                layui.layer.alert(r.msg);
                 return false;
             } else {
-                var resData = JSONC.decode(r.data.data);
-                drow_init(rdata.id, rdata.name, resData.jsonStr);
+                drow_init(rdata.id, rdata.name, r.data.jsonStr);
                 OperationHistory.init();
                 var group = document.getElementById('group');
                 var Love = group.bindClass;
@@ -32,13 +31,17 @@ function flowdrowopenback(rdata) {
  */
 function saveFlowData(love) {
     var param = new tlv8.RequestParam();
-    param.set("sprocessid", Love.id);
-    param.set("sprocessname", Love.name);
+    param.set("sprocessid", love.id);
+    param.set("sprocessname", love.name);
     param.set("sdrawlg", document.getElementById("group").innerHTML);
-    param.set("sprocessacty", Love.toJson().toString().encodeSpechars());
-    tlv8.XMLHttpRequest("saveFlowDrawLGAction", param, "post", true,
+    param.set("sprocessacty", love.toJson().toString().encodeSpechars());
+    tlv8.XMLHttpRequest("/system/flow/dwr/saveFlowDrawLGAction", param, "post", true,
         function (r) {
-            sAlert("保存成功!");
+            if (r.state == false) {
+                layui.layer.alert(r.msg);
+            } else {
+                layui.layer.msg("保存成功!");
+            }
         });
 }
 

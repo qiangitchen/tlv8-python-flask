@@ -149,7 +149,7 @@ class SAFlowDraw(db.Model):
     sprocessid = db.Column(db.String(100), nullable=False, unique=True, doc='流程标识')
     sprocessname = db.Column(db.String(100), doc='流程名称')
     sdrawlg = db.Column(db.Text, doc='流程图')
-    sprocessacty = db.Column(db.Text, doc='流程环节')
+    sprocessacty = db.Column(db.Text, default='', doc='流程环节')
     screatorid = db.Column(db.String(100), doc='创建人ID')
     screatorname = db.Column(db.String(100), doc='创建人名称')
     supdatorid = db.Column(db.String(100), doc='修改人ID')

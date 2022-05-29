@@ -1201,7 +1201,7 @@ def process_list_del():
         db.session.commit()
         rdata['state'] = True
     else:
-        rdata['state'] = True
+        rdata['state'] = False
         rdata['msg'] = '指定的id无效!'
     return json.dumps(rdata, ensure_ascii=False)
 
@@ -1221,6 +1221,54 @@ def process_list_edit():
         db.session.commit()
         rdata['state'] = True
     else:
-        rdata['state'] = True
+        rdata['state'] = False
         rdata['msg'] = '指定的id或字段无效!'
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 加载流程图
+@system.route("/flow/dwr/flowloadIocusXAction", methods=["GET", "POST"])
+@user_login
+def flow_load_io_cus():
+    rdata = dict()
+    processID = url_decode(request.form.get('processID', ''))
+    dwr = SAFlowDraw.query.filter_by(sprocessid=processID).first()
+    if dwr:
+        data = dict()
+        data['id'] = dwr.sprocessid
+        data['name'] = dwr.sprocessname
+        data['jsonStr'] = dwr.sprocessacty
+        rdata['data'] = data
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = '指定的id无效!'
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 保存流程图
+@system.route("/flow/dwr/saveFlowDrawLGAction", methods=["GET", "POST"])
+@user_login
+def save_flow_draw():
+    rdata = dict()
+    sprocessid = url_decode(request.form.get('sprocessid', ''))
+    print(sprocessid)
+    # sprocessname = url_decode(request.form.get('sprocessname', ''))
+    sdrawlg = url_decode(request.form.get('sdrawlg', ''))
+    sprocessacty = url_decode(request.form.get('sprocessacty', ''))
+    dwr = SAFlowDraw.query.filter_by(sprocessid=sprocessid).first()
+    try:
+        if dwr:
+            # dwr.sprocessname = sprocessname
+            dwr.sdrawlg = sdrawlg
+            dwr.sprocessacty = sprocessacty
+            db.session.add(dwr)
+            db.session.commit()
+            rdata['state'] = True
+        else:
+            rdata['state'] = False
+            rdata['msg'] = 'sprocessid无效!'
+    except Exception as e:
+        rdata['state'] = False
+        rdata['msg'] = '保存异常：' + str(e)
     return json.dumps(rdata, ensure_ascii=False)
