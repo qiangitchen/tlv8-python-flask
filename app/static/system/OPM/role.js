@@ -55,7 +55,7 @@ function delRoleData(data) {
         tlv8.XMLHttpRequest("/system/OPM/role/deleteRole", param, "post", true,
             function (r) {
                 if (r.state == true) {
-                    layui.layer.alert("删除成功！");
+                    layui.layer.msg("删除成功！");
                     reloadList();
                 } else {
                     layui.layer.alert(r.msg);
@@ -105,7 +105,7 @@ function cocationCallback(data) {
     tlv8.XMLHttpRequest("/system/OPM/role/AssignPermissions", param, "post", true,
         function (r) {
             if (r.state == true) {
-                layui.layer.alert("添加权限成功！");
+                layui.layer.msg("添加权限成功！");
                 loadPermission(currentRole);
             } else {
                 layui.layer.alert(r.msg);
@@ -133,7 +133,7 @@ function deletePermission() {
     tlv8.XMLHttpRequest("/system/OPM/role/CancelPermissions", param, "post", true,
         function (r) {
             if (r.state == true) {
-                layui.layer.alert("删除成功！");
+                layui.layer.msg("删除成功！");
                 loadPermission(currentRole);
             } else {
                 layui.layer.alert(r.msg);

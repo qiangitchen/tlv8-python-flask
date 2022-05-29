@@ -3,6 +3,7 @@
 from . import system
 from flask import session, redirect, url_for, render_template, request, abort
 from sqlalchemy import or_
+from datetime import datetime
 from app import db
 from app.sa.forms import LoginForm, OrgForm, PersonForm, RoleForm
 from app.sa.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize, SAOnlineInfo
@@ -1122,7 +1123,7 @@ def flow_folder_tree_edit():
 
 
 # 流程目录树-节点删除
-@system.route("/flow/dwr/dialog/deleteflwFolderAction", methods=["GET", "POST"])
+@system.route("/flow/dwr/dialog/deleteflwFolderAction", methods=["POST"])
 @user_login
 def flow_folder_tree_del():
     rdata = dict()
@@ -1146,8 +1147,21 @@ def flow_folder_tree_del():
 def process_list():
     rdata = dict()
     rdata['code'] = 0
-    data_query = SAFlowDraw.query
     sparent = request.args.get('sparent')
+    action = request.args.get('action', '')
+    if action == 'add':
+        user = get_curr_person_info()
+        new_data = SAFlowDraw()
+        new_data.sprocessid = guid()
+        new_data.sprocessname = '新建的流程图'
+        new_data.screatorname = user['personName']
+        if sparent:
+            new_data.sfolderid = sparent
+        else:
+            new_data.sfolderid = 'root'
+        db.session.add(new_data)
+        db.session.commit()
+    data_query = SAFlowDraw.query
     if sparent:
         data_query = data_query.filter(SAFlowDraw.sfolderid == sparent)
     search_text = url_decode(request.args.get('search_text', ''))
@@ -1168,8 +1182,45 @@ def process_list():
         row_data['sprocessid'] = d.sprocessid
         row_data['sprocessname'] = d.sprocessname
         row_data['screatorname'] = d.screatorname
-        row_data['screatetime'] = d.screatetime
+        row_data['screatetime'] = datetime.strftime(d.screatetime, '%Y-%m-%d %H:%M:%S')
         data.append(row_data)
         no += 1
     rdata['data'] = data
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 流程图列表-删除数据
+@system.route("/flow/dwr/dialog/deleteFlowDWR", methods=["POST"])
+@user_login
+def process_list_del():
+    rdata = dict()
+    id = url_decode(request.form.get('id', ''))
+    dwr = SAFlowDraw.query.filter_by(sid=id).first()
+    if dwr:
+        db.session.delete(dwr)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = True
+        rdata['msg'] = '指定的id无效!'
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 流程图列表-修改数据
+@system.route("/flow/dwr/dialog/editFlowDWR", methods=["POST"])
+@user_login
+def process_list_edit():
+    rdata = dict()
+    id = url_decode(request.form.get('id', ''))
+    value = url_decode(request.form.get('value'))
+    field = url_decode(request.form.get('field'))
+    dwr = SAFlowDraw.query.filter_by(sid=id).first()
+    if dwr and field:
+        setattr(dwr, field, value)
+        db.session.add(dwr)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = True
+        rdata['msg'] = '指定的id或字段无效!'
     return json.dumps(rdata, ensure_ascii=False)

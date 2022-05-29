@@ -3,7 +3,7 @@ import os
 
 
 class Config:
-    SECRET_KEY = 'tlv8'
+    SECRET_KEY = 'tlv8-flask'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     UP_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "app/static/uploads/")  # 文件上传路径
 
@@ -17,13 +17,13 @@ class Config:
 
 # the config for development
 class DevelopmentConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:password@127.0.0.1:3306/tlv8'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:TLv8MySQL@127.0.0.1:3306/tlv8'
     DEBUG = True
 
 
 # 生产环境
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:password@127.0.0.1:3306/tlv8'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:TLv8MySQL@127.0.0.1:3306/tlv8'
     DEBUG = False
 
 

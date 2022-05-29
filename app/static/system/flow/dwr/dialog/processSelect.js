@@ -151,11 +151,14 @@ function pageLoad() {
     Jtree_Folder.init("tree_folder", setting, param);
 }
 
-function loadList() {
+function loadList(isAdd) {
     var search_text = $("#search_text").val();
     var surl = '/system/flow/dwr/dialog/dataList?search_text=' + J_u_encode(search_text);
     if (currentNode) {
         surl += "&sparent=" + currentNode.id;
+    }
+    if (isAdd) {
+        surl += "&action=add";
     }
     layui.table.reload('datalist', {
         url: surl,
@@ -165,10 +168,58 @@ function loadList() {
     });
 }
 
-function addData(){
-
+function addData() {
+    loadList(true);
 }
 
-function deleteData(){
+var currentRow;
 
+function deleteData() {
+    if (!currentRow || !currentRow.sid) {
+        layui.layer.alert("请先选中需要删除的行！");
+        return;
+    }
+    layui.layer.confirm("数据删除后不可恢复，确定删除吗?", function () {
+        var param = new tlv8.RequestParam();
+        param.set("id", currentRow.sid);
+        tlv8.XMLHttpRequest("/system/flow/dwr/dialog/deleteFlowDWR", param, "post",
+            true, function (r) {
+                if (r.state == true) {
+                    layui.layer.msg("删除成功！");
+                    loadList();
+                } else {
+                    layui.layer.alert("删除失败：" + r.msg);
+                }
+            });
+    });
+}
+
+function editData(value, field, data) {
+    var param = new tlv8.RequestParam();
+    param.set("id", data.sid);
+    param.set("value", value);
+    param.set("field", field);
+    tlv8.XMLHttpRequest("/system/flow/dwr/dialog/editFlowDWR", param, "post",
+        true, function (r) {
+            if (r.state == true) {
+                layui.layer.msg("编辑成功！");
+                loadList();
+            } else {
+                layui.layer.alert("编辑失败：" + r.msg);
+            }
+        });
+}
+
+/*
+ * 确定返回 @param {Object} param
+ */
+function dailogEngin(param) {
+    if (!currentRow || !currentRow.sid) {
+        layui.layer.alert("请先选中需要打开的流程图！");
+        return;
+    }
+    return {
+        id: currentRow.sprocessid,
+        name: currentRow.sprocessname
+    };
 }

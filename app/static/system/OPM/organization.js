@@ -238,7 +238,7 @@ function resetPassword(data) {
         var r = tlv8.XMLHttpRequest("/system/OPM/organization/ResetPassword", param,
             "post", false, null);
         if (r.state == true) {
-            layui.layer.alert("密码重置成功！");
+            layui.layer.msg("密码重置成功！");
         } else {
             layui.layer.alert(r.msg);
         }
@@ -284,7 +284,7 @@ function disassignPsmFn(data) {
             var r = tlv8.XMLHttpRequest("/system/OPM/organization/disassignPsmAction", param, "post", false,
                 null);
             if (r.state == true) {
-                layui.layer.alert("取消分配成功！");
+                layui.layer.msg("取消分配成功！");
                 creat_dailogcallback(currenttreeID);// 操作完成刷新数据
             } else {
                 layui.layer.alert(r.msg);
@@ -301,7 +301,7 @@ function setMemberOrg(data) {
         tlv8.XMLHttpRequest("/system/OPM/organization/setMemberOrgAction", param1, "post", true,
             function (r) {
                 if (r.state == true) {
-                    layui.layer.alert("设置成功！");
+                    layui.layer.msg("设置成功！");
                     loadList();
                 } else {
                     layui.layer.alert(r.msg);
@@ -354,7 +354,7 @@ function changeOrgAbleAction(rowid, state) {
             if (r.state == false) {
                 layui.layer.alert(r.msg);
             } else {
-                layui.layer.alert("操作成功!");
+                layui.layer.msg("操作成功!");
                 loadList();
             }
         });
@@ -370,7 +370,7 @@ function deleteorgitem(data) {
                 if (r.state == false) {
                     layui.layer.alert(r.msg);
                 } else {
-                    layui.layer.alert("操作成功!");
+                    layui.layer.msg("操作成功!");
                     creat_dailogcallback(currenttreeID);// 操作完成刷新数据
                 }
             });

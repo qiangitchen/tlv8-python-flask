@@ -87,7 +87,7 @@ function addDataCallBack(roles) {
     tlv8.XMLHttpRequest("/system/OPM/authorization/addRole", param, "post", true,
         function (r) {
             if (r.state == true) {
-                layui.layer.alert("添加成功！");
+                layui.layer.msg("添加成功！");
                 loadList();
             } else {
                 layui.layer.alert(r.msg);
@@ -102,19 +102,21 @@ function deleteData() {
         layui.layer.alert("请先勾选需要删除的数据！")
         return;
     }
-    var values = [];
-    for (var i = 0; i < rows.length; i++) {
-        values.push(rows[i].sid);
-    }
-    var param = new tlv8.RequestParam();
-    param.set("values", values.join(","));
-    tlv8.XMLHttpRequest("/system/OPM/authorization/deleteRole", param, "post", true,
-        function (r) {
-            if (r.state == true) {
-                layui.layer.alert("删除成功！");
-                loadList();
-            } else {
-                layui.layer.alert(r.msg);
-            }
-        });
+    layui.layer.confirm("确定删除所选数据吗？", function () {
+        var values = [];
+        for (var i = 0; i < rows.length; i++) {
+            values.push(rows[i].sid);
+        }
+        var param = new tlv8.RequestParam();
+        param.set("values", values.join(","));
+        tlv8.XMLHttpRequest("/system/OPM/authorization/deleteRole", param, "post", true,
+            function (r) {
+                if (r.state == true) {
+                    layui.layer.msg("删除成功！");
+                    loadList();
+                } else {
+                    layui.layer.alert(r.msg);
+                }
+            });
+    });
 }
