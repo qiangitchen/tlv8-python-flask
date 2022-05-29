@@ -1,6 +1,7 @@
 # _*_ coding:utf-8 _*_
 
 from app.menus.functiontree import functions
+from app.common.pubstatic import guid
 
 """
 菜单操作相关方法
@@ -173,3 +174,40 @@ def get_process_full_child(child, url):
             name = get_process_full_child(menu.get('child', []), url)
             if name:
                 return menu.get('title', '') + "/" + name
+
+
+# 获取功能树菜单（全部）用于zTree展示
+def get_function_ztree():
+    zTree = list()
+    for mm in functions:
+        item = dict()
+        id = guid()
+        item['id'] = id
+        item['name'] = mm['title']
+        item['pid'] = ''
+        item['surl'] = ''
+        zTree.append(item)
+        if 'child' in mm:
+            get_function_ztree_child(zTree, mm['child'], id)
+    return zTree
+
+
+# 获取功能树菜单（子）用于zTree展示
+def get_function_ztree_child(zTree, childs, pid):
+    for mm in childs:
+        item = dict()
+        id = guid()
+        item['id'] = id
+        item['name'] = mm['title']
+        item['pid'] = pid
+        if 'href' in mm:
+            item['surl'] = mm['href']
+        else:
+            item['surl'] = ''
+        if 'process' in mm:
+            item['process'] = mm['process']
+        if 'activity' in mm:
+            item['activity'] = mm['activity']
+        zTree.append(item)
+        if 'child' in mm:
+            get_function_ztree_child(zTree, mm['child'], id)

@@ -49,8 +49,8 @@ function saveFlowData(love) {
  * 选择执行页面
  */
 function selectexePage() {
-    var url = "/system/flow/dwr/dialog/func-tree-select.html";
-    tlv8.portal.dailog.openDailog("选择执行页面", url, 300, 360, function (data) {
+    var url = "/system/flow/dwr/dialog/funcTreeSelect";
+    tlv8.portal.dailog.openDailog("选择执行页面", url, 300, 400, function (data) {
         if (data) {
             var win = document.getElementById('propWin');
             $("#" + win.type + '_p_exepage').val(data.surl);
@@ -86,7 +86,7 @@ function selectexeLabel() {
     }
     var url = "/system/flow/dwr/dialog/expressionEditor?Olexpression="
         + Olexpression;
-    tlv8.portal.dailog.openDailog("环节标题-表达式编辑器", url, 700, 460, function (
+    tlv8.portal.dailog.openDailog("环节标题-表达式编辑器", url, 800, 600, function (
         data) {
         try {
             $("#" + win.type + '_p_label').val(data ? data : "");
@@ -109,7 +109,7 @@ function selectRange() {
     }
     var url = "/system/flow/dwr/dialog/expressionEditor?Olexpression="
         + Olexpression;
-    tlv8.portal.dailog.openDailog("执行人范围-表达式编辑器", url, 700, 460, function (
+    tlv8.portal.dailog.openDailog("执行人范围-表达式编辑器", url, 800, 600, function (
         data) {
         try {
             $("#" + win.type + '_p_group').html(data ? data : "");
@@ -130,7 +130,7 @@ function selectRangeTran() {
     }
     var url = "/system/flow/dwr/dialog/expressionEditor?Olexpression="
         + Olexpression;
-    tlv8.portal.dailog.openDailog("转发规则-表达式编辑器", url, 700, 460, function (
+    tlv8.portal.dailog.openDailog("转发规则-表达式编辑器", url, 800, 600, function (
         data) {
         try {
             $("#" + win.type + '_r_transe').html(data ? data : "");
@@ -153,7 +153,7 @@ function selectConditionExpression() {
     }
     var url = "/system/flow/dwr/dialog/expressionEditor?operatType=condition&Olexpression="
         + Olexpression;
-    tlv8.portal.dailog.openDailog("转发规则-表达式编辑器", url, 700, 460, function (
+    tlv8.portal.dailog.openDailog("转发规则-表达式编辑器", url, 800, 600, function (
         data) {
         try {
             $("#" + win.type + '_p_expression').val(data ? data : "");

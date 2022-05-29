@@ -1,0 +1,56 @@
+<html lang="zh_CN">
+{% include "common/tree_page_head.html" %}
+<body>
+<div class="easyui-layout" fit="true">
+    <div data-options="region:'center',border:false" style="overflow: auto;">
+        <ul id="treeDemo" class="ztree"></ul>
+    </div>
+</div>
+<script type="text/javascript">
+    window.isWriteLog = false; //不写系统日志
+    /*
+     * 机构树配置
+     */
+    var setting = {
+        view: {
+            selectedMulti: false
+        },
+        data: {
+            simpleData: {
+                enable: true,
+                idKey: "id",
+                pIdKey: "pid"
+            }
+        },
+        callback: {
+            onClick: treecheckedSelect
+        }
+    };
+    var zNodes = [];
+    var funTree;
+    tlv8.XMLHttpRequest("/system/flow/dwr/dialog/getFunctionTreeAction", null, "post", true,
+        function (r) {
+            var NodeData = r.data;
+            if (typeof NodeData == "string") {
+                zNodes = eval("(" + NodeData + ")");
+            } else {
+                zNodes = NodeData;
+            }
+            funTree = $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+        });
+    var currentNode;
+
+    function treecheckedSelect(event, treeId, node, clickFlag) {
+        currentNode = node;
+    }
+
+    function dailogEngin() {
+        if (!currentNode || currentNode.surl == "") {
+            layui.layer.alert('请选择功能!');
+            return false;
+        }
+        return currentNode;
+    }
+</script>
+</body>
+</html>

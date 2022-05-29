@@ -1,0 +1,145 @@
+<html lang="zh_CN">
+{% include "common/tree_page_head.html" %}
+<style type="text/css">
+    * {
+        font-size: 12px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    a {
+        text-decoration: none;
+        color: #000000;
+    }
+
+    a:hover {
+        background: url({{ url_for('static',filename='system/flow/dwr/images/m_item.gif') }});
+    }
+
+    td.grid_label {
+        text-align: Center;
+        vertical-align: Middle;
+        font-size: 11pt;
+        height: 35px;
+        table-layout: fixed;
+        word-break: break-all;
+        border-right: 1px solid #ddd;
+        background: url({{ url_for('static',filename='common/image/footer_bg_h.png') }}) repeat-x;
+    }
+</style>
+<script type="text/javascript" src="{{ url_for('static',filename='system/flow/dwr/js/simple-grid.js') }}"></script>
+<script type="text/javascript"
+        src="{{ url_for('static',filename='system/flow/dwr/dialog/expressionEditor.js',v='1.0.20220529') }}"></script>
+<body style="padding: 0; overflow: hidden;">
+<div class="easyui-layout" border="false" fit="true">
+    <div data-options="region:'center',border:false" style="padding: 0;">
+        <div class="easyui-layout" id="MyDiv" fit="true" border="false">
+            <div data-options="region:'west',title:'函数列表',split:true" style="width: 220px;">
+                <div style="background: #ffffff;">
+                    <ul id="FlowFoldertreeNode" class="ztree"></ul>
+                </div>
+            </div>
+            <div data-options="region:'center'" border="false" style="padding: 0;">
+                <div class="easyui-layout" fit="true" border="false">
+                    <div data-options="region:'north',title:'参数'" style="height: 180px; padding: 0;">
+                        <div style="width: 100%; height: 100%; overflow: auto; background: #ffffff;"
+                             id="parameterList"></div>
+                    </div>
+                    <div data-options="region:'center',title:'帮助'" style="overflow: hidden; padding: 0;">
+                        <div style="width: 100%; height: 100%; overflow: auto; background: #ffffff;"
+                             id="helperView"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div data-options="region:'south'" border="false" style="height: 110px; padding: 0;">
+        <div class="easyui-layout" border="false" fit="true">
+            <div data-options="region:'north'" border="false" style="overflow: hidden; padding: 0;">
+                <table width="100%" height="35px"
+                       style="background: url({{ url_for('static',filename='system/flow/dwr/images/bg.gif') }});">
+                    <tr>
+                        <td style="line-height: 22px;">
+                            <form id="itemForm">
+                                <a href="javascript:void(0)" class="queckItem"
+                                   style="width: 40px; height: 20px; text-align: center;" name="+">加(+)</a>
+                                &nbsp;
+                                <a href="javascript:void(0)" class="queckItem"
+                                   style="width: 40px; height: 20px; text-align: center;" name="-">减(-)</a>
+                                &nbsp;
+                                <a href="javascript:void(0)" class="queckItem"
+                                   style="width: 40px; height: 20px; text-align: center;" name="*">乘(*)</a>
+                                &nbsp;
+                                <a href="javascript:void(0)" class="queckItem"
+                                   style="width: 40px; height: 20px; text-align: center;" name="/">除(/)</a>
+                                &nbsp;
+                                <a href="javascript:void(0)" class="queckItem"
+                                   style="width: 40px; height: 20px; text-align: center;" name="=">等(=)</a>
+                                &nbsp;
+                                <img src="{{ url_for('static',filename='system/flow/dwr/images/grid-blue-split.gif') }}"/>
+                                <a
+                                        href="javascript:void(0)" class="queckItem"
+                                        style="width: 32px; height: 20px; text-align: center;"
+                                        name="AND">AND</a>
+                                &nbsp;
+                                <a href="javascript:void(0)"
+                                   class="queckItem"
+                                   style="width: 32px; height: 20px; text-align: center;"
+                                   name="OR">OR</a>
+                                <img src="{{ url_for('static',filename='system/flow/dwr/images/grid-blue-split.gif') }}"/>
+                                &nbsp;
+                                <a
+                                        href="javascript:void(0)" class="queckItem"
+                                        style="width: 10px; height: 20px; text-align: center;" name="(">(</a>
+                                &nbsp;
+                                <a href="javascript:void(0)" class="queckItem"
+                                   style="width: 10px; height: 20px; text-align: center;" name=")">)</a>
+                                &nbsp;
+                                <a href="javascript:void(0)" class="queckItem"
+                                   style="width: 32px; height: 20px; text-align: center;"
+                                   name="TRUE">TRUE</a>
+                                &nbsp;
+                                <a href="javascript:void(0)"
+                                   class="queckItem"
+                                   style="width: 32px; height: 20px; text-align: center;"
+                                   name="FALSE">FALSE</a>
+                                <img src="{{ url_for('static',filename='system/flow/dwr/images/grid-blue-split.gif') }}"/>
+                            </form>
+                        </td>
+                        <td style="line-height: 22px;">
+                            <a href="javascript:void(0)"
+                               style="width: 50px; height: 20px; text-align: center; line-height: 20px;"
+                               id="addButton" onclick="ExpressionEditer.addExpression()">
+                                <img src="{{ url_for('static',filename='system/flow/dwr/images/add.png') }}"
+                                     style="vertical-align: middle;"/> 添加
+                            </a>
+                            &nbsp;
+                            <a href="javascript:void(0)"
+                               style="width: 50px; height: 20px; text-align: center; line-height: 20px;"
+                               id="deleteButton" onclick="ExpressionEditer.clearExpression()">
+                                <img src="{{ url_for('static',filename='system/flow/dwr/images/delete.png') }}"
+                                     style="vertical-align: middle;"/> 清除
+                            </a>
+                            &nbsp;
+                            <img src="{{ url_for('static',filename='system/flow/dwr/images/grid-blue-split.gif') }}"/>
+                            &nbsp;
+                            <a href="javascript:void(0)"
+                               style="width: 50px; height: 20px; text-align: center; line-height: 20px;"
+                               id="checkButton" onclick="ExpressionEditer.checkExpression()">
+                                <img src="{{ url_for('static',filename='system/flow/dwr/images/checkvalidity.gif') }}"
+                                     style="vertical-align: middle;"/>
+                                检查
+                            </a></td>
+                    </tr>
+                </table>
+            </div>
+            <div data-options="region:'center'" border="false" style="overflow: hidden; padding: 0;">
+			       <textarea style="width: 100%; height: 100%; min-height: 30px;" class="layui-textarea"
+                             id="epressionEditerArea"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -9,6 +9,7 @@ from app.sa.forms import LoginForm, OrgForm, PersonForm, RoleForm
 from app.sa.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize, SAOnlineInfo
 from app.sa.models import SAFlowDraw, SAFlowFolder
 from app.menus.menuutils import get_process_name, get_process_full, get_function_tree, is_have_author_url
+from app.menus.menuutils import get_function_ztree
 from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, guid, get_org_type
 from app.sa.persons import get_person_info, get_curr_person_info, get_permission_list
 from app.sa.onlineutils import set_online, clear_online
@@ -1272,3 +1273,27 @@ def save_flow_draw():
         rdata['state'] = False
         rdata['msg'] = '保存异常：' + str(e)
     return json.dumps(rdata, ensure_ascii=False)
+
+
+# 流程设计-选择执行页面对话框
+@system.route("/flow/dwr/dialog/funcTreeSelect", methods=["GET", "POST"])
+@user_login
+def func_tree_select():
+    return render_template("system/flow/dwr/dialog/funcTreeSelect.html")
+
+
+# 选择执行页面对话框-加载功能树
+@system.route("/flow/dwr/dialog/getFunctionTreeAction", methods=["GET", "POST"])
+@user_login
+def get_function_ztree_action():
+    rdata = dict()
+    rdata['data'] = get_function_ztree()
+    rdata['state'] = True
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 流程设计-表单时编辑器对话框
+@system.route("/flow/dwr/dialog/expressionEditor", methods=["GET", "POST"])
+@user_login
+def expression_editor():
+    return render_template("system/flow/dwr/dialog/expressionEditor.html")

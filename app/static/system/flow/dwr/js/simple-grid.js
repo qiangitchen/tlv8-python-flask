@@ -1,8 +1,8 @@
 /*
  * Subject: 静态列表(属性列表)
- * Author:   www.tlv8.com 技术研发部
+ * Author:   陈乾
  * CopyRight: www.tlv8.com
- * Version:  v1.1.1
+ * Version:  v1.0.0
  */
 var simpleGrid = function() {
 	this.id = null;
