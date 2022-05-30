@@ -54,7 +54,7 @@ ExpressionEditer.addExpression = function () {
  * 清空表达式
  */
 ExpressionEditer.clearExpression = function () {
-    document.getElementById("epressionEditerArea").innerHTML = "";
+    $("#epressionEditerArea").val("");
 };
 
 /*
@@ -88,7 +88,7 @@ var setting = {
 
 function initExpTree() {
     var param = new tlv8.RequestParam();
-    var r = tlv8.XMLHttpRequest("GetExpressionTreeAction", param, "post",
+    var r = tlv8.XMLHttpRequest("/system/flow/dwr/dialog/GetExpressionTreeAction", param, "post",
         true, function (r) {
             try {
                 zNodes = r.data;
@@ -118,7 +118,7 @@ function TreeonClick(event, treeId, treeNode, clickFlag) {
     if (treeNode.param) {
         paramList = new Array();
         var params = treeNode.param.split(",");
-        var paramvalues = treeNode.paramvalue.split(",");
+        var paramvalues = treeNode.param_value.split(",");
         for (var i = 0; i < params.length; i++) {
             var djson = {};
             if (params[i] && params[i] != "") {
@@ -170,7 +170,7 @@ $(document).ready(function () {
  * 确定返回
  */
 function dailogEngin() {
-    var reData = document.getElementById("epressionEditerArea").value;
+    var reData = $("#epressionEditerArea").val();
     if (reData)
         return reData;
     else

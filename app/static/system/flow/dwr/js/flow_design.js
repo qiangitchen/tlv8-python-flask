@@ -63,7 +63,7 @@ function selectexePage() {
  */
 function selectexePerson() {
     var url = "/system/dialog/SelectChPsm";
-    tlv8.portal.dailog.openDailog("选择执行人", url, 800, 700, function (data) {
+    tlv8.portal.dailog.openDailog("选择执行人", url, 1000, 700, function (data) {
         if (data) {
             var win = document.getElementById('propWin');
             $("#" + win.type + '_p_roleID').val(data.id);
@@ -86,7 +86,7 @@ function selectexeLabel() {
     }
     var url = "/system/flow/dwr/dialog/expressionEditor?Olexpression="
         + Olexpression;
-    tlv8.portal.dailog.openDailog("环节标题-表达式编辑器", url, 800, 600, function (
+    tlv8.portal.dailog.openDailog("环节标题-表达式编辑器", url, 1000, 700, function (
         data) {
         try {
             $("#" + win.type + '_p_label').val(data ? data : "");
@@ -100,7 +100,7 @@ function selectexeLabel() {
  */
 function selectRange() {
     var win = document.getElementById('propWin');
-    var Olexpression = document.getElementById(win.type + '_p_group').innerHTML;
+    var Olexpression = $("#" + win.type + '_p_group').val();
     if (Olexpression) {
         Olexpression = tlv8.encodeURIComponent(Olexpression.toString()
             .decodeSpechars());
@@ -109,10 +109,10 @@ function selectRange() {
     }
     var url = "/system/flow/dwr/dialog/expressionEditor?Olexpression="
         + Olexpression;
-    tlv8.portal.dailog.openDailog("执行人范围-表达式编辑器", url, 800, 600, function (
+    tlv8.portal.dailog.openDailog("执行人范围-表达式编辑器", url, 1000, 700, function (
         data) {
         try {
-            $("#" + win.type + '_p_group').html(data ? data : "");
+            $("#" + win.type + '_p_group').val(data ? data : "");
         } catch (e) {
         }
     });
@@ -121,7 +121,7 @@ function selectRange() {
 // 转发规则
 function selectRangeTran() {
     var win = document.getElementById('propWin');
-    var Olexpression = document.getElementById(win.type + '_r_transe').innerHTML;
+    var Olexpression = $("#" + win.type + '_r_transe').val();
     if (Olexpression) {
         Olexpression = tlv8.encodeURIComponent(Olexpression.toString()
             .decodeSpechars());
@@ -130,10 +130,10 @@ function selectRangeTran() {
     }
     var url = "/system/flow/dwr/dialog/expressionEditor?Olexpression="
         + Olexpression;
-    tlv8.portal.dailog.openDailog("转发规则-表达式编辑器", url, 800, 600, function (
+    tlv8.portal.dailog.openDailog("转发规则-表达式编辑器", url, 1000, 700, function (
         data) {
         try {
-            $("#" + win.type + '_r_transe').html(data ? data : "");
+            $("#" + win.type + '_r_transe').val(data ? data : "");
         } catch (e) {
         }
     });
@@ -144,7 +144,7 @@ function selectRangeTran() {
  */
 function selectConditionExpression() {
     var win = document.getElementById('propWin');
-    var Olexpression = document.getElementById(win.type + '_p_expression').value;
+    var Olexpression = $("#" + win.type + '_p_expression').val();
     if (Olexpression) {
         Olexpression = tlv8.encodeURIComponent(Olexpression.toString()
             .decodeSpechars());
@@ -153,7 +153,7 @@ function selectConditionExpression() {
     }
     var url = "/system/flow/dwr/dialog/expressionEditor?operatType=condition&Olexpression="
         + Olexpression;
-    tlv8.portal.dailog.openDailog("转发规则-表达式编辑器", url, 800, 600, function (
+    tlv8.portal.dailog.openDailog("转发规则-表达式编辑器", url, 1000, 700, function (
         data) {
         try {
             $("#" + win.type + '_p_expression').val(data ? data : "");

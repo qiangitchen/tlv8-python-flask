@@ -14,6 +14,7 @@ from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, guid
 from app.sa.persons import get_person_info, get_curr_person_info, get_permission_list
 from app.sa.onlineutils import set_online, clear_online
 from app.sa.orgutils import can_move_to, up_child_org_path
+from app.flow.expressions import get_expression_tree
 from functools import wraps
 import json
 
@@ -1297,3 +1298,13 @@ def get_function_ztree_action():
 @user_login
 def expression_editor():
     return render_template("system/flow/dwr/dialog/expressionEditor.html")
+
+
+# 选择执行页面对话框-加载表达式
+@system.route("/flow/dwr/dialog/GetExpressionTreeAction", methods=["GET", "POST"])
+@user_login
+def get_expression_tree_action():
+    rdata = dict()
+    rdata['data'] = get_expression_tree()
+    rdata['state'] = True
+    return json.dumps(rdata, ensure_ascii=False)

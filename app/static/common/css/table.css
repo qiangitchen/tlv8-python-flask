@@ -1,3 +1,25 @@
+.grid {
+	margin: 0px auto;
+	padding: 0;
+	font-size: 11pt;
+	color: #666;
+	border-collapse: collapse;
+	border-spacing: 0px;
+	table-layout: fixed;
+	word-wrap: break-word;
+	word-break: break-all;
+}
+
+td.grid_td {
+	margin: 0;
+	padding: 0;
+	border: 1px solid #eee;
+	font-size: 11pt;
+	line-height: 28px;
+	height: 28px;
+	padding: 5px 0;
+}
+
 .layui-table tr {
     background-color: #ffffff;
 }
