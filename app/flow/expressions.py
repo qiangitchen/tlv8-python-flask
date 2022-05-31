@@ -191,6 +191,16 @@ Process = {
                     "例子: <br>getActivityCreatorOrg(getFlowID(), 'activity1')")
          },
         {'pId': 'process',
+         'id': 'getActivityCreatorOrgID',
+         'name': '获取指定环节提交人所属组织ID',
+         'param': 'flowID,activity',
+         'param_value': 'getFlowID(),',
+         'helper': ("getActivityCreatorOrgID<br>参数: <br>"
+                    "flowID值为当前流程标识,默认为:getFlowID()<br>"
+                    "activity: 活动标识,类型是字符串<br>"
+                    "例子: <br>getActivityCreatorOrgID(getFlowID(), 'activity1')")
+         },
+        {'pId': 'process',
          'id': 'getActivityCreatorOrgFID',
          'name': '获取指定环节提交人所属组织FID',
          'param': 'flowID,activity',
@@ -437,7 +447,7 @@ BusiExp = {
                     "参数说明：<br>"
                     "concept【必填】： 表(视图)名称<br>"
                     "individual【必填】： 主键的值 fID/sID 流程单据主键 如 ：getProcesssData1()<br>"
-                    "condition【可选】： 过虑条件， 例如：fName='system'<br>"
+                    "condition【必填】： 主键字段名， 例如：fid或sid<br>"
                     "orderRelation【可选】： 用来作排序的字段<br>"
                     "returnRelation【必填】： 要取哪个字段的值.<br>"
                     "例子: getRelationValueString('sa_opperson',getProcesssData1(),'','','sname')<br>")
