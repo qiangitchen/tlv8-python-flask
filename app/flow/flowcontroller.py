@@ -10,6 +10,7 @@ from app.flow.exporgutils import *
 from app.flow.expprocess import *
 from app.flow.expbusiness import *
 from app.flow.exporgexecutor import *
+from datetime import datetime
 
 """
 流程控制
@@ -60,8 +61,9 @@ def start_flow(sdata1, processid):
 
 
 # 流转流程
-def out_flow(flowID, taskID, sdata1, ePersonList, afterActivityList):
-    ctask = SATask.query.filter_by(sid=taskID, sflowid=flowID).first()
+def out_flow(flowID, taskID, sdata1, ePersonList, afactivity):
+    newtaskIDs = list()
+    ctask = SATask.query.filter_by(sid=taskID, sflowid=flowID, sstatusid='tesReady').first()
     if ctask:
         processID = ctask.sprocess
         Activity = ctask.sactivity
@@ -70,42 +72,73 @@ def out_flow(flowID, taskID, sdata1, ePersonList, afterActivityList):
         flwA = FlowActivity(processID, Activity)
         # processName = flwA.getProcessName()
         person = get_curr_person_info()
-        for afactivity in afterActivityList:
-            act = FlowActivity(processID, afactivity)
-            activitylabel = act.getsActivityLabel()
-            if not activitylabel:
-                processName = act.getActivityname() + ":" + act.getProcessName()
-            else:
-                activitylabel = activitylabel.replace("getProcessID()", flowID);
-                activitylabel = activitylabel.replace("getTaskID()", taskID);
-                activitylabel = activitylabel.replace("getProcesssData1()", sdata1);
-                processName = eval(activitylabel)
-            for eperson in ePersonList:
-                newtaskID = guid()
-                task = SATask(sid=newtaskID, sparentid=taskID, sflowid=flowID,
-                              sprocess=processID,
-                              sname=processName,
-                              sdata1=sdata1,
-                              scurl=flwA.getUrl(),
-                              scpersonid=person['personid'],
-                              scpersonname=person['personName'],
-                              scdeptid=person['deptid'],
-                              scdeptname=person['deptname'],
-                              scognid=person['ognid'],
-                              scognname=person['ognname'],
-                              scfid=person['personfid'],
-                              scfname=person['personfname'],
-                              sepersonid=eperson['personid'],
-                              sepersonname=eperson['personName'],
-                              sedeptid=eperson['deptid'],
-                              sedeptname=eperson['deptname'],
-                              seognid=eperson['ognid'],
-                              seognname=eperson['ognname'],
-                              sefid=eperson['personfid'],
-                              sefname=eperson['personfname'],
-                              seurl=act.getUrl(),
-                              sstatusid='tesExecuting',
-                              sstatusname='正在处理')
-                db.session.add(task)
+        act = FlowActivity(processID, afactivity)
+        beforeAct = FlowActivity(processID, Activity)
+        actType = beforeAct.getType()
+        activitylabel = act.getsActivityLabel()
+        SSTATUSID = "tesReady"
+        SSTATUSNAME = "尚未处理"
+        if act.getType() == "end":
+            SSTATUSID = "tesFinished"
+            SSTATUSNAME = "已完成"
+            ePersonList = list()  # 结束环节默认执行人为自己
+            ePersonList.append(person)
+        if not activitylabel:
+            processName = act.getActivityname() + ":" + act.getProcessName()
+        else:
+            activitylabel = activitylabel.replace("getProcessID()", flowID);
+            activitylabel = activitylabel.replace("getTaskID()", taskID);
+            activitylabel = activitylabel.replace("getProcesssData1()", sdata1);
+            processName = eval(activitylabel)
+        for eperson in ePersonList:  # 给指定的执行人添加待办
+            newtaskID = guid()
+            task = SATask(sid=newtaskID, sparentid=taskID, sflowid=flowID,
+                          sprocess=processID,
+                          sname=processName,
+                          sdata1=sdata1,
+                          scurl=flwA.getUrl(),
+                          scpersonid=person['personid'],
+                          scpersonname=person['personName'],
+                          scdeptid=person['deptid'],
+                          scdeptname=person['deptname'],
+                          scognid=person['ognid'],
+                          scognname=person['ognname'],
+                          scfid=person['personfid'],
+                          scfname=person['personfname'],
+                          sepersonid=eperson['personid'],
+                          sepersonname=eperson['personName'],
+                          sedeptid=eperson['deptid'],
+                          sedeptname=eperson['deptname'],
+                          seognid=eperson['ognid'],
+                          seognname=eperson['ognname'],
+                          sefid=eperson['personfid'],
+                          sefname=eperson['personfname'],
+                          seurl=act.getUrl(),
+                          sstatusid=SSTATUSID,
+                          sstatusname=SSTATUSNAME)
+            db.session.add(task)
+            newtaskIDs.append(newtaskID)
+        if actType != "start" and beforeAct.getGrapModle() != "together":  # 上一个环节为抢占模式需要取消同环节任务
+            bftasks = SATask.query.filter(SATask.sid != taskID, SATask.sflowid == flowID,
+                                          SATask.sparentid == ctask.sparentid).all()
+            for bft in bftasks:
+                bft.sstatusid = 'tesCanceled'
+                bft.sstatusname = '已取消'
+                bft.sexecutetime = datetime.now()
+                bft.version = bft.version + 1
+                db.session.add(bft)
+        if len(act.getAfterActivity) == 0 or act.getType() == "end":  # 流程结束 完成所有待办
+            chtask = SATask.query.filter_by(sstatusid='tesReady', sflowid=flowID, sparentid=taskID).first()
+            if not chtask:
+                stask = SATask.query.filter_by(sid=flowID).first()  # 完成所有待办则标记流程为已完成
+                if stask:
+                    stask.sstatusid = 'tesFinished'
+                    stask.sstatusname = '已完成'
+                    db.session.add(stask)
+        ctask.sstatusid = 'tesFinished'
+        ctask.sstatusname = '已完成'
+        db.session.add(ctask)
         db.session.commit()
-        return newtaskID
+        return newtaskIDs
+    else:
+        raise Exception("指定的任务id无效,或任务已经处理完成不能再处理！")
