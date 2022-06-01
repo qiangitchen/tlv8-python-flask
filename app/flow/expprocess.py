@@ -1,6 +1,6 @@
 # _*_ coding:utf-8 _*_
 
-from app.sa.models import SATask, SAOrganization, SAPerson
+from app.models import SATask, SAOrganization, SAPerson
 
 """
 流程执行者函数

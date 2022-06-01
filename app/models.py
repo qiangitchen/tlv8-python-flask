@@ -210,3 +210,22 @@ class SATask(db.Model):
     skindid = db.Column(db.String(32), default='task', doc='任务类型：task-待办，note-通知')
     scontent = db.Column(db.Text, doc='任务内容')
     version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
+
+
+# OA-请假
+class OALeave(db.Model):
+    __tablename__ = "oa_leave"
+    __table_args__ = {"useexisting": True}
+    fid = db.Column(db.String(32), primary_key=True, default=guid, doc='主键')
+    fcreatorname = db.Column(db.String(255), doc='申请人名称')
+    fcreatorid = db.Column(db.String(32), doc='申请人ID')
+    fcreatorfid = db.Column(db.String(1024), doc='申请人fID')
+    fcreatorfname = db.Column(db.String(1024), doc='申请人全名')
+    fcreatedate = db.Column(db.DateTime, default=datetime.now, doc='创建时间')
+    fstartdate = db.Column(db.Date, doc='开始时间')
+    fenddate = db.Column(db.Date, doc='结束时间')
+    fday = db.Column(db.Integer, default=0, doc='请假天数')
+    fleavetype = db.Column(db.String(255), doc='请假类型')
+    fstate = db.Column(db.String(50), doc='申请状态')
+    freason = db.Column(db.String(512), doc='请假原因')
+    version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')

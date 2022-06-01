@@ -6,8 +6,8 @@ from sqlalchemy import or_
 from datetime import datetime
 from app import db
 from app.sa.forms import LoginForm, OrgForm, PersonForm, RoleForm
-from app.sa.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize, SAOnlineInfo
-from app.sa.models import SAFlowDraw, SAFlowFolder
+from app.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize, SAOnlineInfo
+from app.models import SAFlowDraw, SAFlowFolder
 from app.menus.menuutils import get_process_name, get_process_full, get_function_tree, is_have_author_url
 from app.menus.menuutils import get_function_ztree
 from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, guid, get_org_type

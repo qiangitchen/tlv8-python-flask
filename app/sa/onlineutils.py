@@ -2,7 +2,7 @@
 
 from flask import session, request
 from app import db
-from app.sa.models import SAOnlineInfo
+from app.models import SAOnlineInfo
 from app.sa.persons import get_person_info
 from app.common.pubstatic import guid, get_ip, md5_code
 

@@ -1,8 +1,8 @@
 # _*_ coding: utf-8 _*_
 
 from app import db
-from flask import session, request
-from app.sa.models import SAOrganization, SAAuthorize, SAPermission
+from flask import session
+from app.models import SAOrganization, SAAuthorize, SAPermission
 from sqlalchemy import or_
 
 """

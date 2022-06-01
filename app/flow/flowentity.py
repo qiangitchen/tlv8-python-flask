@@ -1,11 +1,7 @@
 # _*_ coding:utf-8 _*_
 
-from app.sa.models import SAFlowDraw
+from app.models import SAFlowDraw
 from app.flow.codeutils import decodeSpechars
-from app.flow.exporgutils import *
-from app.flow.expprocess import *
-from app.flow.expbusiness import *
-from app.flow.exporgexecutor import *
 
 """
 流程相关实体

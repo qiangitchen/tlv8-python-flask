@@ -1,7 +1,7 @@
 # _*_ coding:utf-8 _*_
 
 from app import db
-from app.sa.models import SAOrganization
+from app.models import SAOrganization
 from app.flow.exporgutils import getCurrentOgnID
 
 """

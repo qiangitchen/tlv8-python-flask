@@ -1,14 +1,10 @@
 # _*_ coding:utf-8 _*_
 
 from flask import request
-from app import db
-from app.sa.models import SATask, SAOrganization, SAPerson, SAFlowDraw
-from app.sa.persons import get_curr_person_info
+from app.models import SAFlowDraw
 from app.flow.flowentity import FlowActivity
 from app.common.pubstatic import guid
-from app.flow.exporgutils import *
 from app.flow.expprocess import *
-from app.flow.expbusiness import *
 from app.flow.exporgexecutor import *
 from app.sa.persons import *
 from datetime import datetime

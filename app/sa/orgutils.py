@@ -1,8 +1,7 @@
 # _*_ coding: utf-8 _*_
 
-from flask import session, request
 from app import db
-from app.sa.models import SAOrganization
+from app.models import SAOrganization
 
 """
 组织机构操作公共方法
