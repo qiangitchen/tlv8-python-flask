@@ -15,23 +15,15 @@ def get_org_unit_has_activity(process, activity, inOrg, personMember):
     ognfid = org.sfid
     sql = ("select SORGID from sa_opauthorize a inner join sa_oppermission m "
            " on m.SPERMISSIONROLEID = a.SAUTHORIZEROLEID where m.SPROCESS = '" + process + "' and SACTIVITY = '" + activity + "'")
-
-    if inOrg and "" != inOrg and isinstance(inOrg, str):
-        sql = ("select o.SID SORGID from sa_oporg o where o.SFID like '" + ognfid + "%' and o.SFID like '%" + str(
-            inOrg) +
-               "%' and o.SID in(select SORGID from sa_opauthorize a inner join sa_oppermission m " +
-               " on m.SPERMISSIONROLEID = a.SAUTHORIZEROLEID where m.SPROCESS = '" + str(process) +
-               "' and SACTIVITY = '" + str(activity) + "')"
-               )
-    elif isinstance(inOrg, bool):  # 为false或true时为当前机构下
-        sql = ("select o.SID SORGID from sa_oporg o where  o.SFID like '" + ognfid + "%' "
-               + " and o.SID in(select SORGID from sa_opauthorize a inner join sa_oppermission m "
-               + " on m.SPERMISSIONROLEID = a.SAUTHORIZEROLEID where m.SPROCESS = '" + process
-               + "' and SACTIVITY = '" + activity + "')"
-               )
-
     if personMember == True:
         sql += " and (SORGID like '%@%')"
+
+    if inOrg and "" != inOrg and isinstance(inOrg, str):
+        sql = ("select o.SID SORGID from sa_oporg o "
+               "where o.SFID like '" + ognfid + "%' and o.SFID like '%" + str(inOrg) + "%'  and o.SID in (" + sql + ")")
+    elif isinstance(inOrg, bool):  # 为false或true时为当前机构下
+        sql = ("select o.SID SORGID from sa_oporg o "
+               "where  o.SFID like '" + ognfid + "%' " + " and o.SID in(" + sql + ")")
 
     rs = db.session.execute(sql)
     orgs = list()

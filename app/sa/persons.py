@@ -3,6 +3,7 @@
 from app import db
 from flask import session, request
 from app.sa.models import SAOrganization, SAAuthorize, SAPermission
+from sqlalchemy import or_
 
 """
 用户信息（全）
@@ -122,3 +123,19 @@ def get_permission_list(psm_id):
                 pp['sactivityfname'] = p.sactivityfname
                 per.append(pp)
     return per
+
+
+# 获取指定id或fid的组织下的人员列表
+def get_person_list_by_org(orgidss):
+    relist = list()
+    orgids = orgidss.split(",")
+    for orgid in orgids:
+        orgs = SAOrganization.query(SAOrganization.sfid).filter(
+            or_(SAOrganization.sid == orgid, SAOrganization.sfid == orgid)).all()
+        for org in orgs:
+            pmo = SAOrganization.query(SAOrganization.spersonid).filter(SAOrganization.sfid.ilike(org.sfid + '%'),
+                                                                        SAOrganization.sorgkindid == 'psm').all()
+            for pm in pmo:
+                p = get_person_info(pm.spersonid)
+                relist.append(p)
+    return relist

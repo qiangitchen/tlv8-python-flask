@@ -207,6 +207,6 @@ class SATask(db.Model):
     scurl = db.Column(db.String(1024), doc='提交任务的页面')
     seurl = db.Column(db.String(1024), doc='执行任务的页面')
     sdata1 = db.Column(db.String(32), index=True, doc='业务数据主键')
-    skindid = db.Column(db.String(32), doc='任务类型')
+    skindid = db.Column(db.String(32), default='task', doc='任务类型：task-待办，note-通知')
     scontent = db.Column(db.Text, doc='任务内容')
     version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
