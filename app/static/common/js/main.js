@@ -3107,7 +3107,7 @@ tlv8.System.Date = {
      */
     sysDate: function () {
         var param = new tlv8.RequestParam();
-        var r = tlv8.XMLHttpRequest("getSystemDate", param, "post", false,
+        var r = tlv8.XMLHttpRequest("/getSystemDate", param, "post", false,
             null, true);
         var rdate = tlv8.System.Date.strToDate(r.sysdate);
         return rdate.format("yyyy-MM-dd");
@@ -3119,7 +3119,7 @@ tlv8.System.Date = {
      */
     sysDateTime: function () {
         var param = new tlv8.RequestParam();
-        var r = tlv8.XMLHttpRequest("getSystemDateTime", param, "post",
+        var r = tlv8.XMLHttpRequest("/getSystemDateTime", param, "post",
             false, null, true);
         return r.sysdate;
     },

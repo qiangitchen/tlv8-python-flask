@@ -104,18 +104,33 @@
             toolbarItem = toobar.items;
         }
 
-        $(document).ready(function(){
+        $(document).ready(function () {
             init_toolbar();
             flwCompent = new tlv8.flw("flowToolbar");
+
+            var rowid = tlv8.RequestURLParam.getParam("sData1");
+            if (rowid && rowid != "") {
+
+            } else {
+                initPsData();
+            }
         });
 
         //保存表单数据
-        function dataSave(){
+        function dataSave() {
 
         }
 
-        function dataDeleted(){
+        function dataDeleted() {
 
+        }
+
+        function initPsData() {
+            $("#FCREATORNAME").val(tlv8.Context.getCurrentPersonName());
+            $("#FCREATORID").val(tlv8.Context.getCurrentPersonID());
+            $("#FCREATORFID").val(tlv8.Context.getCurrentPersonFID());
+            $("#FCREATORFNAME").val(tlv8.Context.getCurrentPersonFName());
+            $("#FCREATEDATE").val(tlv8.System.Date.sysDateTime());
         }
     </script>
 {% endblock %}

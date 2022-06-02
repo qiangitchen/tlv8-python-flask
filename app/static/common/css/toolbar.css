@@ -1,3 +1,6 @@
+*{
+    font-size: 12pt;
+}
 /* CSS Document */
 html {
     width: 100%;
@@ -88,4 +91,12 @@ button {
 	margin-top: 4px;
 	border: 0;
 	color: #2F4F4F;
+}
+
+.layui-btn{
+    font-size: 12pt;
+}
+
+.layui-icon{
+    font-size: 11pt;
 }

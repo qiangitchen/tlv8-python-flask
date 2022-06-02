@@ -1,0 +1,33 @@
+<html>
+<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  		<title>Complex Layout</title>
+		<script type="text/javascript" src="dojoAll.js"></script>
+
+		<script type="text/javascript" src="testData.js"></script>
+		
+		<script type="text/javascript" src="json.js"></script>
+		<script type="text/javascript" src="base.js"></script>
+		<script type="text/javascript" src="observable.js"></script>
+		<script type="text/javascript" src="route.js"></script>
+		<script type="text/javascript" src="graphics.js"></script>
+		<script type="text/javascript" src="canvas.js"></script>
+		<script type="text/javascript" src="diagram.js"></script>
+		<script type="text/javascript" src="processTrajectoryView.js"></script>
+	</head>
+
+	<body unselectable="on" onselectstart="return false;" style="-moz-user-select:none;">
+	<div id="center"  >
+	   <div id="canvas1" style="border:1px solid;width: 100%; height: 100%;overflow:auto"  onselectstart="return false">
+	   </div>
+	</div> 
+	<span id="p1" style="font-size:9pt"></span>
+	   <script type="text/javascript">
+    	function initDesigner(){   
+            var track = new Justep.ProcessTrajectoryView({id:'canvas1'});
+			track.loadData(trackData);
+        }
+         dojo.addOnLoad(initDesigner);
+	   </script>
+	</body>
+</html>

@@ -16,6 +16,7 @@ from datetime import datetime
 
 # 根据地址获取流程图id
 def seach_process_id(url):
+    url = url.replace("/", "%")
     dwr = SAFlowDraw.query.filter(SAFlowDraw.sprocessacty.ilike("%" + url + "%")).first()
     if dwr:
         return dwr.sprocessid

@@ -6,6 +6,7 @@ from app.common.captcha import generate_captcha
 from app.menus.menuutils import get_function_menu
 from app.sa.persons import get_permission_list
 from app.sa.views import user_login
+from datetime import datetime
 import json
 
 
@@ -61,3 +62,19 @@ def init_menu():
 @home.route("/home/console")
 def home_console():
     return render_template("home/console.html")
+
+
+# 获取当前日期
+@home.route("/getSystemDate", methods=["GET", "POST"])
+def get_system_date():
+    rdata = dict()
+    rdata['sysdate'] = datetime.now().strftime("%Y-%m-%d")
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 获取当前时间
+@home.route("/getSystemDateTime", methods=["GET", "POST"])
+def get_system_date_time():
+    rdata = dict()
+    rdata['sysdate'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return json.dumps(rdata, ensure_ascii=False)

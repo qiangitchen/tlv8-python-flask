@@ -7,7 +7,7 @@ from datetime import datetime
 from app import db
 from app.sa.forms import LoginForm, OrgForm, PersonForm, RoleForm
 from app.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize, SAOnlineInfo
-from app.models import SAFlowDraw, SAFlowFolder
+from app.models import SAFlowDraw, SAFlowFolder, SATask
 from app.menus.menuutils import get_process_name, get_process_full, get_function_tree, is_have_author_url
 from app.menus.menuutils import get_function_ztree
 from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, guid, get_org_type
@@ -15,6 +15,7 @@ from app.sa.persons import get_person_info, get_curr_person_info, get_permission
 from app.sa.onlineutils import set_online, clear_online
 from app.sa.orgutils import can_move_to, up_child_org_path
 from app.flow.expressions import get_expression_tree
+from app.flow.flowcontroller import seach_process_id
 from functools import wraps
 import json
 
@@ -1307,4 +1308,66 @@ def get_expression_tree_action():
     rdata = dict()
     rdata['data'] = get_expression_tree()
     rdata['state'] = True
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 查看流程图
+@system.route("/flow/viewiocusbot/", methods=["GET", "POST"])
+@user_login
+def view_iocusbot():
+    return render_template("system/flow/viewiocusbot/iocus_bot.html")
+
+
+# 查看流程图-加载流程图
+@system.route("/flow/viewiocusbot/flowloadIocusAction", methods=["GET", "POST"])
+@user_login
+def flow_load_iocus_action():
+    rdata = dict()
+    flowID = url_decode(request.form.get('flowID', ''))
+    currentUrl = url_decode(request.form.get('currentUrl', ''))
+    if flowID and flowID != "":
+        task = SATask.query.filter(SATask.sflowid == flowID).first()
+        if task:
+            sprocessid = task.sprocess
+        elif currentUrl and currentUrl != "":
+            sprocessid = seach_process_id(currentUrl)
+    if not sprocessid:
+        rdata['state'] = False
+        rdata['msg'] = "没有找到流程图，请确认流程图配置！"
+    else:
+        dwr = SAFlowDraw.query.filter_by(sprocessid=sprocessid).first()
+        if dwr:
+            data = dict()
+            data['id'] = sprocessid
+            data['name'] = dwr.sprocessname
+            data['jsonStr'] = dwr.sprocessacty
+            rdata['data'] = data
+            rdata['state'] = True
+        else:
+            rdata['state'] = False
+            rdata['msg'] = "processid无效~"
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 查看流程图-加载流程图(process)
+@system.route("/flow/viewiocusbot/getFlowDrawAction", methods=["GET", "POST"])
+@user_login
+def flow_load_draw_action():
+    rdata = dict()
+    sprocessid = url_decode(request.form.get('sprocessid', ''))
+    if not sprocessid:
+        rdata['state'] = False
+        rdata['msg'] = "没有找到流程图，请确认流程图配置！"
+    else:
+        dwr = SAFlowDraw.query.filter_by(sprocessid=sprocessid).first()
+        if dwr:
+            data = dict()
+            data['id'] = sprocessid
+            data['name'] = dwr.sprocessname
+            data['jsonStr'] = dwr.sprocessacty
+            rdata['data'] = data
+            rdata['state'] = True
+        else:
+            rdata['state'] = False
+            rdata['msg'] = "processid无效~"
     return json.dumps(rdata, ensure_ascii=False)

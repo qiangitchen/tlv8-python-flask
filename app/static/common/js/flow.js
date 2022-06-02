@@ -22,12 +22,12 @@ tlv8.flw = function (div, data, setting) {
             autorefresh: true,
             autoselectext: true,
             item: {
-                audit: true,
+                audit: false,
                 back: true,
                 out: true,
                 transmit: false,
                 pause: false,
-                stop: true
+                stop: false
             }
         };
     }
@@ -38,8 +38,8 @@ tlv8.flw = function (div, data, setting) {
     }
     if (!setting.item) {
         setting.item = {
-            audit: true,
-            back: true,
+            audit: false,
+            back: false,
             out: true,
             transmit: false,
             pause: false,
@@ -127,118 +127,118 @@ tlv8.flw.prototype.setItemStatus = function (item) {
         || (!item.audit && setting.item.audit == true && item != setting.item)) {
         itemHTML += "<td style='boder:1px solid #eee;' id='" + this.id
             + "_auditItem_Td'>"
-            + "<a class='toobar_item' href='javascript:void(0)'><img id='"
+            + "<button class='layui-btn layui-btn-sm layui-btn-primary' id='"
             + this.id + "_auditItem' src='" + $dpimgpath
             + "toolbar/flw/audit.gif' title='审批' "
             + "onclick='document.getElementById(\"" + div.id
-            + "\").flw.flowAudit();return false;'/></a></td>";
+            + "\").flw.flowAudit();return false;' style='height:30px; width:80px; margin-right:5px;'><i class='layui-icon'>&#xe672;</i>审批</button></td>";
     } else if (item.audit == "readonly"
         || (!item.audit && setting.item.audit == "readonly" && item != setting.item)) {
         itemHTML += "<td style='boder:1px solid #eee;' id='" + this.id
             + "_auditItem_Td'>"
-            + "<a class='toobar_item' href='javascript:void(0)'><img id='"
-            + this.id + "_auditItem' src='" + $dpimgpath
+            + "<button class='layui-btn layui-btn-sm layui-btn-disabled' id='"
+            + this.id + "_auditItem' disabled='true'  src='" + $dpimgpath
             + "toolbar/flw/un_audit.gif' title='审批' "
-            + "onclick='return false;'/></a></td>";
+            + "onclick='return false;' style='height:30px; width:80px; margin-right:5px;'><i class='layui-icon'>&#xe672;</i>审批</button></td>";
     }
     if (item.back == false) {
     } else if ((item.back && item.back == true && setting.auditParam.isRequired == false)
         || (!item.back && setting.item.back == true && item != setting.item && setting.auditParam.isRequired == false)) {
         itemHTML += "<td style='boder:1px solid #eee;'>"
-            + "<a class='toobar_item' href='javascript:void(0)'><img id='"
+            + "<button class='layui-btn layui-btn-sm layui-btn-warm' id='"
             + this.id
             + "_backItem' src='"
             + $dpimgpath
             + "toolbar/flw/back.gif' title='回退' onclick='document.getElementById(\""
-            + div.id + "\").flw.flowback()'/></a></td>";
+            + div.id + "\").flw.flowback()' style='height:30px; width:80px; margin-right:5px;'><i class='layui-icon'>&#xe65c;</i>回退</button></td>";
     } else if (item.back == "readonly"
         || setting.auditParam.isRequired == true
         || (!item.back && setting.item.back == "readonly" && item != setting.item)) {
         itemHTML += "<td style='boder:1px solid #eee;'>"
-            + "<a class='toobar_item' href='javascript:void(0)'><img id='"
-            + this.id + "_backItem' src='" + $dpimgpath
-            + "toolbar/flw/un_back.gif' title='回退' /></a></td>";
+            + "<button class='layui-btn layui-btn-sm layui-btn-disabled' id='"
+            + this.id + "_backItem' disabled='true' src='" + $dpimgpath
+            + "toolbar/flw/un_back.gif' title='回退' style='height:30px; width:80px; margin-right:5px;'><i class='layui-icon'>&#xe65c;</i>回退</button></td>";
     }
     if (item.out == false) {
     } else if ((item.out == true && setting.auditParam.isRequired == false)
         || (!item.out && setting.item.out == true && item != setting.item && setting.auditParam.isRequired == false)) {
-        itemHTML += "<td><a class='toobar_item' href='javascript:void(0)'><img id='"
+        itemHTML += "<td><button class='layui-btn layui-btn-sm layui-btn-normal' id='"
             + this.id
             + "_outItem' src='"
             + $dpimgpath
             + "toolbar/flw/turn.gif' title='流转' onclick='document.getElementById(\""
-            + div.id + "\").flw.flowout()'/></a></td>";
+            + div.id + "\").flw.flowout()' style='height:30px; width:80px; margin-right:5px;'><i class='layui-icon'>&#xe605;</i>提交</button></td>";
     } else if (item.out == "readonly"
         || setting.auditParam.isRequired == true
         || (item.out && setting.item.out == "readonly" && item != setting.item)) {
-        itemHTML += "<td><a class='toobar_item' href='javascript:void(0)'><img id='"
+        itemHTML += "<td><button class='layui-btn layui-btn-sm layui-btn-disabled' id='"
             + this.id
-            + "_outItem' src='"
+            + "_outItem' disabled='true' src='"
             + $dpimgpath
-            + "toolbar/flw/un_turn.gif' title='流转'/></a></td>";
+            + "toolbar/flw/un_turn.gif' title='流转' style='height:30px; width:80px; margin-right:5px;'><i class='layui-icon'>&#xe605;</i>提交</button></td>";
     }
     if (item.transmit == false) {
     } else if ((item.transmit == true && setting.auditParam.isRequired == false)
         || (!item.transmit && setting.item.transmit == true
             && item != setting.item && setting.auditParam.isRequired == false)) {
-        itemHTML += "<td><a class='toobar_item' href='javascript:void(0)'><img id='"
+        itemHTML += "<td><button class='layui-btn layui-btn-sm layui-btn-primary' id='"
             + this.id
             + "_transmitItem' src='"
             + $dpimgpath
             + "toolbar/flw/redirect.gif' title='转发' onclick='document.getElementById(\""
-            + div.id + "\").flw.flowtransmit()'/></a></td>";
+            + div.id + "\").flw.flowtransmit()' style='height:30px; width:80px; margin-right:5px;'><i class='layui-icon'>&#xe609;</i>转发</button></td>";
     } else if (item.transmit == "readonly"
         || setting.auditParam.isRequired == true
         || (!item.transmit && setting.item.transmit == "readonly" && item != setting.item)) {
-        itemHTML += "<td><a class='toobar_item' href='javascript:void(0)'><img id='"
+        itemHTML += "<td><button class='layui-btn layui-btn-sm layui-btn-disabled' id='"
             + this.id
-            + "_transmitItem' src='"
+            + "_transmitItem' disabled='true' src='"
             + $dpimgpath
-            + "toolbar/flw/un_redirect.gif' title='转发'/></a></td>";
+            + "toolbar/flw/un_redirect.gif' title='转发' style='height:30px; width:80px; margin-right:5px;'><i class='layui-icon'>&#xe609;</i>转发</button></td>";
     }
     if (item.pause == false) {
     } else if ((item.pause == true && setting.auditParam.isRequired == false)
         || (!item.pause && setting.item.pause == true
             && item != setting.item && setting.auditParam.isRequired == false)) {
-        itemHTML += "<td><a class='toobar_item' href='javascript:void(0)'><img id='"
+        itemHTML += "<td><button class='layui-btn layui-btn-sm layui-btn-warm' id='"
             + this.id
             + "_pauseItem' src='"
             + $dpimgpath
             + "toolbar/flw/pause.gif' title='暂停' onclick='document.getElementById(\""
-            + div.id + "\").flw.flowpause()'/></a></td>";
+            + div.id + "\").flw.flowpause()' style='height:30px; width:80px; margin-right:5px;'><i class='layui-icon'>&#xe651;</i>暂停</button></td>";
     } else if (item.pause == "readonly"
         || setting.auditParam.isRequired == true
         || (!item.pause && setting.item.pause == "readonly" && item != setting.item)) {
-        itemHTML += "<td><a class='toobar_item' href='javascript:void(0)'><img id='"
+        itemHTML += "<td><button class='layui-btn layui-btn-sm layui-btn-disabled' id='"
             + this.id
-            + "_pauseItem' src='"
+            + "_pauseItem' disabled='true' src='"
             + $dpimgpath
-            + "toolbar/flw/un_pause.gif' title='暂停'/></a></td>";
+            + "toolbar/flw/un_pause.gif' title='暂停' style='height:30px; width:80px; margin-right:5px;'><i class='layui-icon'>&#xe651;</i>暂停</button></td>";
     }
     if (item.stop == false) {
     } else if ((item.stop == true && setting.auditParam.isRequired == false)
         || (!item.stop && setting.item.stop == true && item != setting.item && setting.auditParam.isRequired == false)) {
-        itemHTML += "<td><a class='toobar_item' href='javascript:void(0)'><img id='"
+        itemHTML += "<td><button class='layui-btn layui-btn-sm layui-btn-danger' id='"
             + this.id
             + "_stopItem' src='"
             + $dpimgpath
             + "toolbar/flw/stop.gif' title='终止' onclick='document.getElementById(\""
-            + div.id + "\").flw.flowstop()'/></a></td>";
+            + div.id + "\").flw.flowstop()' style='height:30px; width:80px; margin-right:5px;'><i class='layui-icon'>&#xe617;</i>终止</button></td>";
     } else if (item.stop == "readonly"
         || setting.auditParam.isRequired == true
         || (!item.stop && setting.item.stop == "readonly" && item != setting.item)) {
-        itemHTML += "<td><a class='toobar_item' href='javascript:void(0)'><img id='"
+        itemHTML += "<td><button class='layui-btn layui-btn-sm layui-btn-disabled' id='"
             + this.id
-            + "_stopItem' src='"
+            + "_stopItem' disabled='true' src='"
             + $dpimgpath
-            + "toolbar/flw/un_stop.gif' title='终止'/></a></td>";
+            + "toolbar/flw/un_stop.gif' title='终止' style='height:30px; width:80px; margin-right:2px;'><i class='layui-icon'>&#xe617;</i>终止</button></td>";
     }
-    itemHTML += "<td><a class='toobar_item' href='javascript:void(0)'><img id='"
+    itemHTML += "<td><button class='layui-btn layui-btn-sm' id='"
         + this.id
         + "_chartItem' src='"
         + $dpimgpath
         + "toolbar/flw/chart.gif' title='查看流程图' onclick='document.getElementById(\""
-        + div.id + "\").flw.viewChart()' style='height:100%;'/></a></td>";
+        + div.id + "\").flw.viewChart()' style='height:30px; width:90px; margin-right:2px;'><i class='layui-icon'>&#xe60d;</i>流程图</button></td>";
     itemHTML += "</tr></table>";
     div.innerHTML = itemHTML;
 };
@@ -1740,26 +1740,24 @@ tlv8.flw.prototype.viewChart = function (flowID, taskID) {
         flowID = this.flowID;
     if (!taskID)
         taskID = this.taskID;
-    var currentUrl = window.location.pathname;
-    if (currentUrl.indexOf("?") > 0)
-        currentUrl = currentUrl.substring(0, currentUrl.indexOf("?"));
-    var mainFormid = this.data.formid;
-    if (mainFormid) {
-        var sData1 = document.getElementById(this.data.formid).rowid;
-    }
+    var sData1 = this.sData1;
+    var url = "/system/flow/viewiocusbot/";
     if (flowID && flowID != "" && taskID && taskID != "") {
         tlv8.portal.openWindow("流程图",
-            "/flw/viewiocusbot/yj_iocus_bot.html?flowID=" + flowID
-            + "&taskID=" + taskID + "&currentUrl=" + currentUrl);
+            url + "?flowID=" + flowID
+            + "&taskID=" + taskID);
     } else if (this.processID && this.processID != "") {
         tlv8.portal.openWindow("流程图",
-            "/flw/viewiocusbot/yj_iocus_bot.html?processID="
+            url + "?processID="
             + this.processID);
     } else if (sData1 && sData1 != "") {
         tlv8.task.viewChart(sData1);
     } else {
+        var currentUrl = window.location.pathname;
+        if (currentUrl.indexOf("?") > 0)
+            currentUrl = currentUrl.substring(0, currentUrl.indexOf("?"));
         tlv8.portal.openWindow("流程图",
-            "/flw/viewiocusbot/yj_iocus_bot.html?currentUrl="
+            url + "?currentUrl="
             + currentUrl);
     }
 };
@@ -2085,22 +2083,20 @@ tlv8.task = {
             rdata = window.eval("(" + result.data.data + ")");
         } catch (e) {
         }
+        var url = "/flow/viewiocusbot/";
         if (rdata.length > 0) {
             var flowID = rdata[0].SFLOWID;
             var taskID = rdata[0].SID;
             tlv8.portal.openWindow("流程图",
-                "/flw/viewiocusbot/yj_iocus_bot.html?flowID=" + flowID
+                url + "?flowID=" + flowID
                 + "&taskID=" + taskID);
         } else {
             var currentUrl = window.location.pathname;
             if (currentUrl.indexOf("?") > 0)
                 currentUrl = currentUrl.substring(0, currentUrl.indexOf("?"));
-            var flowID, taskID;
             tlv8.portal
                 .openWindow("流程图",
-                    "/flw/viewiocusbot/yj_iocus_bot.html?flowID="
-                    + flowID + "&taskID=" + taskID
-                    + "&currentUrl=" + currentUrl);
+                    url + "?currentUrl=" + currentUrl);
         }
     },
     /**
