@@ -5,6 +5,37 @@
 """
 
 functions = [
+    {"title": "OA系统",
+     "icon": "layui-icon layui-icon-date",
+     "child": [
+         {"title": "人事管理", "icon": "layui-icon layui-icon-template", "child": [
+             {"title": "请假申请",
+              "href": "/oa/leave/mainActivity",
+              "process": "/oa/leave/Process",
+              "activity": "mainActivity"
+              },
+             {"title": "部门审批",
+              "href": "/oa/leave/bizActivity4",
+              "process": "/oa/leave/Process",
+              "activity": "bizActivity4",
+              "display": "hide"
+              },
+             {"title": "领导审批",
+              "href": "/oa/leave/bizActivity6",
+              "process": "/oa/leave/Process",
+              "activity": "bizActivity6",
+              "display": "hide"
+              },
+             {"title": "返回申请人",
+              "href": "/oa/leave/bizActivity8",
+              "process": "/oa/leave/Process",
+              "activity": "bizActivity8",
+              "display": "hide"
+              }
+         ]
+          }
+     ]
+     },
     {"title": "系统管理",
      "icon": "layui-icon layui-icon-set",
      "child": [

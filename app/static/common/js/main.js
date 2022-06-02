@@ -1670,8 +1670,8 @@ tlv8.toolbar = function (div, insertitem, saveitem, deleteitem, refreshitem) {
         }
     };
     this.items = items;
-    if (!checkPathisHave($dpcsspath + "toolbar.main.css"))
-        createStyleSheet($dpcsspath + "toolbar.main.css");
+    if (!checkPathisHave($dpcsspath + "toolbar.css"))
+        createStyleSheet($dpcsspath + "toolbar.css");
     div.style.overflow = "hidden";
     var Stander = "<table style='align:left;' class='standard_toolbar' border='0' id='toolbar'><tr>"
         + "<td width='75px' align='left' id='"
@@ -1726,8 +1726,8 @@ tlv8.toolbar = function (div, insertitem, saveitem, deleteitem, refreshitem) {
  */
 tlv8.exportbar = function (div, expid, canprint, isword, isexcel, ispdf) {
     var $commonpath = $dpjspath.replace("/js/", "/");
-    if (!checkPathisHave($dpcsspath + "toolbar.main.css"))
-        createStyleSheet($dpcsspath + "toolbar.main.css");
+    if (!checkPathisHave($dpcsspath + "toolbar.css"))
+        createStyleSheet($dpcsspath + "toolbar.css");
     if (!checkPathisHave($commonpath + "print/print.js"))
         createJSSheet($commonpath + "print/print.js");
     div.style.overflow = "hidden";
@@ -3152,8 +3152,8 @@ tlv8.System.Date = {
 var $dpjspath = null;
 var scripts = document.getElementsByTagName("script");
 for (i = 0; i < scripts.length; i++) {
-    if (scripts[i].src.substring(scripts[i].src.length - 13).toLowerCase() == 'comon.main.js') {
-        $dpjspath = scripts[i].src.substring(0, scripts[i].src.length - 13);
+    if (scripts[i].src.substring(scripts[i].src.length - 7).toLowerCase() == 'main.js') {
+        $dpjspath = scripts[i].src.substring(0, scripts[i].src.length - 7);
         break;
     }
 }

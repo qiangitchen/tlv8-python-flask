@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>TLv8平台-流程页面</title>
+        <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap/css/bootstrap.min.css')}}" media="all">
+        <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap/css/justified.css')}}" media="all">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui/themes/default/easyui.css') }}"></link>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui/themes/icon.css') }}"></link>
+        <link rel="stylesheet" href="{{ url_for('static',filename='layui/css/layui.css')}}" media="all">
+        <link rel="stylesheet" href="{{ url_for('static',filename='common/css/toolbar.css')}}" media="all">
+        <link rel="stylesheet" href="{{ url_for('static',filename='common/css/table.css')}}" media="all">
+        <link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='common/css/toolbar.css') }}"></link>
+        <script type="text/javascript" src="{{ url_for('static',filename='common/js/jquery/jquery.min.js')}}"></script>
+        <script type="text/javascript" src="{{ url_for('static',filename='common/js/main.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static',filename='common/js/flow.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static',filename='common/print/print.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static',filename='bootstrap/js/bootstrap.min.js')}}"></script>
+        <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui/jquery.easyui.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui/locale/easyui-lang-zh_CN.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static',filename='layui/layui.js')}}"></script>
+    </head>
+    <body>
+        <div class="easyui-layout" fit="true">
+           <div data-options="region:'north',split:false" style="height:45px;overflow: hidden; padding: 5px;">
+                <div id="stander_bar" insertAction="dataInsert()" saveAction="dataSave()" refreshAction="dataRefresh()" deleteAction="dataDeleted()" style="margin-left: 1px; float: left;">
+                </div>
+                <a class="toobar_item" onclick="tlv8.HtmlPrint.printForm(['page_content'])" style="width: 100px; float: left;"> <img src="{{ url_for('static',filename='common/image/toolbar/edit/print.gif') }}"> 打印表单</a>
+                <div component="flowprocess" id="flowToolbar" onAdvanceCommit="advancecmit" onBeforeAdvance="bfadvance" style="float: right;"></div>
+           </div>
+           <div data-options="region:'center'" id="page_content">
+               <!--内容-->
+                {% block content %}{% endblock %}
+                <!--内容-->
+           </div>
+        </div>
+    </body>
+</html>
