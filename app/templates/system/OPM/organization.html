@@ -59,40 +59,40 @@
 </div>
 <div id="showdivt" style="display: none;">
     <ul>
-        <li style="border-bottom: 1px solid #C9DCA6;">
-            <a href="javascript:void(0);" title="新建组织">
+        <li>
+            <button class="buttnew" id="ogn" onclick="newognData('ogn')" title="新建组织">
                 <img src="{{ url_for('static',filename='common/image/toolbar/org/newOgn.gif') }}"
-                     style="margin-top: 1px;"/>
-                <button class="buttnew" id="ogn" onclick="newognData('ogn')">新建组织</button>
-            </a>
+                 style="margin-top: 1px;"/>
+                新建组织
+            </button>
         </li>
-        <li style="border-bottom: 1px solid #C9DCA6;">
-            <a href="javascript:void(0);" title="新建部门">
+        <li>
+            <button class="buttnew" id="dpt" onclick="newognData('dpt')" title="新建部门" disabled>
                 <img src="{{ url_for('static',filename='common/image/toolbar/org/newDpt.gif') }}"
-                     style="margin-top: 1px;"/>
-                <button class="buttnew" id="dpt" onclick="newognData('dpt')" disabled>新建部门</button>
-            </a>
+                 style="margin-top: 1px;"/>
+                新建部门
+            </button>
         </li>
-        <li style="border-bottom: 1px solid #C9DCA6;">
-            <a href="javascript:void(0);" title="新建岗位">
+        <li>
+            <button class="buttnew" id="pos" onclick="newognData('pos')" title="新建岗位" disabled>
                 <img src="{{ url_for('static',filename='common/image/toolbar/org/newPos.gif') }}"
-                     style="margin-top: 1px;"/>
-                <button class="buttnew" id="pos" onclick="newognData('pos')" disabled>新建岗位</button>
-            </a>
+                 style="margin-top: 1px;"/>
+                新建岗位
+            </button>
         </li>
-        <li style="border-bottom: 1px solid #C9DCA6;">
-            <a href="javascript:void(0);" title="新建人员">
+        <li>
+            <button class="buttnew" id="psm" onclick="newPsmData()" title="新建人员" disabled>
                 <img src="{{ url_for('static',filename='common/image/toolbar/org/newPerson.gif') }}"
-                     style="margin-top: 1px;"/>
-                <button class="buttnew" id="psm" onclick="newPsmData()" disabled>新建人员</button>
-            </a>
+                 style="margin-top: 1px;"/>
+                新建人员
+            </button>
         </li>
-        <li style="border-bottom: 1px solid #C9DCA6;">
-            <a href="javascript:void(0);" title="分配人员">
+        <li>
+            <button class="buttnew" id="assignPerson" onclick="assignPsmData()" title="分配人员" disabled>
                 <img src="{{ url_for('static',filename='common/image/toolbar/org/newPerson.gif') }}"
-                     style="margin-top: 1px;"/>
-                <button class="buttnew" id="assignPerson" onclick="assignPsmData()" disabled>分配人员</button>
-            </a>
+                 style="margin-top: 1px;"/>
+                分配人员
+            </button>
         </li>
     </ul>
 </div>

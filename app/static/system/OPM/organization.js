@@ -78,7 +78,10 @@ function beforeClick(treeId, treeNode) {
         $("#org").attr({
             disabled: "disabled"
         });
-        $("#dept").attr({
+        $("#ogn").attr({
+            disabled: "disabled"
+        });
+        $("#dpt").attr({
             disabled: "disabled"
         });
         $("#pos").attr({

@@ -1,5 +1,5 @@
 *{
-    font-size: 12pt;
+    font-size: 11pt;
 }
 /* CSS Document */
 html {
@@ -73,30 +73,26 @@ button {
 	display: none;
 	background: #F5F5F5;
 	border: 1px solid #C9DCA6;
-	width: 100px;
+	width: 140px;
 	position: absolute;
-	z-index: 30;
+	z-index: 999;
 }
 
-#showdivt li a:hover {
-	background: #CCCCFF;
-	color: #036;
-	text-decoration: none;
+#showdivt ul li{
+    border-bottom: 1px solid #C9DCA6;
+    padding: 2px;
+}
+
+#showdivt ul li:hover {
+	background: #eeeeee;
 }
 
 .buttnew {
-	width: 56px;
-	height: 17px;
-	line-height: 18px;
-	margin-top: 4px;
+	height: 25px;
+	line-height: 25px;
 	border: 0;
-	color: #2F4F4F;
 }
 
-.layui-btn{
-    font-size: 12pt;
-}
-
-.layui-icon{
-    font-size: 11pt;
+.buttnew:disabled img{
+    filter: grayscale(100%);
 }
