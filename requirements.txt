@@ -12,7 +12,6 @@ itsdangerous==1.1.0
 Jinja2==2.11.3
 Mako==1.1.4
 MarkupSafe==1.1.1
-pip==21.0.1
 PyMySQL==1.0.2
 python-dateutil==2.8.1
 python-editor==1.0.4
