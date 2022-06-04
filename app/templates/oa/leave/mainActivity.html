@@ -89,26 +89,30 @@
                             <textarea id="FREASON" name="FREASON" class="layui-textarea"></textarea>
                         </div>
                     </div>
+                    <div style="display: none">
+                        <button id="mainfsub" class="layui-btn" lay-submit lay-filter="mainform">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
     <script type="text/javascript">
         //工具条
-        var toolbarItem, flwCompent;
+        let toolbarItem, flwComponent;
 
         function init_toolbar() {
-            var bardiv = J$("stander_bar");
-            var toobar = new tlv8.toolbar(bardiv, false, true, "readonly",
+            let barDiv = J$("stander_bar");
+            let toolbar = new tlv8.toolbar(barDiv, false, true, "readonly",
                 true);
-            toolbarItem = toobar.items;
+            toolbarItem = toolbar.items;
         }
 
         $(document).ready(function () {
             init_toolbar();
-            flwCompent = new tlv8.flw("flowToolbar");
+            flwComponent = new tlv8.flw("flowToolbar");
 
-            var rowid = tlv8.RequestURLParam.getParam("sData1");
+            let rowid = tlv8.RequestURLParam.getParam("sData1");
             if (rowid && rowid != "") {
 
             } else {
@@ -118,13 +122,15 @@
 
         //保存表单数据
         function dataSave() {
-
+            $("#mainfsub").click();
         }
 
+        //删除数据动作
         function dataDeleted() {
 
         }
 
+        //初始化数据
         function initPsData() {
             $("#FCREATORNAME").val(tlv8.Context.getCurrentPersonName());
             $("#FCREATORID").val(tlv8.Context.getCurrentPersonID());
@@ -132,5 +138,15 @@
             $("#FCREATORFNAME").val(tlv8.Context.getCurrentPersonFName());
             $("#FCREATEDATE").val(tlv8.System.Date.sysDateTime());
         }
+
+        //监听表单提交
+        layui.form.on('submit(mainform)', function (data) {
+            // layui.layer.msg(JSON.stringify(data.field));
+            let rowid = new UUID().toString(); //MainData.saveData();
+            if (!flwComponent.taskID || flwComponent.taskID == "") {
+                flwComponent.flowStart(rowid);
+            }
+            return false;
+        });
     </script>
 {% endblock %}

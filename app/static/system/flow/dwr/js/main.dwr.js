@@ -1543,7 +1543,6 @@ var JSONC = new function () {
                         if (self[j] !== undefined && (tmp = JSONC.encode(self[j])))
                             result[i++] = tmp;
                     }
-                    ;
                     result = "[".concat(result.join(","), "]");
                     break;
                 case Boolean:

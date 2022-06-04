@@ -4,7 +4,7 @@ from . import home
 from flask import render_template, url_for, redirect, session, send_file
 from app.common.captcha import generate_captcha
 from app.menus.menuutils import get_function_menu
-from app.sa.persons import get_permission_list
+from app.common.persons import get_permission_list
 from app.sa.views import user_login
 from datetime import datetime
 import json

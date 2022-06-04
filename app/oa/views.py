@@ -5,7 +5,7 @@ from . import oa
 from flask import request, render_template, url_for, redirect, session, send_file
 from app import db
 from functools import wraps
-from app.sa.views import user_login
+from app.common.decorated import user_login
 import json
 
 

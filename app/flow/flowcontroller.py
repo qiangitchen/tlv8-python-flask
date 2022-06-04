@@ -1,12 +1,11 @@
 # _*_ coding:utf-8 _*_
 
-from flask import request
 from app.models import SAFlowDraw
 from app.flow.flowentity import FlowActivity
 from app.common.pubstatic import guid
 from app.flow.expprocess import *
 from app.flow.exporgexecutor import *
-from app.sa.persons import *
+from app.common.persons import *
 from datetime import datetime
 
 """
@@ -23,12 +22,13 @@ def seach_process_id(url):
 
 
 # 启动流程
-def start_flow(sdata1, processid):
-    if not processid:
-        processid = seach_process_id(request.path)
+def start_flow(sdata1, srcPath, processid):
+    if not processid or processid == "":
+        processid = seach_process_id(srcPath)
         if not processid:
             raise Exception("没有找到流程图，请确认流程图配置是否正确！")
-    processName = FlowActivity(processid, 'start').getProcessName()
+    activity = FlowActivity(processid, 'start')
+    processName = activity.getProcessName()
     flowID = guid()
     taskID = flowID
     person = get_curr_person_info()
@@ -55,13 +55,15 @@ def start_flow(sdata1, processid):
                   sstatusname='正在处理')
     db.session.add(task)
     db.session.commit()
-    return flowID, taskID
+    afactivity = activity.getAfterActivity()[0].getActivity()
+    return processid, flowID, taskID, afactivity
 
 
 # 流转流程
 def out_flow(flowID, taskID, sdata1, ePersonList, afactivity):
     newtaskIDs = list()
-    ctask = SATask.query.filter_by(sid=taskID, sflowid=flowID, sstatusid='tesReady').first()
+    ctask = SATask.query.filter(SATask.sid == taskID, SATask.sflowid == flowID,
+                                or_(SATask.sstatusid == 'tesReady', SATask.sstatusid == 'tesExecuting')).first()
     if ctask:
         processID = ctask.sprocess
         Activity = ctask.sactivity
@@ -71,6 +73,7 @@ def out_flow(flowID, taskID, sdata1, ePersonList, afactivity):
         # processName = flwA.getProcessName()
         person = get_curr_person_info()
         act = FlowActivity(processID, afactivity)
+        print(act)
         beforeAct = FlowActivity(processID, Activity)
         actType = beforeAct.getType()
         activitylabel = act.getsActivityLabel()
@@ -84,9 +87,9 @@ def out_flow(flowID, taskID, sdata1, ePersonList, afactivity):
         if not activitylabel:
             processName = act.getActivityname() + ":" + act.getProcessName()
         else:
-            activitylabel = activitylabel.replace("getProcessID()", flowID);
-            activitylabel = activitylabel.replace("getTaskID()", taskID);
-            activitylabel = activitylabel.replace("getProcesssData1()", sdata1);
+            activitylabel = activitylabel.replace("getProcessID()", flowID)
+            activitylabel = activitylabel.replace("getTaskID()", taskID)
+            activitylabel = activitylabel.replace("getProcesssData1()", sdata1)
             processName = eval(activitylabel)
         for eperson in ePersonList:  # 给指定的执行人添加待办
             newtaskID = guid()
@@ -125,7 +128,7 @@ def out_flow(flowID, taskID, sdata1, ePersonList, afactivity):
                 bft.sexecutetime = datetime.now()
                 bft.version = bft.version + 1
                 db.session.add(bft)
-        if len(act.getAfterActivity) == 0 or act.getType() == "end":  # 流程结束 完成所有待办
+        if len(act.getAfterActivity()) == 0 or act.getType() == "end":  # 流程结束 完成所有待办
             chtask = SATask.query.filter_by(sstatusid='tesReady', sflowid=flowID, sparentid=taskID).first()
             if not chtask:
                 stask = SATask.query.filter_by(sid=flowID).first()  # 完成所有待办则标记流程为已完成
@@ -133,9 +136,10 @@ def out_flow(flowID, taskID, sdata1, ePersonList, afactivity):
                     stask.sstatusid = 'tesFinished'
                     stask.sstatusname = '已完成'
                     db.session.add(stask)
-        ctask.sstatusid = 'tesFinished'
-        ctask.sstatusname = '已完成'
-        db.session.add(ctask)
+        if ctask.sstatusid == "tesReady":
+            ctask.sstatusid = 'tesFinished'
+            ctask.sstatusname = '已完成'
+            db.session.add(ctask)
         db.session.commit()
         noteActivity = act.getNoteActivity()
         if noteActivity and noteActivity != "":  # 如果定义了通知环节则去发送通知

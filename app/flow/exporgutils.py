@@ -1,6 +1,6 @@
 # _*_ coding:utf-8 _*_
 
-from app.sa.persons import get_curr_person_info
+from app.common.persons import get_curr_person_info
 
 """
 组织函数-获取当前登录人相关信息

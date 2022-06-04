@@ -1,42 +1,23 @@
 # _*_ coding: utf-8 _*_
 
 from . import system
-from flask import session, redirect, url_for, render_template, request, abort
+from flask import session, render_template, request
 from sqlalchemy import or_
 from datetime import datetime
 from app import db
 from app.sa.forms import LoginForm, OrgForm, PersonForm, RoleForm
 from app.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize, SAOnlineInfo
 from app.models import SAFlowDraw, SAFlowFolder, SATask
-from app.menus.menuutils import get_process_name, get_process_full, get_function_tree, is_have_author_url
+from app.menus.menuutils import get_process_name, get_process_full, get_function_tree
 from app.menus.menuutils import get_function_ztree
 from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, guid, get_org_type
-from app.sa.persons import get_person_info, get_curr_person_info, get_permission_list
+from app.common.persons import get_person_info, get_curr_person_info
+from app.common.decorated import user_login
 from app.sa.onlineutils import set_online, clear_online
 from app.sa.orgutils import can_move_to, up_child_org_path
 from app.flow.expressions import get_expression_tree
 from app.flow.flowcontroller import seach_process_id
-from functools import wraps
 import json
-
-
-# 登录装饰器(验证是否已登录和是否有权限访问)
-def user_login(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if "user_id" not in session:  # 未登录则跳转登录页
-            return redirect(url_for("home.login"))
-        else:
-            if 'permission' in session:
-                per = session['permission']
-            else:
-                per = get_permission_list(session['user_id'])
-                session['permission'] = per
-            if not is_have_author_url(per, request.path):
-                abort(403)  # 返回没有访问权限的错误
-        return f(*args, **kwargs)
-
-    return decorated_function
 
 
 # 用户登录
@@ -1371,3 +1352,13 @@ def flow_load_draw_action():
             rdata['state'] = False
             rdata['msg'] = "processid无效~"
     return json.dumps(rdata, ensure_ascii=False)
+
+
+# 首页待办任务列表框
+@system.route("/flow/taskporLet/", methods=["GET", "POST"])
+@user_login
+def wait_task_view():
+    person = get_curr_person_info()
+    page_data = SATask.query.filter_by(sepersonid=person['personid'], sstatusid='tesReady').order_by(
+        SATask.screatetime.desc()).paginate(1, 5)
+    return render_template("system/flow/taskporLet/wait_task_view.html", page_data=page_data)

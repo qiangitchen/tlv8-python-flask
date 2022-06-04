@@ -43,17 +43,17 @@ class FlowActivity:
             self.__processID = ProcessID
             self.__processName = dwr.sprocessname
             self.__processActy = dwr.sprocessacty
-            jsonObj = eval(dwr.sprocessacty)
+            jsonObj = eval(dwr.sprocessacty.replace("null", "''").replace("\\", ""))
             sprocessacty = jsonObj['nodes']
             self.__sActivityList = sprocessacty
             for Acjson in sprocessacty:
                 if Acjson['id'] == ActivityID or Acjson['type'] == ActivityID:
                     self.__sActivity = Acjson
-                    self.__id = Acjson["id"];
-                    self.__type = Acjson["type"];
-                    self.__activity = Acjson["id"];
-                    self.__activityname = Acjson["name"];
-                    self.__urlname = Acjson["name"];
+                    self.__id = Acjson["id"]
+                    self.__type = Acjson["type"]
+                    self.__activity = Acjson["id"]
+                    self.__activityname = Acjson["name"]
+                    self.__urlname = Acjson["name"]
                     if "property" in Acjson and Acjson['property']:
                         self.__property = Acjson['property']
                         for propJson in Acjson['property']:
@@ -106,7 +106,7 @@ class FlowActivity:
         data['grapWay'] = self.__grapWay
         data['transeRole'] = self.__transeRole
         data['outquery'] = self.__outquery
-        return data;
+        return data
 
     def getBeforeActivity(self):  # 获取前序环节
         alist = list()

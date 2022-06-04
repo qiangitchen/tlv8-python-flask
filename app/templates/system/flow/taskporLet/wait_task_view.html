@@ -1,0 +1,33 @@
+<html lang="zh_CN">
+{% include "common/page_head.html" %}
+<script type="text/javascript" src="{{ url_for('static',filename='common/js/flow.js') }}"></script>
+<body style="overflow:hidden; width: 100%; height: 100%;">
+<div id="more_infor"
+     style="text-align: right; font-size: 11pt; top: 0px; width: 100%; height: 25px; line-height: 25px;">
+    <a href="javascript:void(0);" onclick="goToMyTaskList()">更多...</a>
+</div>
+<div id="taskListView" style="font-size: 11pt; overflow:auto;  width: 100%; height: 100%;">
+    <!--
+    <img alt="loading......" src="{{ url_for('static',filename="common/image/smol_loading.gif") }}"/>
+    -->
+    <table class="layui-table" lay-skin="nob" lay-size="sm">
+        {% for v in page_data.items %}
+            <tr id='{{ v.sid }}' style='border-bottom:1px dashed #eee; height: 35px; line-height:35px; cursor: pointer;'
+                onclick='tlv8.task.openTask("{{ v.sid }}")'>
+                <td width='20px'><img src='{{ url_for('static',filename="common/image/symbol.png") }}'/></td>
+                <td title='{{ v.sname }}'>{{ v.sname }}</td>
+                <td title='{{ v.scdeptname }}' width='120px'>{{ v.scdeptname }}</td>
+                <td title='{{ v.scpersonname }}' width='80px'>{{ v.scpersonname }}</td>
+                <td title='{{ v.screatetime }}' width='150px'>{{ v.screatetime }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+</body>
+<script type="text/javascript">
+    function goToMyTaskList() {
+        let url = "/SA/task/taskCenter/mainActivity.html?opation=waitting";
+        tlv8.portal.openWindow("任务列表", url);
+    }
+</script>
+</html>
