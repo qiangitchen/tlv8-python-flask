@@ -1,0 +1,348 @@
+/* CSS Document */
+
+.grid {
+	margin: 0px auto;
+	padding: 0;
+	font-size: 11pt;
+	color: #666;
+	border-collapse: collapse;
+	border-spacing: 0px;
+	table-layout: fixed;
+	word-wrap: break-word;
+	word-break: break-all;
+}
+
+.gridtable {
+	margin: 0px auto;
+	padding: 0;
+	font-size: 11pt;
+	color: #666;
+	border-collapse: collapse;
+	border-spacing: 0px;
+	word-wrap: break-word;
+	word-break: break-all;
+}
+
+.grid_data_view {
+	border-left: 1px #ddd solid;
+	border-right: 1px #ddd solid;
+}
+
+.grid td {
+	padding: 0px;
+	margin: 0px;
+}
+
+.grid_td {
+	margin: 0;
+	padding: 0;
+	border: 1px solid #ddd;
+	font-size: 11pt;
+	line-height: 28px;
+}
+
+.grid_td_underline {
+	margin: 0;
+	padding: 0;
+	border: 1px solid #ddd;
+	font-size: 11pt;
+	text-align: center;
+	background-color: #FAFAFA;
+	line-height: 28px;
+	height: 28px;
+}
+
+td.grid_td {
+	margin: 0;
+	padding: 0;
+	border: 1px solid #ddd;
+	font-size: 11pt;
+	line-height: 28px;
+	height: 28px;
+	padding: 5px 0;
+}
+
+td.grid_label {
+	Text-Align: Center;
+	Vertical-Align: Middle;
+	table-layout: fixed;
+	word-break: break-all;
+	border: 1px solid #ddd;
+}
+
+td.sortASC {
+	Text-Align: Center;
+	Vertical-Align: Middle;
+	table-layout: fixed;
+	word-break: break-all;
+	border: 1px solid #ddd;
+}
+
+td.sortDESC {
+	Text-Align: Center;
+	Vertical-Align: Middle;
+	table-layout: fixed;
+	word-break: break-all;
+	border: 1px solid #ddd;
+}
+
+caption {
+	text-align: center;
+	font-size: 11pt;
+	font-weight: bold;
+	margin: 0 auto;
+}
+
+.message {
+	text-align: center;
+	font-size: 11pt;
+	background-color: #FFFF66;
+}
+
+tr.t1 {
+	background-color: #ffffff;
+} /* 交替行第一行的背景色 */
+tr.t2 {
+	background-color: #f9f9f9;
+} /* 交替行第二行的背景色 */
+tr.t3 {
+	background-color: #dff0d8;
+} /* 鼠标经过时的背景色 */
+tr.t4 {
+	background-color: #dff0ff;
+	color: white;
+} /* 鼠标经过时的背景色 */
+tr.t1:hover{
+	background: #f5f5f5;
+}
+tr.t2:hover{
+	background: #f5f5f5;
+}
+tr.t3:hover{
+	background: #d0e9c6;
+}
+
+.grid thead {
+	text-align: center;
+}
+
+.grid thead tr td {
+	text-align: center;
+}
+
+.sortASC {
+	background:
+		url(../image/grid/filter-up.gif)
+		no-repeat right;
+	font-weight: bold;
+}
+
+.sortDESC {
+	background:
+		url(../image/grid/filter-dropdown.gif)
+		no-repeat right;
+	font-weight: bold;
+}
+
+.gridbutton {
+	height: 28px;
+	text-align: center;
+	background: #FAFAFA;
+}
+
+.grid td a {
+	text-align: center;
+}
+
+.grid th {
+	align: left;
+	text-align: left;
+}
+
+#toolbar td {
+	text-align: left;
+	float: left;
+}
+
+.page_input {
+	align: center;
+	font-size: 11pt;
+	float: left;
+	font-color: red;
+}
+
+.firt a {
+	padding: 2px 5px;
+	margin: 2px;
+	color: #000;
+	text-decoration: none;
+	border: 1px #c0c0c0 solid;
+}
+
+.Dselect {
+	border: #999 1px solid;
+	height: 28px;
+	background: #fff url(../image/grid/combo_select.gif) no-repeat right;
+}
+
+input.Dselect {
+	border: #999 1px solid;
+	height: 28px;
+	background: #fff url(../image/grid/combo_select.gif) no-repeat right;
+}
+
+.toolbar {
+	margin: 0px auto;
+	padding: 0;
+	font-size: 11pt;
+	border-collapse: collapse; /*细线表格*/
+	table-layout: fixed;
+	word-break: break-all;
+}
+
+.toolbar_item {
+	padding: 0;
+	font-size: 11pt;
+	border-collapse: collapse; /*细线表格*/
+}
+
+img {
+	border: none;
+}
+
+.page {
+	padding: 0px 0px;
+	margin: 1px;
+	border: 0px;
+	text-decoration: none;
+	height: 28px;
+}
+
+a.toobar_item {
+	display: block;
+	padding: 0px 0px;
+	margin: 1px;
+	border: 0px;
+	text-decoration: none;
+	height: 30px;
+	border: 1px #ccc solid;
+	font: 12px 宋体, "Arial Narrow", arial, serif;
+	cursor: pointer;
+	padding: 5px 10px;
+	border-radius: 4px;
+}
+
+a.toobar_item:hover {
+	color: #000;
+	background: #eee;
+}
+
+a.toobar_item:active {
+	color: #000;
+}
+
+.grid_label_sf {
+	margin: 0;
+	padding: 0px 2px;
+	height: 20px;
+	text-align: left;
+	vertical-align: Middle;
+	font-size: 11pt;
+	color: #0099FF;
+	background: url(../image/grid/footer_bg.gif);
+}
+
+.scrollColThead {
+	/*background-image: url(footer_bg_h.png);*/
+	
+}
+
+.scrollColTheadBottom {
+	/*background: url(footer_bg.gif) 0 -1 repeat-x;*/
+	
+}
+
+/*行头列头背景*/
+.scrollColThead td,.scrollColThead th {
+	/*
+	background-image: url(grid_h_bg.png);
+	background-repeat: repeat-x;
+	*/
+  background-color: #FAFAFA;
+  background: -webkit-linear-gradient(top,#F8F8F8 0,#FAFAFA 100%);
+  background: -moz-linear-gradient(top,#F8F8F8 0,#FAFAFA 100%);
+  background: -o-linear-gradient(top,#F8F8F8 0,#FAFAFA 100%);
+  background: linear-gradient(to bottom,#F8F8F8 0,#FAFAFA 100%);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#F8F8F8,endColorstr=#FAFAFA,GradientType=0);
+  padding: 5px 0;
+}
+
+.scrollColTheadBottom td,.scrollColTheadBottom th {
+	/*
+	background-image: url(grid_h_bg.png);
+	background-repeat: repeat-x;
+	*/
+	
+  background-color: #FAFAFA;
+  background: -webkit-linear-gradient(top,#F8F8F8 0,#FAFAFA 100%);
+  background: -moz-linear-gradient(top,#F8F8F8 0,#FAFAFA 100%);
+  background: -o-linear-gradient(top,#F8F8F8 0,#FAFAFA 100%);
+  background: linear-gradient(to bottom,#F8F8F8 0,#FAFAFA 100%);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#F8F8F8,endColorstr=#FAFAFA,GradientType=0);
+  padding: 5px 0;
+}
+
+button {
+	cursor: pointer;
+}
+
+.gridLabel {
+	width: 99%;
+	overflow: hidden;
+	color: #333333;
+	font-weight: bold;
+	line-height: 1.5;
+	padding: 5px 0;
+}
+
+.gridValue {
+	width: 100%;
+	height: 28px;
+	line-height: 28px;
+	overflow: hidden;
+	color: #333333;
+}
+
+.grid_underline{
+	height: 28px;
+	border-left:1px solid #ddd; 
+	background-color: #FFFFCC;
+}
+
+.grid_pagetextbar{
+	font-size: 11pt;
+	padding: 0 2px;
+}
+
+.xui-button {
+	border: #baceeb 1px solid;
+	width: 65px;
+	height: 22px;
+	font: 12px 宋体, "Arial Narrow", arial, serif;
+	vertical-align: middle;
+	cursor: pointer;
+}
+
+.xui-button:hover {
+	border: #c0c0c0 1px solid;
+}
+
+.toolbar_item select{
+	height: 30px;
+}	
+
+.toolbar_item input{
+	height: 30px;
+}

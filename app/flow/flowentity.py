@@ -43,7 +43,7 @@ class FlowActivity:
             self.__processID = ProcessID
             self.__processName = dwr.sprocessname
             self.__processActy = dwr.sprocessacty
-            jsonObj = eval(dwr.sprocessacty.replace("null", "''").replace("\\", ""))
+            jsonObj = eval(dwr.sprocessacty.replace("null", "''"))
             sprocessacty = jsonObj['nodes']
             self.__sActivityList = sprocessacty
             for Acjson in sprocessacty:
@@ -58,7 +58,7 @@ class FlowActivity:
                         self.__property = Acjson['property']
                         for propJson in Acjson['property']:
                             if propJson['id'] == 'n_p_exepage':
-                                self.__url = propJson['value']
+                                self.__url = propJson['value'].replace("\\", "")
                             if propJson['id'] == 'n_p_label':
                                 self.__sActivityLabel = propJson['value']
                             if propJson['id'] == 'n_p_group':

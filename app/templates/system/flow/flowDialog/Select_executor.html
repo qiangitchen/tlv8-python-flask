@@ -1,0 +1,28 @@
+<html lang="zh_CN">
+{% include "common/tree_page_head.html" %}
+<script type="text/javascript" src="{{ url_for('static',filename="common/StaticGrid/StaticGrid.js") }}"></script>
+<script type="text/javascript" src="{{ url_for('static',filename="system/flow/flowDialog/Select_executor.js") }}"></script>
+<script type="text/javascript">
+    window.isWriteLog = false;
+</script>
+<body style="overflow:hidden;">
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'west',title:'下一步',split:true" style="width:280px;padding: 3px;">
+        <div id="activityList" style="cursor:default;"></div>
+    </div>
+    <div data-options="region:'center'" data-options="border:false" border="false">
+        <div class="easyui-layout" data-options="fit:true,border:false">
+            <div data-options="region:'west',title:'选择经办人',split:true" style="width:260px;">
+                <div id="OrgCheckTree" class="zTreeDemoBackground left"
+                     style="width:100%;height:100%;overflow:auto;cursor:default;">
+                    <ul id="treeDemo" class="ztree"></ul>
+                </div>
+            </div>
+            <div data-options="region:'center',title:'已选人员'" style="overflow: hidden;">
+                <div id="executorList" style="width:100%;height:100%;cursor:default;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

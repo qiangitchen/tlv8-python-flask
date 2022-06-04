@@ -713,7 +713,7 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
     param.set("taskID", taskID || this.taskID);
     param.set("sdata1", sData1 || this.sData1);
     if (ePersonID && ePersonID !== "") {
-        param.set("ePersonIDs", ePersonID);
+        param.set("epersonids", ePersonID);
     }
     tlv8
         .XMLHttpRequest(
@@ -737,8 +737,9 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
                         flowComponent.processID = reActData.processID;
                         flowComponent.flowID = reActData.flowID;
                         flowComponent.taskID = reActData.taskID;
-                        let activityListStr = reActData.activityListStr;
-                        let exe_selct_url = "/flw/flwcommo/flowDialog/Select_executor.html";
+                        let activityListStr = JSON.stringify(reActData.activityList);
+                        console.log(activityListStr);
+                        let exe_selct_url = "/system/flow/flowDialog/Select_executor";
                         exe_selct_url += "?flowID="
                             + reActData.flowID;
                         exe_selct_url += "&taskID="
@@ -751,7 +752,7 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
                         alert("流转失败!m:" + e.message);
                     }
                 } else {
-                    let flwData = eval("(" + r.data.data + ")");
+                    let flwData = r.data;
                     flowComponent.processID = flwData.processID;
                     flowComponent.flowID = flwData.flowID;
                     flowComponent.taskID = flwData.taskID;
@@ -772,7 +773,7 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
                     if (onFlowActionCommit) {
                         let inFn = eval(onFlowActionCommit);
                         if (typeof (inFn) == "function") {
-                            var rEvent = {
+                            let rEvent = {
                                 source: flowComponent,
                                 taskID: flowComponent.taskID,
                                 flowID: flowComponent.flowID,
@@ -782,7 +783,7 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
                         }
                     }
                     // 流程结束
-                    if (r.data.flag === "end") {
+                    if (r.state === "end") {
                         let onFlowEndCommit = flowComponent.onFlowEndCommit;
                         if (onFlowEndCommit) {
                             let inFnend = eval(onFlowEndCommit);

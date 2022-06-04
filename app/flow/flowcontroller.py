@@ -73,7 +73,6 @@ def out_flow(flowID, taskID, sdata1, ePersonList, afactivity):
         # processName = flwA.getProcessName()
         person = get_curr_person_info()
         act = FlowActivity(processID, afactivity)
-        print(act)
         beforeAct = FlowActivity(processID, Activity)
         actType = beforeAct.getType()
         activitylabel = act.getsActivityLabel()
@@ -94,7 +93,7 @@ def out_flow(flowID, taskID, sdata1, ePersonList, afactivity):
         for eperson in ePersonList:  # 给指定的执行人添加待办
             newtaskID = guid()
             task = SATask(sid=newtaskID, sparentid=taskID, sflowid=flowID,
-                          sprocess=processID,
+                          sprocess=processID, sactivity=afactivity,
                           sname=processName,
                           sdata1=sdata1,
                           scurl=flwA.getUrl(),

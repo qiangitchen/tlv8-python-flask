@@ -1362,3 +1362,10 @@ def wait_task_view():
     page_data = SATask.query.filter_by(sepersonid=person['personid'], sstatusid='tesReady').order_by(
         SATask.screatetime.desc()).paginate(1, 5)
     return render_template("system/flow/taskporLet/wait_task_view.html", page_data=page_data)
+
+
+# 流程执行-选择执行人
+@system.route("/flow/flowDialog/Select_executor", methods=["GET", "POST"])
+@user_login
+def select_executor():
+    return render_template("system/flow/flowDialog/Select_executor.html")

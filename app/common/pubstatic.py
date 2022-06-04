@@ -23,6 +23,8 @@ def guid():
 
 # url参数解码：utf-8
 def url_decode(s):
+    if not s:
+        return None
     return unquote_to_bytes(s).decode('utf-8')
 
 
