@@ -7,7 +7,7 @@ from app.models import SATask
 from app.common.decorated import user_login
 from app.common.pubstatic import url_decode, create_icon
 from app.common.persons import get_curr_person_info, get_person_list_by_org
-from app.flow.flowcontroller import start_flow, out_flow
+from app.flow.flowcontroller import start_flow, out_flow, flow_back
 from app.flow.flowentity import FlowActivity
 from app.flow.expprocess import *
 from app.flow.exporgexecutor import *
@@ -26,7 +26,7 @@ def open_task_action():
     executor = url_decode(request.form.get('executor', ''))
     if not executor or executor == "" or executor == "null":
         executor = person['personid']
-    task = SATask.query.filter_by(sid=taskID, sepersonid=executor).first()
+    task = SATask.query.filter_by(sid=taskID, sstatusid='tesReady', sepersonid=executor).first()
     if task:
         task.slock = person['personid']
         db.session.add(task)
@@ -249,6 +249,60 @@ def flow_get_executor_tree():
         data_list.append(data)
     rdata['state'] = True
     rdata['data'] = data_list
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+@flow.route("/flowbackAction", methods=["GET", "POST"])
+@user_login
+def flow_back_action():
+    rdata = dict()
+    flowID = url_decode(request.form.get('flowID', ''))
+    taskID = url_decode(request.form.get('taskID', ''))
+    task = SATask.query.filter_by(sid=taskID, sstatusid='tesReady').first()
+    if task:
+        processID = task.sprocess
+        curActivity = task.sactivity
+        flwA = FlowActivity(processID, curActivity)
+        backActivity = flwA.getBackActivity()  # 指定回退环节
+        Activity = None
+        if backActivity and backActivity != "":
+            Activity = backActivity
+        else:
+            ActivityList = flwA.getBeforeActivity()  # 获取流程图的前序环节（列表）
+            # SATask.sstatusid != 'tesReturned'
+            bf_task = SATask.query.filter_by(sid=task.sparentid, sstatusid='tesFinished').order_by(
+                SATask.sexecutetime.desc()).first()
+            if bf_task:
+                for bfa in ActivityList:
+                    if bfa.getActivity() == bf_task.sactivity:
+                        Activity = bf_task.sactivity
+                        break
+        if Activity:
+            task_back = SATask.query.filter_by(sflowid=flowID, sactivity=Activity, sstatusid='tesFinished').order_by(
+                SATask.sexecutetime.desc()).first()
+            if task_back:
+                ePersonList = get_person_list_by_org(task_back.sepersonid)
+                n_task = flow_back(processID, task.sname, Activity, flowID, taskID, task.sdata1, ePersonList,
+                                   task.seurl)
+                if n_task:
+                    task.sstatusid = 'tesReturned'
+                    task.sstatusname = '已回退'
+                    task.sexecutetime = datetime.now()
+                    task.version = task.version + 1
+                    db.session.add(task)
+                    db.session.commit()
+                    data = dict()
+                    data['processID'] = processID
+                    data['flowID'] = flowID
+                    data['taskID'] = n_task
+                    rdata['data'] = data
+                    rdata['state'] = True
+        else:
+            rdata['state'] = False
+            rdata['msg'] = "没有找到前序环节无法回退！"
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "任务id无效,或任务已经处理完成不能再处理！"
     return json.dumps(rdata, ensure_ascii=False)
 
 

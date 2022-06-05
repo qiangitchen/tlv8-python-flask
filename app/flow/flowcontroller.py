@@ -213,3 +213,39 @@ def flow_send_notes(flowID, taskID, sdata1, noteActivity):
                               skindid='note')
                 db.session.add(task)
             db.session.commit()
+
+
+# 流程回退
+def flow_back(processID, processName, Activity, flowID, taskID, sData1, ePersonList, cURL):
+    act = FlowActivity(processID, Activity)
+    nprocessName = act.getActivityname()  # 任务标题
+    processName = nprocessName + "←回退-" + processName
+    person = get_curr_person_info()
+    for eperson in ePersonList:
+        newtaskID = guid()
+        task = SATask(sid=newtaskID, sparentid=taskID, sflowid=flowID,
+                      sprocess=processID, sactivity=Activity,
+                      sname=processName,
+                      sdata1=sData1,
+                      scurl=cURL,
+                      scpersonid=person['personid'],
+                      scpersonname=person['personName'],
+                      scdeptid=person['deptid'],
+                      scdeptname=person['deptname'],
+                      scognid=person['ognid'],
+                      scognname=person['ognname'],
+                      scfid=person['personfid'],
+                      scfname=person['personfname'],
+                      sepersonid=eperson['personid'],
+                      sepersonname=eperson['personName'],
+                      sedeptid=eperson['deptid'],
+                      sedeptname=eperson['deptname'],
+                      seognid=eperson['ognid'],
+                      seognname=eperson['ognname'],
+                      sefid=eperson['personfid'],
+                      sefname=eperson['personfname'],
+                      seurl=act.getUrl(),
+                      sstatusid='tesReady',
+                      sstatusname='尚未处理')
+        db.session.add(task)
+    return newtaskID

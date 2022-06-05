@@ -14,7 +14,8 @@ def get_org_unit_has_activity(process, activity, inOrg, personMember):
     org = SAOrganization.query.filter_by(sid=getCurrentOgnID()).first()
     ognfid = org.sfid
     sql = ("select SORGID from sa_opauthorize a inner join sa_oppermission m "
-           " on m.SPERMISSIONROLEID = a.SAUTHORIZEROLEID where m.SPROCESS = '" + process + "' and SACTIVITY = '" + activity + "'")
+           " on m.SPERMISSIONROLEID = a.SAUTHORIZEROLEID "
+           "where m.SPROCESS = '" + process + "' and SACTIVITY = '" + activity + "'")
     if personMember == True:
         sql += " and (SORGID like '%@%')"
 
@@ -35,7 +36,8 @@ def get_org_unit_has_activity(process, activity, inOrg, personMember):
 # 获取指定activity权限的组织单元(跨单位)
 def get_org_unit_has_activity_inter_agency(process, activity, personMember):
     sql = ("select SORGID from sa_opauthorize a inner join sa_oppermission m "
-           " on m.SPERMISSIONROLEID = a.SAUTHORIZEROLEID where m.SPROCESS = '" + process + "' and SACTIVITY = '" + activity + "'")
+           " on m.SPERMISSIONROLEID = a.SAUTHORIZEROLEID "
+           " where m.SPROCESS = '" + process + "' and SACTIVITY = '" + activity + "'")
 
     if personMember == True:
         sql += " and (SORGID like '%@%')"
@@ -110,7 +112,7 @@ def get_org_unit_has_role_by_code_inter_agency(roleCode, personMember):
         orgs0.append(o.SORGID)
     orgUnit = ','.join(orgs)
     if personMember:
-        sql1 = ("select SID from sa_oporg o where o.sfid like '" + org.sfid + "%' EXISTS(select SFID from sa_oporg "
+        sql1 = ("select SID from sa_oporg o where EXISTS(select SFID from sa_oporg "
                 + " o1 where SID in (" + orgUnit
                 + ") and o.SFID like concat(o1.SFID,'%')) and SORGKINDID = 'psm'")
         rs1 = db.session.execute(sql1)

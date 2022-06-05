@@ -131,7 +131,7 @@ def get_person_list_by_org(orgidss):
     orgids = orgidss.split(",")
     for orgid in orgids:
         orgs = SAOrganization.query.filter(
-            or_(SAOrganization.sid == orgid, SAOrganization.sfid == orgid)).all()
+            or_(SAOrganization.sid == orgid, SAOrganization.sfid == orgid, SAOrganization.spersonid == orgid)).all()
         for org in orgs:
             pmo = SAOrganization.query.filter(SAOrganization.sfid.ilike(org.sfid + '%'),
                                               SAOrganization.sorgkindid == 'psm').all()
