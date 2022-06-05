@@ -1369,3 +1369,36 @@ def wait_task_view():
 @user_login
 def select_executor():
     return render_template("system/flow/flowDialog/Select_executor.html")
+
+
+# 任务中心
+@system.route("/task/taskCenter", methods=["GET", "POST"])
+@user_login
+def task_center():
+    option = request.args.get('option', 'waiting')
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 10, type=int)
+    data_query = SATask.query.filter(SATask.sflowid != SATask.sid)
+    person = get_curr_person_info()
+    if option == 'all':
+        data_query = data_query.filter(SATask.sepersonid == person['personid'])
+    if option == 'waiting':
+        data_query = data_query.filter(SATask.sstatusid == 'tesReady', SATask.sepersonid == person['personid'])
+    if option == 'finished':
+        data_query = data_query.filter(SATask.scpersonid == person['personid'])
+    if option == 'tesReturned':
+        data_query = data_query.filter(SATask.sstatusid == 'tesReturned', SATask.sepersonid == person['personid'])
+    if option == 'tesCanceled':
+        data_query = data_query.filter(SATask.sstatusid == 'tesCanceled', SATask.sepersonid == person['personid'])
+    if option == 'tesAborted':
+        data_query = data_query.filter(SATask.sstatusid == 'tesAborted', SATask.sepersonid == person['personid'])
+    search_text = url_decode(request.args.get('search_text', ''))
+    if search_text and search_text != "":
+        data_query = data_query.filter(
+            or_(SATask.sname.ilike('%' + search_text + '%'), SATask.scpersonname.ilike('%' + search_text + '%'),
+                SATask.scdeptname.ilike('%' + search_text + '%')))
+    count = data_query.count()
+    page_data = data_query.filter().paginate(page, limit)
+    return render_template("system/task/taskCenter/mainActivity.html", option=option,
+                           page_data=page_data, count=count, limit=limit, page=page,
+                           nul2em=nul2em, search_text=search_text)

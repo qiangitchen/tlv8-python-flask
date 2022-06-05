@@ -1,0 +1,154 @@
+<html lang="zh_CN">
+{% include "common/table_page_head.html" %}
+<script type="text/javascript" src="{{ url_for('static',filename='common/js/flow.js') }}"></script>
+<body style="overflow: hidden;">
+<div style="padding: 5px; width: 100%; position: relative; height: 35px;">
+    <div style='float:left; height: 30px; margin-top: 2px;'>
+        <button class="layui-btn layui-btn-sm" onclick="doQuery()" style="float: left;">
+            <span class='glyphicon glyphicon-repeat'></span>&nbsp;刷新
+        </button>
+    </div>
+    <form class='layui-form' style='width:80px;margin-left: 5px; margin-right:5px; height: 30px; float: left;'>
+        <select id='status_select' lay-filter='status_select1'>
+            <option value='all'>全部</option>
+            <option value='waiting'>待办</option>
+            <option value='finished'>已办</option>
+            <option value='tesReturned'>已回退</option>
+            <option value='tesCanceled'>已取消</option>
+            <option value='tesAborted'>已终止</option>
+        </select>
+    </form>
+    <div class='input-group input-group-sm' style='float:left; width:280px; height: 30px;'>
+        <input type="text" id="query_text" value="{{ nul2em(search_text) }}" placeholder="快速查询..." class='form-control'>
+        <span class='input-group-btn'>
+            <button class='btn btn-default' onclick="doQuery()">
+                <span class='glyphicon glyphicon-search'></span>查询
+            </button>
+        </span>
+    </div>
+</div>
+<table lay-filter="datalist" class="layui-table" id="datalist">
+    <thead>
+    <tr>
+        <th lay-data="{field:'sid',hide:true}"></th>
+        <th lay-data="{field:'sflowid',hide:true}"></th>
+        <th lay-data="{field:'sname'}">任务标题</th>
+        <th lay-data="{field:'sstatusid',hide:true}"></th>
+        <th lay-data="{field:'sstatusname'}">环节状态</th>
+        <th lay-data="{field:'scpersonname', width:90}">提交人</th>
+        <th lay-data="{field:'scdeptname', width:200}">提交部门</th>
+        <th lay-data="{field:'screatetime', width:160}">提交时间</th>
+        <th lay-data="{field:'sepersonname', width:90}">执行人</th>
+        <th lay-data="{field:'sedeptname', width:90}">执行部门</th>
+        <th lay-data="{field:'sexecutetime', width:160}">处理时间</th>
+        <th lay-data="{field:'scurl',hide:true}"></th>
+        <th lay-data="{field:'seurl',hide:true}"></th>
+        <th lay-data="{fixed:'right',toolbar:'#actionBar',width:180}">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for d in page_data.items %}
+        <tr>
+            <td>{{ d.sid }}</td>
+            <td>{{ d.sflowid }}</td>
+            <td>{{ d.sname }}</td>
+            <td>{{ d.sstatusid }}</td>
+            <td>{{ d.sstatusname }}</td>
+            <td>{{ d.scpersonname }}</td>
+            <td>{{ d.scdeptname }}</td>
+            <td>{{ d.screatetime }}</td>
+            <td>{{ d.sepersonname }}</td>
+            <td>{{ d.sedeptname }}</td>
+            <td>{{ d.scurl }}</td>
+            <td>{{ d.seurl }}</td>
+            <td>{{ nul2em(d.sexecutetime) }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<script type="text/html" id="actionBar">
+    <a class="layui-btn layui-btn-xs" lay-event="viewData">查看</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="recycleTask">撤回</a>
+    <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="doTask">处理</a>
+</script>
+<div id="data_list_page"></div>
+</body>
+<script type="text/javascript">
+    function doQuery(page, limit) {
+        let url = "/system/task/taskCenter";
+        url += "?search_text=" + J_u_encode($("#query_text").val());
+        url += "&option=" + $("#status_select").val();
+        if (page) {
+            url += "&page=" + page;
+        }
+        if (limit) {
+            url += "&limit=" + limit;
+        }
+        window.location.href = url;
+    }
+
+    $("#status_select").val('{{ option }}');
+    layui.form.render("select");
+
+    layui.use(['table', 'laypage'], function () {
+        let table = layui.table;
+        let laypage = layui.laypage;
+        //初始化数据表格
+        table.init('datalist',
+            {
+                height: 'full-100',
+                even: true,
+                page: false,
+                limit: 20
+            }
+        );
+        layui.form.on('select(status_select1)', function (data) {
+            doQuery();
+        });
+        $("#query_text").keyup(function (event) {
+            if (event.keyCode == 13) {
+                doQuery();
+            }
+        });
+        //触发行单击事件
+        table.on('row(datalist)', function (obj) {
+            obj.tr.parent().find('tr').removeClass('active')
+            obj.tr.addClass('active') //选中行加特殊背景颜色
+        });
+        //监听行工具事件
+        table.on('tool(datalist)', function (obj) {
+            let data = obj.data;
+            if (obj.event === 'viewData') {
+
+            }
+            if (obj.event === 'recycleTask') {
+                //撤回任务
+            }
+            if (obj.event === 'doTask') {
+                if (data.sstatusid == 'tesReady') {
+                    tlv8.task.openTask(data.sid);
+                } else {
+                    layui.layer.alert("当前数据非待办任务，不能处理！");
+                }
+            }
+        });
+        //执行一个laypage实例
+        laypage.render({
+            elem: 'data_list_page', //注意，这里的ID，不用加 # 号
+            count: {{ count }}, //数据总数，从服务端得到
+            limit: {{ limit }}, //每页行数
+            limits: [10, 20, 30, 40, 50],
+            curr: {{ page }}, //当前页码
+            jump: function (obj, first) {
+                //obj包含了当前分页的所有参数，比如：
+                //console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
+                //console.log(obj.limit); //得到每页显示的条数
+                //首次不执行
+                if (!first) {
+                    doQuery(obj.curr, obj.limit);
+                }
+            }
+        });
+    });
+</script>
+</html>

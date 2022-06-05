@@ -1152,8 +1152,8 @@ tlv8.flw.prototype.flowPause = function (flowID, taskID) {
         tlv8.XMLHttpRequest("/flowControl/flowpauseAction", param, "post", true,
             function (r) {
                 tlv8.showModelState(false);
-                if (r.data.flag === "false") {
-                    alert("操作失败:" + r.data.message);
+                if (r.state === false) {
+                    layui.layer.alert("操作失败:" + r.data.message);
                 } else {
                     let onSuspendCommit = flowComponent.onSuspendCommit;
                     if (onSuspendCommit) {
@@ -1410,7 +1410,7 @@ tlv8.task = {
             tlv8.XMLHttpRequest("/flowControl/openTaskAction", param, "post", true,
                 function (r) {
                     if (r.state === false) {
-                        alert("操作失败:" + r.msg);
+                        layui.layer.alert("操作失败:" + r.msg);
                     } else {
                         let Data = r.data;
                         let name = Data.name;
@@ -1428,6 +1428,44 @@ tlv8.task = {
         }
     },
     /**
+     * 取消流程
+     * @param taskID
+     */
+    cancelTask: function (taskID, callback) {
+        let param = new tlv8.RequestParam();
+        param.set("taskID", taskID);
+        tlv8.XMLHttpRequest("/flowControl/flowcancelAction",
+            param, "POST", true, function (r) {
+                if (r.state === false) {
+                    layui.layer.alert("操作失败:" + r.msg);
+                } else {
+                    layui.layer.msg("取消成功！");
+                    if (callback && typeof callback == "string") {
+                        callback(r);
+                    }
+                }
+            });
+    },
+    /**
+     * 激活任务
+     * @param taskID
+     */
+    flowRestart: function (taskID, callback) {
+        let param = new tlv8.RequestParam();
+        param.set("taskID", taskID);
+        tlv8.XMLHttpRequest("/flowControl/flowrestartAction",
+            param, "POST", true, function (r) {
+                if (r.state === false) {
+                    layui.layer.alert("操作失败:" + r.msg);
+                } else {
+                    layui.layer.msg("操作成功！");
+                    if (callback && typeof callback == "string") {
+                        callback(r);
+                    }
+                }
+            });
+    },
+    /**
      @function
      @name tlv8.task.viewChart
      @description 查看流程图
@@ -1436,48 +1474,18 @@ tlv8.task = {
     viewChart: function (sData1) {
         let param = new tlv8.RequestParam();
         param.set("sdata1", sData1);
-        let result = tlv8.XMLHttpRequest("getProcessByBillIDAction",
+        let result = tlv8.XMLHttpRequest("/flowControl/getProcessByBillIDAction",
             param, "POST", false);
-        let rdata = [];
-        try {
-            rdata = window.eval("(" + result.data.data + ")");
-        } catch (e) {
+        if (result.state === false) {
+            layui.layer.alert(result.msg);
+            return;
         }
-        let url = "/flow/viewiocusbot/";
-        if (rdata.length > 0) {
-            let flowID = rdata[0].SFLOWID;
-            let taskID = rdata[0].SID;
-            tlv8.portal.openWindow("流程图",
-                url + "?flowID=" + flowID
-                + "&taskID=" + taskID);
-        } else {
-            let currentUrl = window.location.pathname;
-            if (currentUrl.indexOf("?") > 0)
-                currentUrl = currentUrl.substring(0, currentUrl.indexOf("?"));
-            tlv8.portal
-                .openWindow("流程图",
-                    url + "?currentUrl=" + currentUrl);
-        }
-    },
-    /**
-     @function
-     @name tlv8.task.Update_Flowbillinfo
-     @description 更新流程业务数据信息
-     @param {string} tablename
-     @param {string} fid
-     @param {string} billitem
-     */
-    Update_Flowbillinfo: function (tablename, fid, billitem) {
-        let param = new tlv8.RequestParam();
-        param.set("tablename", tablename);
-        param.set("fid", fid);
-        param.set("billitem", billitem);
-        let r = tlv8.XMLHttpRequest("Update_Flowbillinfo", param, "post",
-            false, null);
-        if (r.data.flag === "false") {
-            alert(r.data.message);
-            return false;
-        }
-        return r.data.data;
+        let rdata = result.data;
+        let url = "/system/flow/viewiocusbot/";
+        let flowID = rdata.flowID;
+        let taskID = rdata.taskID;
+        tlv8.portal.openWindow("流程图",
+            url + "?flowID=" + flowID
+            + "&taskID=" + taskID);
     }
 };

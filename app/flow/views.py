@@ -223,7 +223,7 @@ def flow_get_executor_tree():
     rdata = dict()
     exGroup = url_decode(request.form.get('exGroup', ''))
     excutorIDs = url_decode(request.form.get('excutorIDs', ''))
-    isflowMonitor = url_decode(request.form.get('isflowMonitor'))
+    # isflowMonitor = url_decode(request.form.get('isflowMonitor')) #流程监控调用-可能需要特殊处理
     sql = ("select distinct a.sparent,a.sid,a.scode,a.sname,a.sfid,a.sorgkindid,a.ssequence,a.slevel from "
            " sa_oporg a inner join (select sfid from sa_oporg where svalidstate=1 ")
     if exGroup and exGroup != "":
@@ -366,6 +366,114 @@ def flow_transmit_action():
     return json.dumps(rdata, ensure_ascii=False)
 
 
+# 取消流程
+@flow.route("/flowcancelAction", methods=["GET", "POST"])
+@user_login
+def flow_cancel_action():
+    rdata = dict()
+    taskID = url_decode(request.form.get('taskID', ''))
+    cur_task = SATask.query.filter_by(sid=taskID, sstatusid='tesReady').first()
+    if cur_task:
+        cur_task.sstatusid = 'tesCanceled'
+        cur_task.sstatusname = '已取消'
+        cur_task.sexecutetime = datetime.now()
+        cur_task.version = cur_task.version + 1
+        db.session.add(cur_task)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "任务id无效,或任务已经处理完成不能取消！"
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 流程暂停
+@flow.route("/flowpauseAction", methods=["GET", "POST"])
+@user_login
+def flow_pause_action():
+    rdata = dict()
+    flowID = url_decode(request.form.get('flowID', ''))
+    taskID = url_decode(request.form.get('taskID', ''))
+    cur_task = SATask.query.filter_by(sid=taskID, sstatusid='tesReady').first()
+    if cur_task:
+        cur_task.sstatusid = 'tesPause'
+        cur_task.sstatusname = '已暂停'
+        cur_task.sexecutetime = datetime.now()
+        cur_task.version = cur_task.version + 1
+        db.session.add(cur_task)
+        main_task = SATask.query.filter_by(sid=flowID).first()
+        if main_task:
+            main_task.sstatusid = 'tesPause'
+            main_task.sstatusname = '已暂停'
+            main_task.sexecutetime = datetime.now()
+            main_task.version = main_task.version + 1
+            db.session.add(main_task)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "任务id无效,或任务已经处理完成不能暂停！"
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 激活流程
+@flow.route("/flowrestartAction", methods=["GET", "POST"])
+@user_login
+def flow_restart_action():
+    rdata = dict()
+    flowID = url_decode(request.form.get('flowID', ''))
+    taskID = url_decode(request.form.get('taskID', ''))
+    cur_task = SATask.query.filter_by(sid=taskID).first()
+    if cur_task:
+        cur_task.sstatusid = 'tesReady'
+        cur_task.sstatusname = '尚未处理'
+        cur_task.sexecutetime = None
+        cur_task.version = cur_task.version + 1
+        db.session.add(cur_task)
+        main_task = SATask.query.filter_by(sid=flowID).first()
+        if main_task:
+            main_task.sstatusid = 'tesExecuting'
+            main_task.sstatusname = '正在处理'
+            main_task.sexecutetime = datetime.now()
+            main_task.version = main_task.version + 1
+            db.session.add(main_task)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "任务id无效！"
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 流程终止
+@flow.route("/flowstopAction", methods=["GET", "POST"])
+@user_login
+def flow_stop_action():
+    rdata = dict()
+    flowID = url_decode(request.form.get('flowID', ''))
+    taskID = url_decode(request.form.get('taskID', ''))
+    cur_task = SATask.query.filter_by(sid=taskID, sstatusid='tesReady').first()
+    if cur_task:
+        cur_task.sstatusid = 'tesAborted'
+        cur_task.sstatusname = '已终止'
+        cur_task.sexecutetime = datetime.now()
+        cur_task.version = cur_task.version + 1
+        db.session.add(cur_task)
+        main_task = SATask.query.filter_by(sid=flowID).first()
+        if main_task:
+            main_task.sstatusid = 'tesAborted'
+            main_task.sstatusname = '已终止'
+            main_task.sexecutetime = datetime.now()
+            main_task.version = main_task.version + 1
+            db.session.add(main_task)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "任务id无效,或任务已经处理完成不能终止！"
+    return json.dumps(rdata, ensure_ascii=False)
+
+
 # 加载波特图
 @flow.route("/flowloadbotAction", methods=["GET", "POST"])
 @user_login
@@ -449,4 +557,23 @@ def flow_check_finish_action():
     except Exception as e:
         rdata['state'] = False
         rdata['msg'] = str(e)
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 根据sdata1获取流程信息
+@flow.route("/getProcessByBillIDAction", methods=["GET", "POST"])
+@user_login
+def get_process_by_bill_id_action():
+    rdata = dict()
+    sdata1 = url_decode(request.form.get('sdata1', ''))
+    task = SATask.query.filter_by(sdata1=sdata1).first()
+    if task:
+        data = dict()
+        data['flowID'] = task.sflowid
+        data['taskID'] = task.sid
+        rdata['data'] = data
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = '没有找到id对应的流程信息！'
     return json.dumps(rdata, ensure_ascii=False)
