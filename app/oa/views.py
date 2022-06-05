@@ -14,5 +14,4 @@ import json
 @user_login
 def oa_leave(activity=None):
     process = request.args.get('process')
-    print(process)
-    return render_template("oa/leave/mainActivity.html")
+    return render_template("oa/leave/mainActivity.html", process=process, activity=activity)

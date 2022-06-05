@@ -87,10 +87,24 @@ def flow_out_action():
     sdata1 = url_decode(request.form.get('sdata1', ''))
     epersonids = url_decode(request.form.get('epersonids'))
     afterActivity = url_decode(request.form.get('afterActivity'))
-    task = SATask.query.filter_by(sid=taskID).first()
+    task = SATask.query.filter_by(sid=taskID, sstatusid='tesReady').first()
     if task:
         processID = task.sprocess
         Activity = task.sactivity
+        if task.skindid == "note":  # 如果待办为‘通知’类型则直接完成不做其他处理
+            task.sexecutetime = datetime.now()
+            task.sstatusid = 'tesFinished'
+            task.sstatusname = '已完成'
+            task.version = task.version + 1
+            db.session.add(task)
+            db.session.commit()
+            rdata['state'] = True
+            data = dict()
+            data['processID'] = processID
+            data['flowID'] = flowID
+            data['taskID'] = taskID
+            rdata['data'] = data
+            return json.dumps(rdata, ensure_ascii=False)
         flwA = FlowActivity(processID, Activity)
         if flwA.getGrapModle() == "together" and flwA.getGrapWay() == "merge":  # 当前环节为“共同模式”则需要判断是否所有人已处理任务
             ch_task = SATask.query.filter(SATask.sflowid == task.sflowid, SATask.sactivity == flwA.getActivity(),
@@ -112,9 +126,11 @@ def flow_out_action():
                 taskIDs = out_flow(flowID, taskID, sdata1, ePersonList, afterActivity)
                 if taskIDs:
                     rdata['state'] = True
-                    rdata['processID'] = processID
-                    rdata['flowID'] = flowID
-                    rdata['taskID'] = taskIDs.split(",")[0]
+                    data = dict()
+                    data['processID'] = processID
+                    data['flowID'] = flowID
+                    data['taskID'] = taskIDs[0]
+                    rdata['data'] = data
                     return json.dumps(rdata, ensure_ascii=False)
             aftAList.append(FlowActivity(processID, afterActivity))
         else:
@@ -122,7 +138,12 @@ def flow_out_action():
         if len(aftAList) == 1:
             # 下一环节为“结束环节”且当前环节不是“共同模式”则直接结束流程
             if aftAList[0].getType() == "end" and (flwA.getGrapModle() != "together" or flwA.getGrapWay() != "merge"):
-                out_flow(flowID, taskID, sdata1, None, aftAList[0].getActivity())
+                newtaskIDs = out_flow(flowID, taskID, sdata1, None, aftAList[0].getActivity())
+                data = dict()
+                data['processID'] = processID
+                data['flowID'] = flowID
+                data['taskID'] = newtaskIDs[0]
+                rdata['data'] = data
                 rdata['state'] = 'end'
                 return json.dumps(rdata, ensure_ascii=False)
             if aftAList[0].getOutquery() == "no":  # 不需要流转确认时处理
@@ -191,7 +212,7 @@ def flow_out_action():
         rdata['data'] = data
     else:
         rdata['state'] = False
-        rdata['msg'] = "任务id无效！"
+        rdata['msg'] = "任务id无效,或任务已经处理完成不能再处理！"
     return json.dumps(rdata, ensure_ascii=False)
 
 
@@ -203,7 +224,7 @@ def flow_get_executor_tree():
     exGroup = url_decode(request.form.get('exGroup', ''))
     excutorIDs = url_decode(request.form.get('excutorIDs', ''))
     isflowMonitor = url_decode(request.form.get('isflowMonitor'))
-    sql = ("select distinct a.sparent,a.sid,a.scode,a.sname,a.sfid,a.sorgkindid,a.ssequence from "
+    sql = ("select distinct a.sparent,a.sid,a.scode,a.sname,a.sfid,a.sorgkindid,a.ssequence,a.slevel from "
            " sa_oporg a inner join (select sfid from sa_oporg where svalidstate=1 ")
     if exGroup and exGroup != "":
         sql += " and (1=2 "
@@ -213,7 +234,7 @@ def flow_get_executor_tree():
             for sid in excutorIDs.split(","):
                 sql += " or sfid like '%" + sid + "%' "
         sql += ")"
-    sql += ")b on b.sfid like concat(a.sfid,'%') where svalidstate=1 order by b.sfid,a.ssequence asc"
+    sql += ")b on b.sfid like concat(a.sfid,'%') where a.svalidstate=1 order by a.slevel asc,a.ssequence asc"
     org_list = db.session.execute(sql)
     data_list = list()
     for org in org_list:
@@ -222,14 +243,96 @@ def flow_get_executor_tree():
         data['name'] = org.sname
         data['type'] = org.sorgkindid
         data['icon'] = create_icon(org.sorgkindid)
-        if org.sparent:
-            data['pId'] = org.sparent
-        else:
-            data['pId'] = ""
+        data['pId'] = org.sparent
         if org.sorgkindid != "psm":
             data["open"] = "true"
         data_list.append(data)
     rdata['state'] = True
     rdata['data'] = data_list
-    print(rdata)
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 加载波特图
+@flow.route("/flowloadbotAction", methods=["GET", "POST"])
+@user_login
+def flow_load_bot_action():
+    rdata = dict()
+    flowID = url_decode(request.form.get('flowID', ''))
+    task_list = SATask.query.filter(SATask.sstatusid != 'tesExecuting', SATask.sactivity is not None,
+                                    SATask.sflowid == flowID).order_by(SATask.screatetime.asc()).all()
+    bot_list = list()
+    for task in task_list:
+        botdata = dict()
+        botdata['id'] = task.sid
+        botdata['title'] = task.sname
+        botdata['executor'] = task.sepersonname
+        botdata['excutordpt'] = task.sedeptname
+        botdata['status'] = task.sstatusname
+        botdata['creator'] = task.scpersonname
+        botdata['createTime'] = datetime.strftime(task.screatetime, '%Y-%m-%d %H:%M:%S')
+        if task.sexecutetime:
+            botdata['auditeTime'] = datetime.strftime(task.sexecutetime, '%Y-%m-%d %H:%M:%S')
+        else:
+            botdata['auditeTime'] = ''
+        botdata['activity'] = task.sactivity
+        bot_list.append(botdata)
+    rdata['state'] = True
+    rdata['data'] = bot_list
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 加载波特图X
+@flow.route("/flowloadbotXAction", methods=["GET", "POST"])
+@user_login
+def flow_load_botx_action():
+    rdata = dict()
+    flowID = url_decode(request.form.get('flowID', ''))
+    task_list = SATask.query.filter(SATask.sstatusid != 'tesExecuting', SATask.sactivity is not None,
+                                    SATask.sflowid == flowID).order_by(SATask.screatetime.asc()).all()
+    bot_list = list()
+    for task in task_list:
+        botdata = dict()
+        botdata['id'] = task.sid
+        botdata['name'] = task.sname
+        botdata['executor'] = task.sepersonname
+        botdata['executordepartment'] = task.sedeptname
+        botdata['status'] = task.sstatusname
+        botdata['creator'] = task.scpersonname
+        botdata['createtime'] = datetime.strftime(task.screatetime, '%Y-%m-%d %H:%M:%S')
+        if task.sexecutetime:
+            botdata['executetime'] = datetime.strftime(task.sexecutetime, '%Y-%m-%d %H:%M:%S')
+        else:
+            botdata['executetime'] = ''
+            botdata['activity'] = task.sactivity
+        if task.sparentid and flowID != task.sparentid:
+            ahead = list()
+            ahead.append(task.sparentid)
+            botdata['ahead'] = ahead
+        anext = list()
+        child = SATask.query.filter_by(sparentid=task.sid).all()
+        for c in child:
+            anext.append(c.sid)
+        botdata['next'] = anext
+        bot_list.append(botdata)
+    rdata['state'] = True
+    rdata['data'] = bot_list
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 检查流程是否已结束
+@flow.route("/flowcheckfinishAction", methods=["GET", "POST"])
+@user_login
+def flow_check_finish_action():
+    rdata = dict()
+    try:
+        flowID = url_decode(request.form.get('flowID', ''))
+        task = SATask.query.filter_by(sid=flowID, sstatusid='tesFinished').first()
+        if task:
+            rdata['data'] = True
+        else:
+            rdata['data'] = False
+        rdata['state'] = True
+    except Exception as e:
+        rdata['state'] = False
+        rdata['msg'] = str(e)
     return json.dumps(rdata, ensure_ascii=False)

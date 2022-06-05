@@ -134,10 +134,13 @@ def out_flow(flowID, taskID, sdata1, ePersonList, afactivity):
                 if stask:
                     stask.sstatusid = 'tesFinished'
                     stask.sstatusname = '已完成'
+                    stask.sexecutetime = datetime.now()
                     db.session.add(stask)
         if ctask.sstatusid == "tesReady":
             ctask.sstatusid = 'tesFinished'
             ctask.sstatusname = '已完成'
+            ctask.sexecutetime = datetime.now()
+            ctask.version = ctask.version + 1
             db.session.add(ctask)
         db.session.commit()
         noteActivity = act.getNoteActivity()

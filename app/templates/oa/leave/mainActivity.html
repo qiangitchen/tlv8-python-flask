@@ -112,6 +112,19 @@
             init_toolbar();
             flwComponent = new tlv8.flw("flowToolbar");
 
+            let activity = "{{ activity }}";
+
+            if (flwComponent.taskID) {
+                flwComponent.setItemStatus({
+                    audit: false,
+                    back: true,
+                    out: true,
+                    transmit: false,
+                    pause: false,
+                    stop: (activity == 'mainActivity')
+                });
+            }
+
             let rowid = tlv8.RequestURLParam.getParam("sData1");
             if (rowid && rowid != "") {
 

@@ -130,11 +130,11 @@ def get_person_list_by_org(orgidss):
     relist = list()
     orgids = orgidss.split(",")
     for orgid in orgids:
-        orgs = SAOrganization.query(SAOrganization.sfid).filter(
+        orgs = SAOrganization.query.filter(
             or_(SAOrganization.sid == orgid, SAOrganization.sfid == orgid)).all()
         for org in orgs:
-            pmo = SAOrganization.query(SAOrganization.spersonid).filter(SAOrganization.sfid.ilike(org.sfid + '%'),
-                                                                        SAOrganization.sorgkindid == 'psm').all()
+            pmo = SAOrganization.query.filter(SAOrganization.sfid.ilike(org.sfid + '%'),
+                                              SAOrganization.sorgkindid == 'psm').all()
             for pm in pmo:
                 p = get_person_info(pm.spersonid)
                 relist.append(p)

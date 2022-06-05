@@ -39,7 +39,7 @@ SelectExecutor.creatActivList = function (activityListStr) {
         alert("流程配置错误!");
         return;
     }
-    var JsonArray;
+    let JsonArray;
     if (typeof activityListStr == "string") {
         try {
             JsonArray = eval("(" + activityListStr + ")");
@@ -146,7 +146,6 @@ SelectExecutor.checkActivty = function (obj) {
                 } else {
                     zNodes = NodeData;
                 }
-                console.log(zNodes)
                 orgTree = $.fn.zTree.init($("#treeDemo"), setting, zNodes);
                 // SelectExecutor.initExecutorList();//流转执行人记录
             });
@@ -216,7 +215,9 @@ const setting = {
     },
     data: {
         simpleData: {
-            enable: true
+            enable: true,
+            idKey: "id",
+            pIdKey: "pId"
         }
     },
     callback: {
@@ -264,10 +265,10 @@ function checkChildrenNode(parentNode, isCheck) {
     }
     for (let i = 0; i < parentNode.length; i++) {
         child_count++;
-        var cNode = parentNode[i];
+        let cNode = parentNode[i];
         if (cNode.type == 'psm') {
             if (isCheck) {
-                var json = {};
+                let json = {};
                 json.rowid = cNode.id;
                 json.fName = cNode.name;
                 json.fType = '人员';

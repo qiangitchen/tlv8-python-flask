@@ -1,20 +1,11 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html xmlns:v="urn:schemas-microsoft-com:vml">
+<html lang="zh">
 <head>
-    <meta http-equiv="pragma" content="no-cache">
-    <meta http-equiv="Cache-Control" content="no-store, must-revalidate">
-    <meta HTTP-EQUIV="expires" CONTENT="Thu, 01 Jan 1970 00:00:01 GMT">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1,IE=Edge">
     <title>查看流程图、波特图</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui/themes/default/easyui.css') }}"></link>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='jquery-easyui/themes/icon.css') }}"></link>
-    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap/css/bootstrap.min.css') }}" media="all">
-    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap/css/justified.css') }}" media="all">
-    <link rel="stylesheet" href="{{ url_for('static',filename='layui/css/layui.css') }}" media="all">
-    <link rel="stylesheet" href="{{ url_for('static',filename='common/css/table.css') }}" media="all">
-    <link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='common/css/toolbar.css') }}"></link>
-    <link type="text/css" rel="stylesheet" href="{{ url_for('static',filename='system/flow/viewiocusbot/css/draw.css') }}"/>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='layui/css/layui.css') }}" media="all">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='common/css/toolbar.css') }}" media="all">
     <script type="text/javascript" src="{{ url_for('static',filename='common/js/jquery/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='common/js/main.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='system/flow/processChart/js/dojoAll.js') }}"></script>
@@ -30,32 +21,31 @@
     <script type="text/javascript" src="{{ url_for('static',filename='system/flow/dwr/res/js/graphic.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui/jquery.easyui.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui/locale/easyui-lang-zh_CN.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static',filename='bootstrap/js/bootstrap.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='layui/layui.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='system/flow/viewiocusbot/js/flow-ioc-load.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='system/flow/viewiocusbot/js/loadiocus.js') }}"></script>
     <script type="text/javascript">
 		function initDesigner(botData){
-	        var canvas = new Justep.graphics.Canvas({id:'main_bot_body'});
-			var diagram = new Baud();
+	        let canvas = new Justep.graphics.Canvas({id:'main_bot_body'});
+			let diagram = new Baud();
 			diagram.setCanvas(canvas);
 			diagram.loadData(botData);
 			setTimeout(function() {
-				var sw = $("#main_bot_body").width() + J$("main_bot_body").scrollWidth;
+				let sw = $("#main_bot_body").width() + J$("main_bot_body").scrollWidth;
 				$("#main_bot_body").scrollLeft(sw);
-				var sh = $("#main_bot_body").height() + J$("main_bot_body").scrollHeight;
+				let sh = $("#main_bot_body").height() + J$("main_bot_body").scrollHeight;
 				$("#main_bot_body").scrollTop(sh);
 			}, 100);
 	     }
 		$(document).ready(function() {
-			var iocu = new JIocus();
+			let iocu = new JIocus();
 			iocu.loadData();
 		});
 	</script>
 </head>
-<body style="overflow:hidden;">
-  	<div id="tabveiw1" class="easyui-tabs" fit="true">
-       	<div id="detail_01" title="流程图" style="overflow: hidden;padding:0;">
+<body style="overflow:hidden;" unselectable="on" onselectstart="return false;" style="-moz-user-select:none;">
+  	<div class="easyui-tabs" fit="true">
+        <div title="流程图" style="overflow: hidden;padding:0;">
        		<table style="width:100%; height:100%;">
 				<tr>
 					<td width="100%" valign="top">
@@ -95,7 +85,7 @@
 				</tr>
 			</table>
         </div>
-        <div id="detail_02" title="波特图" style="padding: 0;">
+        <div title="波特图" style="padding: 0;">
        		<div id="main_bot_body" style="width: 100%; height:100%; cursor: default; overflow:auto;"></div>
         </div>
  	 </div>

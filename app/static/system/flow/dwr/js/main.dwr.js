@@ -588,7 +588,6 @@ function Group(id, name) {
             ElementList.clearSelected();
         }
         if (selNode != null) {
-            parent.console.log(selNode);
             if (selNode.type == "condition") {
                 this.setProp(selNode, 'c');
             } else if (selNode.type == "start" || selNode.type == "end") {

@@ -95,7 +95,7 @@ def write_system_log():
         activateName = url_decode(data.get('activateName', ''))
         actionName = url_decode(data.get('actionName', ''))
         discription = url_decode(data.get('discription', ''))
-        if len(activateName) < 1:
+        if not activateName or len(activateName) < 1:
             activateName = get_process_name(srcPath)
         sprocessName = get_process_full(srcPath)
         person_info = get_curr_person_info()

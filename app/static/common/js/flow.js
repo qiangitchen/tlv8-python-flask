@@ -27,7 +27,7 @@ tlv8.flw = function (div, data, setting) {
                 out: true,
                 transmit: false,
                 pause: false,
-                stop: true
+                stop: false
             }
         };
     }
@@ -43,7 +43,7 @@ tlv8.flw = function (div, data, setting) {
             out: true,
             transmit: false,
             pause: false,
-            stop: true
+            stop: false
         };
     } else {
         // if (setting.autosaveData != false)
@@ -390,7 +390,6 @@ tlv8.flw.prototype.flowStart = function (billid) {
             layui.layer.alert("操作失败:" + r.msg);
         } else {
             let flwData = r.data; //eval("(" + r.data + ")");
-            alert(flwData);
             flowComponent.processID = flwData.processID;
             flowComponent.flowID = flwData.flowID;
             flowComponent.taskID = flwData.taskID;
@@ -737,8 +736,7 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
                         flowComponent.processID = reActData.processID;
                         flowComponent.flowID = reActData.flowID;
                         flowComponent.taskID = reActData.taskID;
-                        let activityListStr = JSON.stringify(reActData.activityList);
-                        console.log(activityListStr);
+                        let activityListStr = reActData.activityList;
                         let exe_selct_url = "/system/flow/flowDialog/Select_executor";
                         exe_selct_url += "?flowID="
                             + reActData.flowID;
@@ -837,8 +835,8 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
         param.set("epersonids", backData.epersonids);
         tlv8.XMLHttpRequest("/flowControl/flowOutAction", param, "post", true,
             function (r) {
-                if (r.data.flag === "false") {
-                    alert(r.data.message);
+                if (r.state === false) {
+                    alert(r.msg);
                     return false;
                 }
                 let onAdvanceCommit = flowComponent.onAdvanceCommit;

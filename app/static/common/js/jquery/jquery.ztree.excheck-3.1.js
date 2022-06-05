@@ -562,11 +562,7 @@
 		event: _event,
 		data: _data
 	};
-	try{
-		$.extend(true, $.fn.zTree.consts, _consts);
-	}catch(e){
-		return false;
-	}
+	$.extend(true, $.fn.zTree.consts, _consts);
 	$.extend(true, $.fn.zTree._z, _z);
 
 	var zt = $.fn.zTree,
