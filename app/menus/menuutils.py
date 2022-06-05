@@ -108,10 +108,10 @@ def is_have_author(per, process, activity):
 
 # 判断功能是否在权限列表中（根据url）
 def is_have_author_url(per, url):
+    if not is_in_function_tree(url, functions):
+        return True
     for p in per:
         if p['sdescription'] == url:
-            return True
-        if not is_in_function_tree(url, functions):
             return True
     return False
 

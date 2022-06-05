@@ -249,3 +249,46 @@ def flow_back(processID, processName, Activity, flowID, taskID, sData1, ePersonL
                       sstatusname='尚未处理')
         db.session.add(task)
     return newtaskID
+
+
+# 流程转发
+def flow_forward(task, ePersonList):
+    person = get_curr_person_info()
+    for eperson in ePersonList:
+        newtaskID = guid()
+        n_task = SATask(
+            sid=newtaskID,
+            sparentid=task.sid,
+            sflowid=task.sflowid,
+            sprocess=task.sprocess,
+            sactivity=task.sactivity,
+            sname=task.sname,
+            sdata1=task.sdata1,
+            scurl=task.scurl,
+            scpersonid=person['personid'],
+            scpersonname=person['personName'],
+            scdeptid=person['deptid'],
+            scdeptname=person['deptname'],
+            scognid=person['ognid'],
+            scognname=person['ognname'],
+            scfid=person['personfid'],
+            scfname=person['personfname'],
+            sepersonid=eperson['personid'],
+            sepersonname=eperson['personName'],
+            sedeptid=eperson['deptid'],
+            sedeptname=eperson['deptname'],
+            seognid=eperson['ognid'],
+            seognname=eperson['ognname'],
+            sefid=eperson['personfid'],
+            sefname=eperson['personfname'],
+            seurl=task.seurl,
+            sstatusid='tesReady',
+            sstatusname='尚未处理')
+        db.session.add(n_task)
+    task.sstatusid = 'tesTransmit'
+    task.sstatusname = '已转发'
+    task.sexecutetime = datetime.now()
+    task.version = task.version + 1
+    db.session.add(task)
+    db.session.commit()
+    return newtaskID

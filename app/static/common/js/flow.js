@@ -345,7 +345,10 @@ tlv8.flw.prototype.flowStart = function (billid) {
     param.set("processID", this.processID ? this.processID : "");
     let onBeforeStart = flowComponent.onBeforeStart;
     if (onBeforeStart) {
-        inFn = eval(onBeforeStart);
+        let inFn = onBeforeStart;
+        if (typeof onBeforeStart == "string") {
+            inFn = eval(onBeforeStart);
+        }
         if (typeof (inFn) == "function") {
             let rEvent = {
                 source: this,
@@ -371,7 +374,10 @@ tlv8.flw.prototype.flowStart = function (billid) {
     }
     let onBeforeFlowAction = flowComponent.onBeforeFlowAction;
     if (onBeforeFlowAction) {
-        inFn = eval(onBeforeFlowAction);
+        let inFn = onBeforeFlowAction;
+        if (typeof onBeforeFlowAction == "string") {
+            inFn = eval(onBeforeFlowAction);
+        }
         if (typeof (inFn) == "function") {
             let rEvent = {
                 source: this,
@@ -395,7 +401,10 @@ tlv8.flw.prototype.flowStart = function (billid) {
             flowComponent.taskID = flwData.taskID;
             let onStartCommit = flowComponent.onStartCommit;
             if (onStartCommit) {
-                let inFn = eval(onStartCommit);
+                let inFn = onStartCommit;
+                if (typeof onStartCommit == "string") {
+                    inFn = eval(onStartCommit);
+                }
                 if (typeof (inFn) == "function") {
                     let rEvent = {
                         source: flowComponent,
@@ -408,7 +417,10 @@ tlv8.flw.prototype.flowStart = function (billid) {
             }
             let onFlowActionCommit = flowComponent.onFlowActionCommit;
             if (onFlowActionCommit) {
-                let inFn = eval(onFlowActionCommit);
+                let inFn = onFlowActionCommit;
+                if (typeof onFlowActionCommit == "string") {
+                    inFn = eval(onFlowActionCommit);
+                }
                 if (typeof (inFn) == "function") {
                     let rEvent = {
                         source: flowComponent,
@@ -431,7 +443,10 @@ tlv8.flw.prototype.flowStart = function (billid) {
         }
         let onAfterStart = flowComponent.onAfterStart;
         if (onAfterStart) {
-            let inFn = eval(onAfterStart);
+            let inFn = onAfterStart;
+            if (typeof onAfterStart == "string") {
+                inFn = eval(onAfterStart);
+            }
             if (typeof (inFn) == "function") {
                 let rEvent = {
                     source: flowComponent,
@@ -444,7 +459,10 @@ tlv8.flw.prototype.flowStart = function (billid) {
         }
         let onAfterFlowAction = flowComponent.onAfterFlowAction;
         if (onAfterFlowAction) {
-            let inFn = eval(onAfterFlowAction);
+            let inFn = onAfterFlowAction;
+            if (typeof onAfterFlowAction == "string") {
+                inFn = eval(onAfterFlowAction);
+            }
             if (typeof (inFn) == "function") {
                 let rEvent = {
                     source: flowComponent,
@@ -469,12 +487,15 @@ tlv8.flw.prototype.flowBack = function (flowID, taskID) {
     layui.layer.confirm("确定回退流程吗？", function () {
         let onBeforeBack = flowComponent.onBeforeBack;
         if (onBeforeBack) {
-            let inFn = eval(onBeforeBack);
+            let inFn = onBeforeBack;
+            if (typeof onBeforeBack == "string") {
+                inFn = eval(onBeforeBack);
+            }
             if (typeof (inFn) == "function") {
                 rEvent = {
-                    source: this,
-                    taskID: this.taskID,
-                    flowID: this.flowID,
+                    source: flowComponent,
+                    taskID: flowComponent.taskID,
+                    flowID: flowComponent.flowID,
                     cancel: false
                 };
                 let bfData = inFn(rEvent);
@@ -495,12 +516,15 @@ tlv8.flw.prototype.flowBack = function (flowID, taskID) {
         }
         let onBeforeFlowAction = flowComponent.onBeforeFlowAction;
         if (onBeforeFlowAction) {
-            let inFn = eval(onBeforeFlowAction);
+            let inFn = onBeforeFlowAction;
+            if (typeof onBeforeFlowAction == "string") {
+                inFn = eval(onBeforeFlowAction);
+            }
             if (typeof (inFn) === "function") {
                 rEvent = {
-                    source: this,
-                    taskID: this.taskID,
-                    flowID: this.flowID,
+                    source: flowComponent,
+                    taskID: flowComponent.taskID,
+                    flowID: flowComponent.flowID,
                     cancel: false
                 };
                 inFn(rEvent);
@@ -522,7 +546,10 @@ tlv8.flw.prototype.flowBack = function (flowID, taskID) {
                     flowComponent.taskID = flwData.taskID;
                     let onBackCommit = flowComponent.onBackCommit;
                     if (onBackCommit) {
-                        let inFn = eval(onBackCommit);
+                        let inFn = onBackCommit;
+                        if (typeof onBackCommit == "string") {
+                            inFn = eval(onBackCommit);
+                        }
                         if (typeof (inFn) == "function") {
                             let rEvent = {
                                 source: flowComponent,
@@ -535,7 +562,10 @@ tlv8.flw.prototype.flowBack = function (flowID, taskID) {
                     }
                     let onFlowActionCommit = flowComponent.onFlowActionCommit;
                     if (onFlowActionCommit) {
-                        let inFn = eval(onFlowActionCommit);
+                        let inFn = onFlowActionCommit;
+                        if (typeof onFlowActionCommit == "string") {
+                            inFn = eval(onFlowActionCommit);
+                        }
                         if (typeof (inFn) == "function") {
                             let rEvent = {
                                 source: flowComponent,
@@ -552,7 +582,10 @@ tlv8.flw.prototype.flowBack = function (flowID, taskID) {
                 }
                 let onAfterBack = flowComponent.onAfterBack;
                 if (onAfterBack) {
-                    let inFn = eval(onAfterBack);
+                    let inFn = onAfterBack;
+                    if (typeof onAfterBack == "string") {
+                        inFn = eval(onAfterBack);
+                    }
                     if (typeof (inFn) == "function") {
                         let rEvent = {
                             source: flowComponent,
@@ -565,7 +598,10 @@ tlv8.flw.prototype.flowBack = function (flowID, taskID) {
                 }
                 let onAfterFlowAction = flowComponent.onAfterFlowAction;
                 if (onAfterFlowAction) {
-                    let inFn = eval(onAfterFlowAction);
+                    let inFn = onAfterFlowAction;
+                    if (typeof onAfterFlowAction == "string") {
+                        inFn = eval(onAfterFlowAction);
+                    }
                     if (typeof (inFn) == "function") {
                         let rEvent = {
                             source: flowComponent,
@@ -596,12 +632,15 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
     let flowComponent = this;
     let onBeforeAdvance = flowComponent.onBeforeAdvance;
     if (onBeforeAdvance) {
-        let inFn = eval(onBeforeAdvance);
+        let inFn = onBeforeAdvance;
+        if (typeof onBeforeAdvance == "string") {
+            inFn = eval(onBeforeAdvance);
+        }
         if (typeof (inFn) == "function") {
             let rEvent = {
-                source: this,
-                taskID: this.taskID,
-                flowID: this.flowID,
+                source: flowComponent,
+                taskID: flowComponent.taskID,
+                flowID: flowComponent.flowID,
                 cancel: false
             };
             let bfData = inFn(rEvent);
@@ -622,21 +661,24 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
     }
     let onBeforeFlowAction = flowComponent.onBeforeFlowAction;
     if (onBeforeFlowAction) {
-        let inFn = eval(onBeforeFlowAction);
+        let inFn = onBeforeFlowAction;
+        if (typeof onBeforeFlowAction == "string") {
+            inFn = eval(onBeforeFlowAction);
+        }
         if (typeof (inFn) == "function") {
             let rEvent = {
-                source: this,
-                taskID: this.taskID,
-                flowID: this.flowID,
+                source: flowComponent,
+                taskID: flowComponent.taskID,
+                flowID: flowComponent.flowID,
                 cancel: false
             };
             inFn(rEvent);
         }
     }
     let param = new tlv8.RequestParam();
-    param.set("flowID", flowID || this.flowID);
-    param.set("taskID", taskID || this.taskID);
-    param.set("sdata1", sData1 || this.sData1);
+    param.set("flowID", flowID || flowComponent.flowID);
+    param.set("taskID", taskID || flowComponent.taskID);
+    param.set("sdata1", sData1 || flowComponent.sData1);
     if (ePersonID && ePersonID !== "") {
         param.set("epersonids", ePersonID);
     }
@@ -683,7 +725,10 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
                     flowComponent.taskID = flwData.taskID;
                     let onAdvanceCommit = flowComponent.onAdvanceCommit;
                     if (onAdvanceCommit) {
-                        let inFn = eval(onAdvanceCommit);
+                        let inFn = onAdvanceCommit;
+                        if (typeof onAdvanceCommit == "string") {
+                            inFn = eval(onAdvanceCommit);
+                        }
                         if (typeof (inFn) == "function") {
                             let rEvent = {
                                 source: flowComponent,
@@ -696,7 +741,10 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
                     }
                     let onFlowActionCommit = flowComponent.onFlowActionCommit;
                     if (onFlowActionCommit) {
-                        let inFn = eval(onFlowActionCommit);
+                        let inFn = onFlowActionCommit;
+                        if (typeof onFlowActionCommit == "string") {
+                            inFn = eval(onFlowActionCommit);
+                        }
                         if (typeof (inFn) == "function") {
                             let rEvent = {
                                 source: flowComponent,
@@ -711,15 +759,18 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
                     if (r.state === "end") {
                         let onFlowEndCommit = flowComponent.onFlowEndCommit;
                         if (onFlowEndCommit) {
-                            let inFnend = eval(onFlowEndCommit);
-                            if (typeof (inFnend) == "function") {
+                            let inFn = onFlowEndCommit;
+                            if (typeof onFlowEndCommit == "string") {
+                                inFn = eval(onFlowEndCommit);
+                            }
+                            if (typeof (inFn) == "function") {
                                 let rEvent = {
                                     source: flowComponent,
                                     taskID: flowComponent.taskID,
                                     flowID: flowComponent.flowID,
                                     cancel: false
                                 };
-                                inFnend(rEvent);
+                                inFn(rEvent);
                             }
                         }
                     }
@@ -729,7 +780,10 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
                 }
                 let onAfterAdvance = flowComponent.onAfterAdvance;
                 if (onAfterAdvance) {
-                    let inFn = eval(onAfterAdvance);
+                    let inFn = onAfterAdvance;
+                    if (typeof onAfterAdvance == "string") {
+                        inFn = eval(onAfterAdvance);
+                    }
                     if (typeof (inFn) == "function") {
                         let rEvent = {
                             source: flowComponent,
@@ -742,7 +796,10 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
                 }
                 let onAfterFlowAction = flowComponent.onAfterFlowAction;
                 if (onAfterFlowAction) {
-                    let inFn = eval(onAfterFlowAction);
+                    let inFn = onAfterFlowAction;
+                    if (typeof onAfterFlowAction == "string") {
+                        inFn = eval(onAfterFlowAction);
+                    }
                     if (typeof (inFn) == "function") {
                         let rEvent = {
                             source: flowComponent,
@@ -768,7 +825,10 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
                 }
                 let onAdvanceCommit = flowComponent.onAdvanceCommit;
                 if (onAdvanceCommit) {
-                    let inFn = eval(onAdvanceCommit);
+                    let inFn = onAdvanceCommit;
+                    if (typeof onAdvanceCommit == "string") {
+                        inFn = eval(onAdvanceCommit);
+                    }
                     if (typeof (inFn) == "function") {
                         let rEvent = {
                             source: flowComponent,
@@ -781,7 +841,10 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
                 }
                 let onFlowActionCommit = flowComponent.onFlowActionCommit;
                 if (onFlowActionCommit) {
-                    let inFn = eval(onFlowActionCommit);
+                    let inFn = onFlowActionCommit;
+                    if (typeof onFlowActionCommit == "string") {
+                        inFn = eval(onFlowActionCommit);
+                    }
                     if (typeof (inFn) == "function") {
                         let rEvent = {
                             source: flowComponent,
@@ -795,15 +858,18 @@ tlv8.flw.prototype.flowOut = function (flowID, taskID, ePersonID, sData1) {
                 if (backData.type === "end") {
                     let onFlowEndCommit = flowComponent.onFlowEndCommit;
                     if (onFlowEndCommit) {
-                        let inFnend = eval(onFlowEndCommit);
-                        if (typeof (inFnend) == "function") {
+                        let inFn = onFlowEndCommit;
+                        if (typeof onFlowEndCommit == "string") {
+                            inFn = eval(onFlowEndCommit);
+                        }
+                        if (typeof (inFn) == "function") {
                             let rEvent = {
                                 source: flowComponent,
                                 taskID: flowComponent.taskID,
                                 flowID: flowComponent.flowID,
                                 cancel: false
                             };
-                            inFnend(rEvent);
+                            inFn(rEvent);
                         }
                     }
                 }
@@ -825,12 +891,15 @@ tlv8.flw.prototype.flowForward = function (flowID, taskID, ePersonID) {
     let flowComponent = this;
     let onBeforeTransfer = flowComponent.onBeforeTransfer;
     if (onBeforeTransfer) {
-        let inFn = eval(onBeforeTransfer);
+        let inFn = onBeforeTransfer;
+        if (typeof onBeforeTransfer == "string") {
+            inFn = eval(onBeforeTransfer);
+        }
         if (typeof (inFn) == "function") {
             let rEvent = {
-                source: this,
-                taskID: this.taskID,
-                flowID: this.flowID,
+                source: flowComponent,
+                taskID: flowComponent.taskID,
+                flowID: flowComponent.flowID,
                 cancel: false
             };
             let bfData = inFn(rEvent);
@@ -851,187 +920,59 @@ tlv8.flw.prototype.flowForward = function (flowID, taskID, ePersonID) {
     }
     let onBeforeFlowAction = flowComponent.onBeforeFlowAction;
     if (onBeforeFlowAction) {
-        let inFn = eval(onBeforeFlowAction);
+        let inFn = onBeforeFlowAction;
+        if (typeof onBeforeFlowAction == "string") {
+            inFn = eval(onBeforeFlowAction);
+        }
         if (typeof (inFn) == "function") {
             let rEvent = {
-                source: this,
-                taskID: this.taskID,
-                flowID: this.flowID,
+                source: flowComponent,
+                taskID: flowComponent.taskID,
+                flowID: flowComponent.flowID,
                 cancel: false
             };
             inFn(rEvent);
         }
     }
     let param = new tlv8.RequestParam();
-    const sData1 = this.data.rowid;
-    if (flowID && taskID) {
-        param.set("flowID", flowID);
-        param.set("taskID", taskID);
-        param.set("epersonids", ePersonID ? ePersonID : "");
-        param.set("sdata1", sData1);
-        tlv8
-            .XMLHttpRequest(
-                "flowtransmitAction",
-                param,
-                "post",
-                true,
-                function (r) {
-                    tlv8.showModelState(false);
-                    if (r.data.flag === "false") {
-                        alert("操作失败:" + r.data.message);
-                    } else if (r.data.flag === "select") {
-                        try {
-                            var reActData = eval("(" + r.data.data
-                                + ")");
-                            var activityListStr = reActData.activityListStr;
-                            var exe_selct_url = "/flw/flwcommo/flowDialog/Select_executor.html";
-                            exe_selct_url += "?flowID="
-                                + reActData.flowID;
-                            exe_selct_url += "&taskID="
-                                + reActData.taskID;
-                            tlv8.portal.dailog.openDailog('流程转发',
-                                exe_selct_url, 800, 600,
-                                flowTransEngion, null, null,
-                                activityListStr);
-                        } catch (e) {
-                            alert("流转失败!m:" + e.message);
-                        }
-                    } else {
-                        let flwData = eval("(" + r.data.data + ")");
-                        flowComponent.processID = flwData.processID;
-                        flowComponent.flowID = flwData.flowID;
-                        flowComponent.taskID = flwData.taskID;
-                        let onTransferCommit = flowComponent.onTransferCommit;
-                        if (onTransferCommit) {
-                            let inFn = eval(onTransferCommit);
-                            if (typeof (inFn) == "function") {
-                                let rEvent = {
-                                    source: flowComponent,
-                                    taskID: flowComponent.taskID,
-                                    flowID: flowComponent.flowID,
-                                    cancel: false
-                                };
-                                inFn(rEvent);
-                            }
-                        }
-                        let onFlowActionCommit = flowComponent.onFlowActionCommit;
-                        if (onFlowActionCommit) {
-                            let inFn = eval(onFlowActionCommit);
-                            if (typeof (inFn) == "function") {
-                                let rEvent = {
-                                    source: flowComponent,
-                                    taskID: flowComponent.taskID,
-                                    flowID: flowComponent.flowID,
-                                    cancel: false
-                                };
-                                inFn(rEvent);
-                            }
-                        }
-                        if (flowComponent.setting.autoclose === true) {
-                            tlv8.showSate(false);
-                            tlv8.portal.closeWindow();
-                        }
-                    }
-                });
-        tlv8.showModelState(true);
-    } else {
-        let taskid = this.taskID;
-        tlv8.portal.dailog
-            .openDailog(
-                "选择执行人",
-                "/comon/SelectDialogPsn/singleSelectPsn.html",
-                500,
-                350,
-                function (re) {
-                    let param = new tlv8.RequestParam();
-                    param.set("taskID", taskid);
-                    param.set("epersonids", re.rowid);
-                    tlv8
-                        .XMLHttpRequest(
-                            "ChangeFlowExcutorAction",
-                            param,
-                            "POST",
-                            true,
-                            function (r) {
-                                if (r.data.flag === "false") {
-                                    alert(r.data.message);
-                                } else {
-                                    let onTransferCommit = flowComponent.onTransferCommit;
-                                    if (onTransferCommit) {
-                                        var inFn = eval(onTransferCommit);
-                                        if (typeof (inFn) == "function") {
-                                            var rEvent = {
-                                                source: flowComponent,
-                                                taskID: flowComponent.taskID,
-                                                flowID: flowComponent.flowID,
-                                                cancel: false
-                                            };
-                                            inFn(rEvent);
-                                        }
-                                    }
-                                    let onFlowActionCommit = flowComponent.onFlowActionCommit;
-                                    if (onFlowActionCommit) {
-                                        let inFn = eval(onFlowActionCommit);
-                                        if (typeof (inFn) == "function") {
-                                            let rEvent = {
-                                                source: flowComponent,
-                                                taskID: flowComponent.taskID,
-                                                flowID: flowComponent.flowID,
-                                                cancel: false
-                                            };
-                                            inFn(rEvent);
-                                        }
-                                    }
-                                    if (flowComponent.setting.autoclose === true) {
-                                        tlv8
-                                            .showSate(false);
-                                        tlv8.portal
-                                            .closeWindow();
-                                    }
-                                }
-                            });
-                });
+    param.set("flowID", flowID || flowComponent.flowID);
+    param.set("taskID", taskID || flowComponent.taskID);
+    if (ePersonID && ePersonID !== "") {
+        param.set("epersonids", ePersonID);
     }
-    const onAfterTransfer = flowComponent.onAfterTransfer;
-    if (onAfterTransfer) {
-        let inFn = eval(onAfterTransfer);
-        if (typeof (inFn) == "function") {
-            let rEvent = {
-                source: this,
-                taskID: this.taskID,
-                flowID: this.flowID,
-                cancel: false
-            };
-            inFn(rEvent);
-        }
-    }
-    const onAfterFlowAction = flowComponent.onAfterFlowAction;
-    if (onAfterFlowAction) {
-        let inFn = eval(onAfterFlowAction);
-        if (typeof (inFn) == "function") {
-            let rEvent = {
-                source: this,
-                taskID: this.taskID,
-                flowID: this.flowID,
-                cancel: false
-            };
-            inFn(rEvent);
-        }
-    }
-    const flowTransEngion = function (backData) {
-        param.set("flowID", backData.flowID);
-        param.set("taskID", backData.taskID);
-        param.set("afterActivity", backData.activity);
-        param.set("epersonids", backData.epersonids);
-        tlv8.XMLHttpRequest("flowtransmitAction", param, "post", true,
-            function (r) {
-                let flwData = eval("(" + r.data.data + ")");
+    tlv8.showModelState(true);
+    tlv8.XMLHttpRequest("/flowControl/flowtransmitAction", param, "post", true,
+        function (r) {
+            tlv8.showModelState(false);
+            if (r.state === false) {
+                layui.layer.alert("操作失败:" + r.msg);
+            } else if (r.state === "select") {
+                try {
+                    let reActData = r.data;
+                    let activityListStr = reActData.activityList;
+                    let exe_selct_url = "/system/flow/flowDialog/Select_executor";
+                    exe_selct_url += "?flowID="
+                        + reActData.flowID;
+                    exe_selct_url += "&taskID="
+                        + reActData.taskID;
+                    tlv8.portal.dailog.openDailog('流程转发',
+                        exe_selct_url, 800, 600,
+                        flowTransEngion, null, null,
+                        activityListStr);
+                } catch (e) {
+                    layui.layer.alert("操作失败!m:" + e.message);
+                }
+            } else {
+                let flwData = r.data;
                 flowComponent.processID = flwData.processID;
                 flowComponent.flowID = flwData.flowID;
                 flowComponent.taskID = flwData.taskID;
                 let onTransferCommit = flowComponent.onTransferCommit;
                 if (onTransferCommit) {
-                    let inFn = eval(onTransferCommit);
+                    let inFn = onTransferCommit;
+                    if (typeof onTransferCommit == "string") {
+                        inFn = eval(onTransferCommit);
+                    }
                     if (typeof (inFn) == "function") {
                         let rEvent = {
                             source: flowComponent,
@@ -1044,7 +985,10 @@ tlv8.flw.prototype.flowForward = function (flowID, taskID, ePersonID) {
                 }
                 let onFlowActionCommit = flowComponent.onFlowActionCommit;
                 if (onFlowActionCommit) {
-                    let inFn = eval(onFlowActionCommit);
+                    let inFn = onFlowActionCommit;
+                    if (typeof onFlowActionCommit == "string") {
+                        inFn = eval(onFlowActionCommit);
+                    }
                     if (typeof (inFn) == "function") {
                         let rEvent = {
                             source: flowComponent,
@@ -1055,9 +999,98 @@ tlv8.flw.prototype.flowForward = function (flowID, taskID, ePersonID) {
                         inFn(rEvent);
                     }
                 }
+                if (flowComponent.setting.autoclose === true) {
+                    tlv8.showSate(false);
+                    tlv8.portal.closeWindow();
+                }
+            }
+        });
+    const onAfterTransfer = flowComponent.onAfterTransfer;
+    if (onAfterTransfer) {
+        let inFn = onAfterTransfer;
+        if (typeof onAfterTransfer == "string") {
+            inFn = eval(onAfterTransfer);
+        }
+        if (typeof (inFn) == "function") {
+            let rEvent = {
+                source: flowComponent,
+                taskID: flowComponent.taskID,
+                flowID: flowComponent.flowID,
+                cancel: false
+            };
+            inFn(rEvent);
+        }
+    }
+    const onAfterFlowAction = flowComponent.onAfterFlowAction;
+    if (onAfterFlowAction) {
+        let inFn = onAfterFlowAction;
+        if (typeof onAfterFlowAction == "string") {
+            inFn = eval(onAfterFlowAction);
+        }
+        if (typeof (inFn) == "function") {
+            let rEvent = {
+                source: flowComponent,
+                taskID: flowComponent.taskID,
+                flowID: flowComponent.flowID,
+                cancel: false
+            };
+            inFn(rEvent);
+        }
+    }
+    const flowTransEngion = function (backData) {
+        param.set("flowID", backData.flowID);
+        param.set("taskID", backData.taskID);
+        param.set("epersonids", backData.epersonids);
+        tlv8.XMLHttpRequest("/flowControl/flowtransmitAction", param, "post", true,
+            function (r) {
+                if (r.state === false) {
+                    layui.layer.alert(r.msg);
+                    return;
+                }
+                let flwData = r.data;
+                flowComponent.processID = flwData.processID;
+                flowComponent.flowID = flwData.flowID;
+                flowComponent.taskID = flwData.taskID;
+                let onTransferCommit = flowComponent.onTransferCommit;
+                if (onTransferCommit) {
+                    let inFn = onTransferCommit;
+                    if (typeof onTransferCommit == "string") {
+                        inFn = eval(onTransferCommit);
+                    }
+                    if (typeof (inFn) == "function") {
+                        let rEvent = {
+                            source: flowComponent,
+                            taskID: flowComponent.taskID,
+                            flowID: flowComponent.flowID,
+                            cancel: false
+                        };
+                        inFn(rEvent);
+                    }
+                }
+                let onFlowActionCommit = flowComponent.onFlowActionCommit;
+                if (onFlowActionCommit) {
+                    let inFn = onFlowActionCommit;
+                    if (typeof onFlowActionCommit == "string") {
+                        inFn = eval(onFlowActionCommit);
+                    }
+                    if (typeof (inFn) == "function") {
+                        let rEvent = {
+                            source: flowComponent,
+                            taskID: flowComponent.taskID,
+                            flowID: flowComponent.flowID,
+                            cancel: false
+                        };
+                        inFn(rEvent);
+                    }
+                }
+                if (flowComponent.setting.autoclose === true) {
+                    tlv8.showSate(false);
+                    tlv8.portal.closeWindow();
+                }
             });
     };
 };
+
 /**
  @name flowPause
  @description 流程暂停
@@ -1066,55 +1099,57 @@ tlv8.flw.prototype.flowForward = function (flowID, taskID, ePersonID) {
  */
 tlv8.flw.prototype.flowPause = function (flowID, taskID) {
     let flowComponent = this;
-    if (this.setting.autosaveData) {
-        this.sData1 = this.data.saveData();
-    }
-    if (!confirm("流程暂停后只能到任务中心激活.\n  确定暂停吗?"))
-        return;
-    let onBeforeSuspend = flowComponent.onBeforeSuspend;
-    if (onBeforeSuspend) {
-        let inFn = eval(onBeforeSuspend);
-        if (typeof (inFn) == "function") {
-            let rEvent = {
-                source: this,
-                taskID: this.taskID,
-                flowID: this.flowID,
-                cancel: false
-            };
-            let bfData = inFn(rEvent);
-            try {
-                if (bfData.cancel === true) {
-                    return "cancel";
-                }
-            } catch (e) {
+    layui.layer.confirm("流程暂停后只能到任务中心激活.\n  确定暂停吗?", function () {
+        let onBeforeSuspend = flowComponent.onBeforeSuspend;
+        if (onBeforeSuspend) {
+            let inFn = onBeforeSuspend;
+            if (typeof onBeforeSuspend == "string") {
+                inFn = eval(onBeforeSuspend);
             }
-        } else {
-            try {
-                if (inFn.cancel === true) {
-                    return "cancel";
+            if (typeof (inFn) == "function") {
+                let rEvent = {
+                    source: flowComponent,
+                    taskID: flowComponent.taskID,
+                    flowID: flowComponent.flowID,
+                    cancel: false
+                };
+                let bfData = inFn(rEvent);
+                try {
+                    if (bfData.cancel === true) {
+                        return "cancel";
+                    }
+                } catch (e) {
                 }
-            } catch (e) {
+            } else {
+                try {
+                    if (inFn.cancel === true) {
+                        return "cancel";
+                    }
+                } catch (e) {
+                }
             }
         }
-    }
-    let onBeforeFlowAction = flowComponent.onBeforeFlowAction;
-    if (onBeforeFlowAction) {
-        let inFn = eval(onBeforeFlowAction);
-        if (typeof (inFn) == "function") {
-            let rEvent = {
-                source: this,
-                taskID: this.taskID,
-                flowID: this.flowID,
-                cancel: false
-            };
-            inFn(rEvent);
+        let onBeforeFlowAction = flowComponent.onBeforeFlowAction;
+        if (onBeforeFlowAction) {
+            let inFn = onBeforeFlowAction;
+            if (typeof onBeforeFlowAction == "string") {
+                inFn = eval(onBeforeFlowAction);
+            }
+            if (typeof (inFn) == "function") {
+                let rEvent = {
+                    source: flowComponent,
+                    taskID: flowComponent.taskID,
+                    flowID: flowComponent.flowID,
+                    cancel: false
+                };
+                inFn(rEvent);
+            }
         }
-    }
-    let param = new tlv8.RequestParam();
-    if (flowID && taskID) {
-        param.set("flowID", flowID);
-        param.set("taskID", taskID);
-        tlv8.XMLHttpRequest("flowpauseAction", param, "post", true,
+        let param = new tlv8.RequestParam();
+        param.set("flowID", flowID || flowComponent.flowID);
+        param.set("taskID", taskID || flowComponent.taskID);
+        tlv8.showModelState(true);
+        tlv8.XMLHttpRequest("/flowControl/flowpauseAction", param, "post", true,
             function (r) {
                 tlv8.showModelState(false);
                 if (r.data.flag === "false") {
@@ -1122,7 +1157,10 @@ tlv8.flw.prototype.flowPause = function (flowID, taskID) {
                 } else {
                     let onSuspendCommit = flowComponent.onSuspendCommit;
                     if (onSuspendCommit) {
-                        let inFn = eval(onSuspendCommit);
+                        let inFn = onSuspendCommit;
+                        if (typeof onSuspendCommit == "string") {
+                            inFn = eval(onSuspendCommit);
+                        }
                         if (typeof (inFn) == "function") {
                             let rEvent = {
                                 source: flowComponent,
@@ -1135,7 +1173,10 @@ tlv8.flw.prototype.flowPause = function (flowID, taskID) {
                     }
                     let onFlowActionCommit = flowComponent.onFlowActionCommit;
                     if (onFlowActionCommit) {
-                        let inFn = eval(onFlowActionCommit);
+                        let inFn = onFlowActionCommit;
+                        if (typeof onFlowActionCommit == "string") {
+                            inFn = eval(onFlowActionCommit);
+                        }
                         if (typeof (inFn) == "function") {
                             let rEvent = {
                                 source: flowComponent,
@@ -1151,7 +1192,10 @@ tlv8.flw.prototype.flowPause = function (flowID, taskID) {
                 }
                 let onAfterSuspend = flowComponent.onAfterSuspend;
                 if (onAfterSuspend) {
-                    let inFn = eval(onAfterSuspend);
+                    let inFn = onAfterSuspend;
+                    if (typeof onAfterSuspend == "string") {
+                        inFn = eval(onAfterSuspend);
+                    }
                     if (typeof (inFn) == "function") {
                         let rEvent = {
                             source: flowComponent,
@@ -1164,7 +1208,10 @@ tlv8.flw.prototype.flowPause = function (flowID, taskID) {
                 }
                 let onAfterFlowAction = flowComponent.onAfterFlowAction;
                 if (onAfterFlowAction) {
-                    let inFn = eval(onAfterFlowAction);
+                    let inFn = onAfterFlowAction;
+                    if (typeof onAfterFlowAction == "string") {
+                        inFn = eval(onAfterFlowAction);
+                    }
                     if (typeof (inFn) == "function") {
                         let rEvent = {
                             source: flowComponent,
@@ -1176,78 +1223,9 @@ tlv8.flw.prototype.flowPause = function (flowID, taskID) {
                     }
                 }
             });
-        tlv8.showModelState(true);
-    } else if (this.flowID && this.flowID !== "" && this.taskID
-        && this.taskID !== "") {
-        param.set("flowID", this.flowID);
-        param.set("taskID", this.taskID);
-        tlv8.XMLHttpRequest("flowpauseAction", param, "post", true,
-            function (r) {
-                tlv8.showModelState(false);
-                if (r.data.flag === "false") {
-                    alert("操作失败:" + r.data.message);
-                } else {
-                    let onSuspendCommit = flowComponent.onSuspendCommit;
-                    if (onSuspendCommit) {
-                        let inFn = eval(onSuspendCommit);
-                        if (typeof (inFn) == "function") {
-                            let rEvent = {
-                                source: flowComponent,
-                                taskID: flowComponent.taskID,
-                                flowID: flowComponent.flowID,
-                                cancel: false
-                            };
-                            inFn(rEvent);
-                        }
-                    }
-                    let onFlowActionCommit = flowComponent.onFlowActionCommit;
-                    if (onFlowActionCommit) {
-                        let inFn = eval(onFlowActionCommit);
-                        if (typeof (inFn) == "function") {
-                            let rEvent = {
-                                source: flowComponent,
-                                taskID: flowComponent.taskID,
-                                flowID: flowComponent.flowID,
-                                cancel: false
-                            };
-                            inFn(rEvent);
-                        }
-                    }
-                    if (flowComponent.setting.autoclose)
-                        tlv8.portal.closeWindow();
-                }
-                let onAfterSuspend = flowComponent.onAfterSuspend;
-                if (onAfterSuspend) {
-                    let inFn = eval(onAfterSuspend);
-                    if (typeof (inFn) == "function") {
-                        let rEvent = {
-                            source: flowComponent,
-                            taskID: flowComponent.taskID,
-                            flowID: flowComponent.flowID,
-                            cancel: false
-                        };
-                        inFn(rEvent);
-                    }
-                }
-                let onAfterFlowAction = flowComponent.onAfterFlowAction;
-                if (onAfterFlowAction) {
-                    let inFn = eval(onAfterFlowAction);
-                    if (typeof (inFn) == "function") {
-                        let rEvent = {
-                            source: flowComponent,
-                            taskID: flowComponent.taskID,
-                            flowID: flowComponent.flowID,
-                            cancel: false
-                        };
-                        inFn(rEvent);
-                    }
-                }
-            });
-        tlv8.showModelState(true);
-    } else {
-        mAlert("未指定任务.");
-    }
+    });
 };
+
 /**
  @name flowStop
  @description 流程终止
@@ -1256,60 +1234,68 @@ tlv8.flw.prototype.flowPause = function (flowID, taskID) {
  */
 tlv8.flw.prototype.flowStop = function (flowID, taskID) {
     let flowComponent = this;
-    if (!confirm("终止流程,流程将彻底作废.\n  确定终止吗?"))
-        return;
-    let onBeforeAbort = flowComponent.onBeforeAbort;
-    if (onBeforeAbort) {
-        let inFn = eval(onBeforeAbort);
-        if (typeof (inFn) == "function") {
-            let rEvent = {
-                source: this,
-                taskID: this.taskID,
-                flowID: this.flowID,
-                cancel: false
-            };
-            let bfData = inFn(rEvent);
-            try {
-                if (bfData.cancel === true) {
-                    return "cancel";
-                }
-            } catch (e) {
+    layui.layer.confirm("终止流程,流程将彻底作废.\n  确定终止吗?", function () {
+        let onBeforeAbort = flowComponent.onBeforeAbort;
+        if (onBeforeAbort) {
+            let inFn = onBeforeAbort;
+            if (typeof onBeforeAbort == "string") {
+                inFn = eval(onBeforeAbort);
             }
-        } else {
-            try {
-                if (inFn.cancel === true) {
-                    return "cancel";
+            if (typeof (inFn) == "function") {
+                let rEvent = {
+                    source: flowComponent,
+                    taskID: flowComponent.taskID,
+                    flowID: flowComponent.flowID,
+                    cancel: false
+                };
+                let bfData = inFn(rEvent);
+                try {
+                    if (bfData.cancel === true) {
+                        return "cancel";
+                    }
+                } catch (e) {
                 }
-            } catch (e) {
+            } else {
+                try {
+                    if (inFn.cancel === true) {
+                        return "cancel";
+                    }
+                } catch (e) {
+                }
             }
         }
-    }
-    let onBeforeFlowAction = flowComponent.onBeforeFlowAction;
-    if (onBeforeFlowAction) {
-        let inFn = eval(onBeforeFlowAction);
-        if (typeof (inFn) == "function") {
-            let rEvent = {
-                source: this,
-                taskID: this.taskID,
-                flowID: this.flowID,
-                cancel: false
-            };
-            inFn(rEvent);
+        let onBeforeFlowAction = flowComponent.onBeforeFlowAction;
+        if (onBeforeFlowAction) {
+            let inFn = onBeforeFlowAction;
+            if (typeof onBeforeFlowAction == "string") {
+                inFn = eval(onBeforeFlowAction);
+            }
+            if (typeof (inFn) == "function") {
+                let rEvent = {
+                    source: flowComponent,
+                    taskID: flowComponent.taskID,
+                    flowID: flowComponent.flowID,
+                    cancel: false
+                };
+                inFn(rEvent);
+            }
         }
-    }
-    let param = new tlv8.RequestParam();
-    if (flowID && taskID) {
-        param.set("flowID", flowID);
-        param.set("taskID", taskID);
-        tlv8.XMLHttpRequest("flowstopAction", param, "post", true,
+        let param = new tlv8.RequestParam();
+        param.set("flowID", flowID || flowComponent.flowID);
+        param.set("taskID", taskID || flowComponent.taskID);
+        tlv8.showModelState(true);
+        tlv8.XMLHttpRequest("/flowControl/flowstopAction", param, "post", true,
             function (r) {
                 tlv8.showModelState(false);
-                if (r.data.flag === "false") {
-                    alert("操作失败:" + r.data.message);
+                if (r.state === "false") {
+                    layui.layer.alert("操作失败:" + r.msg);
                 } else {
                     let onAbortCommit = flowComponent.onAbortCommit;
                     if (onAbortCommit) {
-                        let inFn = eval(onAbortCommit);
+                        let inFn = onAbortCommit;
+                        if (typeof onAbortCommit == "string") {
+                            inFn = eval(onAbortCommit);
+                        }
                         if (typeof (inFn) == "function") {
                             let rEvent = {
                                 source: flowComponent,
@@ -1322,7 +1308,10 @@ tlv8.flw.prototype.flowStop = function (flowID, taskID) {
                     }
                     let onFlowActionCommit = flowComponent.onFlowActionCommit;
                     if (onFlowActionCommit) {
-                        let inFn = eval(onFlowActionCommit);
+                        let inFn = onFlowActionCommit;
+                        if (typeof onFlowActionCommit == "string") {
+                            inFn = eval(onFlowActionCommit);
+                        }
                         if (typeof (inFn) == "function") {
                             let rEvent = {
                                 source: flowComponent,
@@ -1338,7 +1327,10 @@ tlv8.flw.prototype.flowStop = function (flowID, taskID) {
                 }
                 let onAfterAbort = flowComponent.onAfterAbort;
                 if (onAfterAbort) {
-                    let inFn = eval(onAfterAbort);
+                    let inFn = onAfterAbort;
+                    if (typeof onAfterAbort == "string") {
+                        inFn = eval(onAfterAbort);
+                    }
                     if (typeof (inFn) == "function") {
                         let rEvent = {
                             source: flowComponent,
@@ -1351,7 +1343,10 @@ tlv8.flw.prototype.flowStop = function (flowID, taskID) {
                 }
                 let onAfterFlowAction = flowComponent.onAfterFlowAction;
                 if (onAfterFlowAction) {
-                    let inFn = eval(onAfterFlowAction);
+                    let inFn = onAfterFlowAction;
+                    if (typeof onAfterFlowAction == "string") {
+                        inFn = eval(onAfterFlowAction);
+                    }
                     if (typeof (inFn) == "function") {
                         let rEvent = {
                             source: flowComponent,
@@ -1363,78 +1358,9 @@ tlv8.flw.prototype.flowStop = function (flowID, taskID) {
                     }
                 }
             });
-        tlv8.showModelState(true);
-    } else if (this.flowID && this.flowID !== "" && this.taskID
-        && this.taskID !== "") {
-        param.set("flowID", this.flowID);
-        param.set("taskID", this.taskID);
-        tlv8.XMLHttpRequest("flowstopAction", param, "post", true,
-            function (r) {
-                if (r.data.flag === "false") {
-                    alert("操作失败:" + r.data.message);
-                } else {
-                    let onAbortCommit = flowComponent.Dom
-                        .getAttribute("onAbortCommit");
-                    if (onAbortCommit) {
-                        let inFn = eval(onAbortCommit);
-                        if (typeof (inFn) == "function") {
-                            let rEvent = {
-                                source: flowComponent,
-                                taskID: flowComponent.taskID,
-                                flowID: flowComponent.flowID,
-                                cancel: false
-                            };
-                            inFn(rEvent);
-                        }
-                    }
-                    let onFlowActionCommit = flowComponent.Dom
-                        .getAttribute("onFlowActionCommit");
-                    if (onFlowActionCommit) {
-                        let inFn = eval(onFlowActionCommit);
-                        if (typeof (inFn) == "function") {
-                            let rEvent = {
-                                source: flowComponent,
-                                taskID: flowComponent.taskID,
-                                flowID: flowComponent.flowID,
-                                cancel: false
-                            };
-                            inFn(rEvent);
-                        }
-                    }
-                    if (flowComponent.setting.autoclose)
-                        tlv8.portal.closeWindow();
-                }
-                let onAfterAbort = flowComponent.onAfterAbort;
-                if (onAfterAbort) {
-                    let inFn = eval(onAfterAbort);
-                    if (typeof (inFn) == "function") {
-                        let rEvent = {
-                            source: flowComponent,
-                            taskID: flowComponent.taskID,
-                            flowID: flowComponent.flowID,
-                            cancel: false
-                        };
-                        inFn(rEvent);
-                    }
-                }
-                let onAfterFlowAction = flowComponent.onAfterFlowAction;
-                if (onAfterFlowAction) {
-                    let inFn = eval(onAfterFlowAction);
-                    if (typeof (inFn) == "function") {
-                        let rEvent = {
-                            source: flowComponent,
-                            taskID: flowComponent.taskID,
-                            flowID: flowComponent.flowID,
-                            cancel: false
-                        };
-                        inFn(rEvent);
-                    }
-                }
-            });
-    } else {
-        mAlert("未指定任务.");
-    }
+    });
 };
+
 /**
  @name viewChart
  @description 查看流程流转图
@@ -1500,275 +1426,6 @@ tlv8.task = {
                     }
                 });
         }
-    },
-    processID: "",
-    flowID: "",
-    taskID: "",
-    /**
-     @function
-     @name tlv8.task.flowback
-     @description 回退流程
-     @param {string} flowID
-     @param {string} taskID
-     @param {string} calback
-     */
-    flowback: function (flowID, taskID, calback) {
-        let param = new tlv8.RequestParam();
-        if (flowID && taskID) {
-            param.set("flowID", flowID);
-            param.set("taskID", taskID);
-            tlv8.XMLHttpRequest("flowbackAction", param, "post", true,
-                function (r) {
-                    tlv8.showModelState(false);
-                    if (r.data.flag === "false") {
-                        alert("操作失败:" + r.data.message);
-                        return false;
-                    } else {
-                        let flwData = eval("(" + r.data.data + ")");
-                        this.processID = flwData.processID;
-                        this.flowID = flwData.flowID;
-                        this.taskID = flwData.taskID;
-                        sAlert("操作成功！");
-                    }
-                    if (calback && typeof calback == "function") {
-                        calback();
-                    } else if (calback && calback !== "") {
-                        try {
-                            calback = eval(calback);
-                            if (typeof calback == "function")
-                                calback();
-                        } catch (e) {
-                            alert("给定的回调函数不存在：" + e);
-                        }
-                    }
-                });
-            tlv8.showModelState(true);
-        }
-    },
-    /**
-     @function
-     @name tlv8.task.flowout
-     @description 流转流程
-     @param {string} flowID
-     @param {string} taskID
-     @param {string} ePersonID
-     @param {string} sData1
-     @param {function} calback
-     */
-    flowout: function (flowID, taskID, ePersonID, sData1, calback) {
-        let param = new tlv8.RequestParam();
-        let srcPath = window.location.pathname;
-        if (srcPath.indexOf('/flw/flwcommo/flowDialog/flow_audit_opinion.html') > 0) {
-            srcPath = parent.window.location.pathname;
-        }
-        if (srcPath.indexOf("?") > 0)
-            srcPath = srcPath.substring(0, srcPath.indexOf("?"));
-        param.set("srcPath", srcPath);
-        if (flowID && taskID) {
-            param.set("flowID", flowID);
-            param.set("taskID", taskID);
-            param.set("ePersonID", ePersonID);
-            if (sData1)
-                param.set("sdata1", sData1);
-            tlv8.XMLHttpRequest("flowoutAction", param, "post", true,
-                function (r) {
-                    tlv8.showModelState(false);
-                    if (r.data.flag === "false") {
-                        alert("操作失败:" + r.data.message);
-                        return false;
-                    } else {
-                        var flwData = eval("(" + r.data.data + ")");
-                        this.processID = flwData.processID;
-                        this.flowID = flwData.flowID;
-                        this.taskID = flwData.taskID;
-                        sAlert("操作成功！");
-                    }
-                    if (calback && typeof calback == "function") {
-                        calback();
-                    } else if (calback && typeof calback == "string") {
-                        try {
-                            calback = eval(calback);
-                            if (typeof calback == "function")
-                                calback();
-                        } catch (e) {
-                            alert("给定的回调函数不存在：" + e);
-                        }
-                    }
-                });
-            tlv8.showModelState(true);
-        }
-    },
-    /**
-     @function
-     @name tlv8.task.flowtransmit
-     @description 转发流程
-     @param {string} flowID
-     @param {string} taskID
-     @param {string} ePersonID
-     */
-    flowtransmit: function (flowID, taskID, ePersonID) {
-    },
-    /**
-     @function
-     @name tlv8.task.flowpause
-     @description 暂停流程
-     @param {string} flowID
-     @param {string} taskID
-     @param {function} callback
-     */
-    flowpause: function (flowID, taskID, callback) {
-        if (!confirm("流程暂停后只能到任务中心激活.\n  确定暂停吗?"))
-            return false;
-        let param = new tlv8.RequestParam();
-        if (flowID && taskID) {
-            param.set("flowID", flowID);
-            param.set("taskID", taskID);
-            tlv8.XMLHttpRequest("flowpauseAction", param, "post", true,
-                function (r) {
-                    tlv8.showModelState(false);
-                    if (r.data.flag === "false") {
-                        alert("操作失败:" + r.data.message);
-                        return false;
-                    } else {
-                        sAlert("操作成功！");
-                        return true;
-                    }
-                    if (callback && typeof callback == "function") {
-                        callback();
-                    } else if (callback && typeof callback == "string") {
-                        try {
-                            callback = eval(callback);
-                            if (typeof callback == "function")
-                                callback();
-                        } catch (e) {
-                            alert("给定的回调函数不存在：" + e);
-                        }
-                    }
-                });
-            tlv8.showModelState(true);
-        }
-        return true;
-    },
-    /**
-     @function
-     @name tlv8.task.flowrestart
-     @description 启动已暂停流程
-     @param {string} flowID
-     @param {string} taskID
-     @param {function} callback
-     */
-    flowrestart: function (flowID, taskID, callback) {
-        var param = new tlv8.RequestParam();
-        if (flowID && taskID) {
-            param.set("flowID", flowID);
-            param.set("taskID", taskID);
-            tlv8.XMLHttpRequest("flowrestartAction", param, "post", true,
-                function (r) {
-                    tlv8.showModelState(false);
-                    if (r.data.flag === "false") {
-                        alert("操作失败:" + r.data.message);
-                        return false;
-                    } else {
-                        sAlert("操作成功！");
-                        return true;
-                    }
-                    if (callback && typeof callback == "function") {
-                        callback();
-                    } else if (callback && typeof callback == "string") {
-                        try {
-                            callback = eval(callback);
-                            if (typeof callback == "function")
-                                callback();
-                        } catch (e) {
-                            alert("给定的回调函数不存在：" + e);
-                        }
-                    }
-                });
-            tlv8.showModelState(true);
-        }
-        return true;
-    },
-    /**
-     @function
-     @name tlv8.task.flowstop
-     @description 终止流程
-     @param {string} flowID
-     @param {string} taskID
-     @param {function} calback
-     */
-    flowstop: function (flowID, taskID, calback) {
-        if (!confirm("终止流程,流程将彻底作废.\n  确定终止吗?"))
-            return false;
-        let param = new tlv8.RequestParam();
-        if (flowID && taskID) {
-            param.set("flowID", flowID);
-            param.set("taskID", taskID);
-            tlv8.XMLHttpRequest("flowstopAction", param, "post", true,
-                function (r) {
-                    tlv8.showModelState(false);
-                    if (r.data.flag === "false") {
-                        alert("操作失败:" + r.data.message);
-                        return false;
-                    } else {
-                        sAlert("操作成功！");
-                        return true;
-                    }
-                    if (calback && typeof calback == "function") {
-                        calback();
-                    } else if (calback && typeof calback == "string") {
-                        try {
-                            calback = eval(calback);
-                            if (typeof calback == "function")
-                                calback();
-                        } catch (e) {
-                            alert("给定的回调函数不存在：" + e);
-                        }
-                    }
-                });
-            tlv8.showModelState(true);
-        }
-        return true;
-    },
-    /**
-     @function
-     @name tlv8.task.flowstart
-     @description 启动流程
-     @param sEurl
-     @param {string} sData1
-     @param {function} calback
-     */
-    flowstart: function (sEurl, sData1, calback) {
-        let flowComponent = this;
-        let param = new tlv8.RequestParam();
-        param.set("sdata1", sData1);
-        let srcPath = sEurl || window.location.pathname;
-        if (srcPath.indexOf("?") > 0)
-            srcPath = srcPath.substring(0, srcPath.indexOf("?"));
-        param.set("srcPath", srcPath);
-        tlv8.showModelState(true);
-        tlv8.XMLHttpRequest("flowstartAction", param, "post", true,
-            function (r) {
-                tlv8.showModelState(false);
-                if (r.data.flag === "false") {
-                    alert("操作失败:" + r.data.message);
-                } else {
-                    var flwData = eval("(" + r.data.data + ")");
-                    flowComponent.processID = flwData.processID;
-                    flowComponent.flowID = flwData.flowID;
-                    flowComponent.taskID = flwData.taskID;
-                }
-                if (calback && typeof calback == "function") {
-                    calback();
-                } else if (calback && typeof calback == "string") {
-                    try {
-                        calback = eval(calback);
-                        if (typeof calback == "function")
-                            calback();
-                    } catch (e) {
-                        alert("给定的回调函数不存在：" + e);
-                    }
-                }
-            });
     },
     /**
      @function

@@ -7,7 +7,7 @@ from app.models import SATask
 from app.common.decorated import user_login
 from app.common.pubstatic import url_decode, create_icon
 from app.common.persons import get_curr_person_info, get_person_list_by_org
-from app.flow.flowcontroller import start_flow, out_flow, flow_back
+from app.flow.flowcontroller import start_flow, out_flow, flow_back, flow_forward
 from app.flow.flowentity import FlowActivity
 from app.flow.expprocess import *
 from app.flow.exporgexecutor import *
@@ -234,6 +234,8 @@ def flow_get_executor_tree():
             for sid in excutorIDs.split(","):
                 sql += " or sfid like '%" + sid + "%' "
         sql += ")"
+    else:
+        sql += " and 1=2 "
     sql += ")b on b.sfid like concat(a.sfid,'%') where a.svalidstate=1 order by a.slevel asc,a.ssequence asc"
     org_list = db.session.execute(sql)
     data_list = list()
@@ -252,6 +254,7 @@ def flow_get_executor_tree():
     return json.dumps(rdata, ensure_ascii=False)
 
 
+# 流程回退
 @flow.route("/flowbackAction", methods=["GET", "POST"])
 @user_login
 def flow_back_action():
@@ -303,6 +306,63 @@ def flow_back_action():
     else:
         rdata['state'] = False
         rdata['msg'] = "任务id无效,或任务已经处理完成不能再处理！"
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 流程转发
+@flow.route("/flowtransmitAction", methods=["GET", "POST"])
+@user_login
+def flow_transmit_action():
+    rdata = dict()
+    flowID = url_decode(request.form.get('flowID', ''))
+    taskID = url_decode(request.form.get('taskID', ''))
+    epersonids = url_decode(request.form.get('epersonids'))
+    task = SATask.query.filter_by(sid=taskID, sstatusid='tesReady').first()
+    if task:
+        processID = task.sprocess
+        Activity = task.sactivity
+        flwA = FlowActivity(processID, Activity)
+        if epersonids and epersonids != "":
+            person_list = get_person_list_by_org(epersonids)
+            task_id = flow_forward(task, person_list)
+            data = {
+                'processID': processID,
+                'flowID': flowID,
+                'taskID': task_id
+            }
+            rdata['data'] = data
+            rdata['state'] = True
+        else:
+            exeGroup = flwA.getTranseRole()
+            if exeGroup and exeGroup != "":
+                exeGroup = exeGroup.replace("getProcessID()", processID)
+                exeGroup = exeGroup.replace("getFlowID()", flowID)
+                exeGroup = exeGroup.replace("getTaskID()", taskID)
+                exeGroup = exeGroup.replace("getProcesssData1()", task.sdata1)
+            else:
+                exeGroup = "get_org_unit_has_activity('" + processID + "','" + Activity + "',False,False)"
+            excutorGroup = eval(exeGroup)
+            # if not excutorGroup or excutorGroup == "":
+            #     excutorGroup = person['personfid']
+            afterActList = list()
+            afterActList.append({
+                'id': flwA.getId(),
+                'name': flwA.getActivityname(),
+                'type': flwA.getType(),
+                'excutorGroup': excutorGroup,
+                'excutorIDs': '',
+                'excutorNames': ''
+            })
+            data = {
+                'activityList': afterActList,
+                'flowID': flowID,
+                'taskID': taskID
+            }
+            rdata['state'] = 'select'
+            rdata['data'] = data
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "任务id无效,或任务已经处理完成不能转发！"
     return json.dumps(rdata, ensure_ascii=False)
 
 
