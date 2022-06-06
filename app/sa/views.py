@@ -1378,27 +1378,27 @@ def task_center():
     option = request.args.get('option', 'waiting')
     page = request.args.get('page', 1, type=int)
     limit = request.args.get('limit', 10, type=int)
-    data_query = SATask.query.filter(SATask.sflowid != SATask.sid)
     person = get_curr_person_info()
-    if option == 'all':
-        data_query = data_query.filter(SATask.sepersonid == person['personid'])
+    data_query = SATask.query.filter(SATask.sflowid != SATask.sid, SATask.sepersonid == person['personid'])
+    # if option == 'all':
+    #     data_query = data_query.filter(SATask.sepersonid == person['personid'])
     if option == 'waiting':
-        data_query = data_query.filter(SATask.sstatusid == 'tesReady', SATask.sepersonid == person['personid'])
+        data_query = data_query.filter(SATask.sstatusid == 'tesReady')
     if option == 'finished':
-        data_query = data_query.filter(SATask.scpersonid == person['personid'])
+        data_query = data_query.filter(SATask.sstatusid == 'tesFinished')
     if option == 'tesReturned':
-        data_query = data_query.filter(SATask.sstatusid == 'tesReturned', SATask.sepersonid == person['personid'])
+        data_query = data_query.filter(SATask.sstatusid == 'tesReturned')
     if option == 'tesCanceled':
-        data_query = data_query.filter(SATask.sstatusid == 'tesCanceled', SATask.sepersonid == person['personid'])
+        data_query = data_query.filter(SATask.sstatusid == 'tesCanceled')
     if option == 'tesAborted':
-        data_query = data_query.filter(SATask.sstatusid == 'tesAborted', SATask.sepersonid == person['personid'])
+        data_query = data_query.filter(SATask.sstatusid == 'tesAborted')
     search_text = url_decode(request.args.get('search_text', ''))
     if search_text and search_text != "":
         data_query = data_query.filter(
             or_(SATask.sname.ilike('%' + search_text + '%'), SATask.scpersonname.ilike('%' + search_text + '%'),
                 SATask.scdeptname.ilike('%' + search_text + '%')))
     count = data_query.count()
-    page_data = data_query.filter().paginate(page, limit)
+    page_data = data_query.order_by(SATask.screatetime.desc()).paginate(page, limit)
     return render_template("system/task/taskCenter/mainActivity.html", option=option,
                            page_data=page_data, count=count, limit=limit, page=page,
                            nul2em=nul2em, search_text=search_text)

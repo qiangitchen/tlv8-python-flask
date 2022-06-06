@@ -43,6 +43,7 @@
         <th lay-data="{field:'sexecutetime', width:160}">处理时间</th>
         <th lay-data="{field:'scurl',hide:true}"></th>
         <th lay-data="{field:'seurl',hide:true}"></th>
+        <th lay-data="{field:'sdata1',hide:true}"></th>
         <th lay-data="{fixed:'right',toolbar:'#actionBar',width:180}">操作</th>
     </tr>
     </thead>
@@ -59,8 +60,10 @@
             <td>{{ d.screatetime }}</td>
             <td>{{ d.sepersonname }}</td>
             <td>{{ d.sedeptname }}</td>
-            <td>{{ d.scurl }}</td>
+            <td>{{ nul2em(d.sexecutetime) }}</td>
+            <td>{{ nul2em(d.scurl) }}</td>
             <td>{{ d.seurl }}</td>
+            <td>{{ d.sdata1 }}</td>
             <td>{{ nul2em(d.sexecutetime) }}</td>
         </tr>
     {% endfor %}
@@ -68,8 +71,8 @@
 </table>
 <script type="text/html" id="actionBar">
     <a class="layui-btn layui-btn-xs" lay-event="viewData">查看</a>
-    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="recycleTask">撤回</a>
     <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="doTask">处理</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="recycleTask">撤回</a>
 </script>
 <div id="data_list_page"></div>
 </body>
@@ -119,10 +122,32 @@
         table.on('tool(datalist)', function (obj) {
             let data = obj.data;
             if (obj.event === 'viewData') {
-
+                console.log(data);
+                let option = "{{ option }}";
+                let url = data.seurl;
+                url += "?flowID=" + data.sflowid + "&taskID=" + data.sid + "&sData1=" + data.sdata1
+                    + "&task=" + data.sid + "&activity-pattern=detail";
+                tlv8.portal.openWindow(data.sname, url);
             }
-            if (obj.event === 'recycleTask') {
-                //撤回任务
+            if (obj.event === 'recycleTask') {//撤回任务
+                if (data.sstatusid != 'tesFinished' && data.sstatusid != 'tesReturned') {
+                    layui.layer.alert("当前任务不能撤回！");
+                    return;
+                }
+                layui.layer.confirm("确定撤回任务吗？", function () {
+                    let param = new tlv8.RequestParam();
+                    param.set("taskID", data.sid);
+                    tlv8.XMLHttpRequest("/flowControl/RecycleTaskAction", param, "POST", true,
+                        function (r) {
+                            if (r.state === false) {
+                                layui.layer.alert('错误:' + r.msg);
+                            } else {
+                                layui.layer.alert("撤回成功！", function () {
+                                    doQuery();
+                                });
+                            }
+                        });
+                });
             }
             if (obj.event === 'doTask') {
                 if (data.sstatusid == 'tesReady') {

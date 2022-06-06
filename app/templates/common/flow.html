@@ -38,4 +38,15 @@
            </div>
         </div>
     </body>
+    <script type="text/javascript">
+        let dea = J_u_decode(tlv8.RequestURLParam.getParam("activity-pattern"));
+        if(dea === "detail"){ //查看流程页面时默认页面内容只读
+            $("input").attr("readonly","readonly");
+            $("input").removeAttr("onclick");
+            $("textarea").attr("readonly","readonly");
+            $("select").attr("disabled","disabled");
+            $("input[type='radio']").attr("disabled","disabled");
+            $("input[type='checkbox']").attr("disabled","disabled");
+        }
+    </script>
 </html>

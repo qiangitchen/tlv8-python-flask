@@ -577,3 +577,32 @@ def get_process_by_bill_id_action():
         rdata['state'] = False
         rdata['msg'] = '没有找到id对应的流程信息！'
     return json.dumps(rdata, ensure_ascii=False)
+
+
+# 撤回提交的任务
+@flow.route("/RecycleTaskAction", methods=["GET", "POST"])
+@user_login
+def recycle_task_action():
+    rdata = dict()
+    taskID = url_decode(request.form.get('taskID', ''))
+    task = SATask.query.filter_by(sid=taskID).first()
+    if task:
+        next_task = SATask.query.filter_by(sparentid=taskID).all()
+        is_lock = False
+        for t in next_task:
+            if t.slock and t.slock != "":
+                is_lock = True
+                break
+            else:
+                db.session.delete(t)
+        if not is_lock:
+            task.sstatusid = 'tesReady'
+            task.sstatusname = '尚未处理'
+            task.sexecutetime = None
+            db.session.add(task)
+            db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = '没有找到id对应的流程信息！'
+    return json.dumps(rdata, ensure_ascii=False)

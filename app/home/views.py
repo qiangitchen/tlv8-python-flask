@@ -28,13 +28,13 @@ def captchaimage():
 
 
 # 登录页面
-@home.route("/login")
+@home.route("/login/")
 def login():
     return render_template("login.html")
 
 
 # 系统首页
-@home.route("/index")
+@home.route("/index/")
 def index_page():
     return render_template("index.html")
 
