@@ -970,6 +970,8 @@ def online_info():
         data_query = data_query.filter(or_(SAOnlineInfo.susername.ilike('%' + search_text + '%'),
                                            SAOnlineInfo.suserfname.ilike('%' + search_text + '%'),
                                            SAOnlineInfo.sloginip.ilike('%' + search_text + '%')))
+    else:
+        search_text = ""
     count = data_query.count()
     page = request.args.get('page', 1, type=int)
     limit = request.args.get('limit', 20, type=int)
@@ -988,6 +990,8 @@ def sys_log():
         data_query = data_query.filter(or_(SALogs.sdescription.ilike('%' + search_text + '%'),
                                            SALogs.sactivityname.ilike('%' + search_text + '%'),
                                            SALogs.sactionname.ilike('%' + search_text + '%')))
+    else:
+        search_text = ""
     count = data_query.count()
     page = request.args.get('page', 1, type=int)
     limit = request.args.get('limit', 20, type=int)
@@ -1306,6 +1310,7 @@ def flow_load_iocus_action():
     rdata = dict()
     flowID = url_decode(request.form.get('flowID', ''))
     currentUrl = url_decode(request.form.get('currentUrl', ''))
+    sprocessid = None
     if flowID and flowID != "":
         task = SATask.query.filter(SATask.sflowid == flowID).first()
         if task:
@@ -1402,3 +1407,10 @@ def task_center():
     return render_template("system/task/taskCenter/mainActivity.html", option=option,
                            page_data=page_data, count=count, limit=limit, page=page,
                            nul2em=nul2em, search_text=search_text)
+
+
+# 流程监控
+@system.route("/flow/monitor", methods=["GET", "POST"])
+@user_login
+def flow_monitor():
+    return render_template("system/task/monitor/mainActivity.html")

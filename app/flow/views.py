@@ -1,18 +1,14 @@
 # _*_ coding: utf-8 _*_
 
 from . import flow
-from flask import request, render_template, url_for, redirect, session, send_file
-from app import db
-from app.models import SATask
+from datetime import datetime
+from flask import request
 from app.common.decorated import user_login
+from app.common.persons import *
 from app.common.pubstatic import url_decode, create_icon
-from app.common.persons import get_curr_person_info, get_person_list_by_org
+from app.flow.expprocess import *
 from app.flow.flowcontroller import start_flow, out_flow, flow_back, flow_forward
 from app.flow.flowentity import FlowActivity
-from app.flow.expprocess import *
-from app.flow.exporgexecutor import *
-from app.common.persons import *
-from datetime import datetime
 import json
 
 
@@ -34,8 +30,8 @@ def open_task_action():
         activity = task.sactivity
         Act = FlowActivity(processID, activity)
         if Act.getGrapModle() == "whenOpen":  # 打开时抢占，则自动取消当前环节其他待办
-            upsql = ("update SA_TASK set SSTATUSID='tesCanceled' ,SSTATUSNAME='已取消' "
-                     " where SID != :taskID and SACTIVITY = :activity and SFLOWID = :flowID and SSTATUSID = 'tesReady'")
+            upsql = ("update sa_task set sstatusid='tesCanceled' ,sstatusname='已取消' "
+                     " where sid != :taskID and sactivity = :activity and sflowid = :flowID and sstatusid = 'tesReady'")
             db.session.execute(upsql, {'taskID': taskID, 'activity': activity, 'flowID': task.sflowid})
         db.session.commit()
         data = dict()

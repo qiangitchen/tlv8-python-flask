@@ -109,7 +109,7 @@
             doQuery();
         });
         $("#query_text").keyup(function (event) {
-            if (event.keyCode == 13) {
+            if (event.keyCode === 13) {
                 doQuery();
             }
         });
@@ -130,7 +130,7 @@
                 tlv8.portal.openWindow(data.sname, url);
             }
             if (obj.event === 'recycleTask') {//撤回任务
-                if (data.sstatusid != 'tesFinished' && data.sstatusid != 'tesReturned') {
+                if (data.sstatusid !== 'tesFinished' && data.sstatusid !== 'tesReturned') {
                     layui.layer.alert("当前任务不能撤回！");
                     return;
                 }
@@ -150,7 +150,7 @@
                 });
             }
             if (obj.event === 'doTask') {
-                if (data.sstatusid == 'tesReady') {
+                if (data.sstatusid === 'tesReady') {
                     tlv8.task.openTask(data.sid);
                 } else {
                     layui.layer.alert("当前数据非待办任务，不能处理！");
