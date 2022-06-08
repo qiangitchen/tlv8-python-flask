@@ -6,6 +6,7 @@ import os
 from flask import url_for
 from datetime import date, datetime
 from urllib.parse import unquote_to_bytes
+from sqlalchemy.orm import class_mapper
 
 
 # md5加密
@@ -19,6 +20,20 @@ def guid():
     rm = str(os.urandom(16))
     mid = curr_time + rm
     return md5_code(mid)
+
+
+# model转json字典
+def serialize(model):
+    columns = [c.key for c in class_mapper(model.__class__).columns]
+    data = dict()
+    for c in columns:
+        v = getattr(model, c)
+        if type(v) == datetime:  # 日期类型在转json字符时会出错，所以需要提前格式化
+            v = datetime.strftime(v, '%Y-%m-%d %H:%M:%S')
+        if type(v) == date:
+            v = datetime.strftime(v, '%Y-%m-%d')
+        data[c] = v
+    return data
 
 
 # url参数解码：utf-8

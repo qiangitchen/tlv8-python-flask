@@ -400,7 +400,7 @@ tlv8.Queryaction = function (actionName, post, callBack, data, where, ays) {
  * @param ays
  * @returns {JSON}
  */
-tlv8.Deleteaction = function (actionName, post, callBack, rowid, data, ays) {
+tlv8.DeleteAction = function (actionName, post, callBack, rowid, data, ays) {
     if (!rowid || rowid === "") {
         layui.layer.alert("rowid不能为空！");
         return;
@@ -416,14 +416,14 @@ tlv8.Deleteaction = function (actionName, post, callBack, rowid, data, ays) {
     let isay = (ays === false) ? ays : true;
     let rscallBack = function (r) {
         if (callBack)
-            callBack(r.data);
+            callBack(r);
     };
     let result = tlv8.XMLHttpRequest(actionName, param, post, isay,
         rscallBack);
     if (ays === false) {
         if (callBack)
-            callBack(result.data);
-        return result.data;
+            callBack(result);
+        return result;
     }
 };
 
@@ -507,6 +507,7 @@ tlv8.Data = function () {
     this.rowid = null;
     this.formid = "";
     this.savAction = "";
+    this.queryAction = "";
     this.dbkay = "";
     this.version = 0;
     this.Cascade = "";
@@ -562,6 +563,7 @@ tlv8.Data = function () {
                 form.find("textarea").attr("readonly", "readonly");
                 form.find("select").attr("disabled", "disabled");
                 form.find("input[type='radio']").attr("disabled", "disabled");
+                form.find("input").removeAttr("onclick");
             }
         } catch (e) {
         }
@@ -644,6 +646,12 @@ tlv8.Data = function () {
             this.savAction = a;
         else
             this.savAction = a.toString();
+    };
+    this.setQueryAction = function (a) {
+        if (typeof (a) == "string")
+            this.queryAction = a;
+        else
+            this.queryAction = a.toString();
     };
     /**
      * @name setFormId
@@ -958,25 +966,31 @@ tlv8.Data = function () {
                 }
             }
         }
-        if (!this.deleteAction || this.deleteAction === "") {
-            this.setDeleteAction("deleteAction");
-        } else {
-            this.setDeleteAction(this.deleteAction);
-        }
         document.getElementById(this.formid).data = this;
         let self = this;
         if (isconfirm === false) {
-            tlv8.Deleteaction(this.deleteAction, "post", function () {
-                self.afdelete(self);
-            }, this.rowid, this);
+            tlv8.DeleteAction(self.deleteAction, "post", function (r) {
+                if (r.state === true) {
+                    self.afdelete(self);
+                } else {
+                    layui.layer.alert(r.msg);
+                }
+            }, self.rowid, self, true);
             isEdited = false;
             return true;
-        } else if (confirm("确定删除数据吗?")) {
-            tlv8.Deleteaction(this.deleteAction, "post", function () {
-                self.afdelete(self);
-            }, this.rowid, this);
-            isEdited = false;
-            return true;
+        } else {
+            layui.layer.confirm("确定删除数据吗?", function (index) {
+                layui.layer.closeAll();
+                tlv8.DeleteAction(self.deleteAction, "post", function (r) {
+                    if (r.state === true) {
+                        self.afdelete(self);
+                    } else {
+                        layui.layer.alert(r.msg);
+                    }
+                }, self.rowid, self, true);
+                isEdited = false;
+                return true;
+            });
         }
         return false;
     };
@@ -998,6 +1012,9 @@ tlv8.Data = function () {
                 }
             }
         }
+        layui.layer.alert("删除成功！",function(){
+            tlv8.portal.closeWindow();
+        });
     };
     /**
      * @name refreshData
@@ -1026,77 +1043,12 @@ tlv8.Data = function () {
                 }
             }
         }
-        this.relation = "";
-        let mainform = document.getElementById(this.formid);
-        mainform.reset();
-        let $JromTag = function (tagname) {
-            return mainform.getElementsByTagName(tagname);
-        };
-        mainform.isrefreshSub = isrefreshSub;
-        mainform.data = this;
-        let rowid = $(mainform).attr("rowid") || mainform.getAttribute("rowid")
-            || mainform.rowid;
-        if (rowid && rowid !== "") {
-            this.setRowId(trim(rowid));
-        }
-        if (!this.filter || this.filter === "") {
-            if (this.dbkay && this.dbkay !== "system") {
-                this.setFilter("fID='" + this.rowid + "'");
-            } else {
-                this.setFilter("sID='" + this.rowid + "'");
-            }
-        }
-        if (this.dbkay && this.dbkay !== "system") {
-            this.relation += ",FID";
-        } else {
-            this.relation += ",SID";
-        }
-        let inputs = $JromTag("INPUT");
-        for (let i = 0; i < inputs.length; i++) {
-            if (inputs[i].type === "text" || inputs[i].type === "textarea"
-                || inputs[i].type === "password" || inputs[i].type === "number"
-                || inputs[i].type === "date" || inputs[i].type === "datetime"
-                || inputs[i].type === "hidden") {
-                let $rid = inputs[i].id;
-                if ($rid && $rid !== ""
-                    && $rid.toUpperCase().substr(4, 12) !== "_FIXFFCURSOR"
-                    && $rid.indexOf("_editgridipt") < 0
-                    && $rid.indexOf("_quick_text") < 0
-                    && $rid.indexOf("_page") < 0) {
-                    this.relation += "," + $rid;
-                }
-            }
-        }
-        let textareas = $JromTag("TEXTAREA");
-        for (let i = 0; i < textareas.length; i++) {
-            let $rid = textareas[i].id;
-            if ($rid && $rid !== ""
-                && $rid.toUpperCase().substr(4, 12) !== "_FIXFFCURSOR") {
-                this.relation += "," + $rid;
-            }
-        }
-        let selects = $JromTag("SELECT");
-        for (let i = 0; i < selects.length; i++) {
-            let $rid = selects[i].id;
-            if ($rid && $rid !== ""
-                && $rid.toUpperCase().substr(4, 12) !== "_FIXFFCURSOR") {
-                this.relation += "," + $rid;
-            }
-        }
-        let labels = $JromTag("LABEL");
-        for (let i = 0; i < labels.length; i++) {
-            let $rid = labels[i].id;
-            if ($rid && $rid !== ""
-                && $rid.toUpperCase().substr(4, 12) !== "_FIXFFCURSOR") {
-                this.relation += "," + $rid;
-            }
-        }
-        this.relation += ",VERSION";
-        this.relation = this.relation.replace(",", "");
         let self = this;
-        tlv8.Queryaction("queryAction", "post", function (rd) {
+        let param = new tlv8.RequestParam();
+        param.set("rowid", self.rowid);
+        tlv8.XMLHttpRequest(self.queryAction, param, "post", true, function (rd) {
             self.setData(rd, self.formid);
-        }, this, this.filter, true);
+        });
         return true;
     };
     this.setData = function (data, nowformid) {
@@ -1105,16 +1057,19 @@ tlv8.Data = function () {
         if (isTasksub) {
             this.setReadonly(true);
         }
-        let message = "操作成功!";
-        if (data.flag === "false") {
-            msessage = r.data.message;
-            if (msessage.indexOf("Exception:") > 0) {
-                msessage = msessage
-                    .substring(msessage.indexOf("Exception:") + 10);
-            }
-            layui.layer.alert(msessage);
+        if (data.state === false) {
+            layui.layer.msg(data.msg);
         } else {
+            layui.layer.msg("操作成功~");
             //给表单赋值
+            let form = document.getElementById(nowformid);
+            let rdata = data.data;
+            if (typeof rdata == "string") {
+                rdata = JSON.parse(rdata);
+            }
+            for (let k in rdata) {
+                $(form[k]).val(rdata[k]);
+            }
         }
         isEdited = false;
         let childrenData = document.getElementById(nowformid).data.childrenData;
@@ -1143,7 +1098,6 @@ tlv8.Data = function () {
                 }
             }
         }
-        sAlert(message, 500);
     };
     /**
      * @name getValueByName
@@ -1261,10 +1215,10 @@ tlv8.Data = function () {
  * @class tlv8.toolbar
  * @description 工具栏组件
  * @param div {HTMLDivElement}
- * @param insertitem {string} -("readonly":只读,true：可操作,false：不可见)
- * @param saveitem {string} -("readonly":只读,true：可操作,false：不可见)
- * @param deleteitem {string} -("readonly":只读,true：可操作,false：不可见)
- * @param refreshitem {string} -("readonly":只读,true：可操作,false：不可见)
+ * @param insertitem -("readonly":只读,true：可操作,false：不可见)
+ * @param saveitem -("readonly":只读,true：可操作,false：不可见)
+ * @param deleteitem -("readonly":只读,true：可操作,false：不可见)
+ * @param refreshitem -("readonly":只读,true：可操作,false：不可见)
  * @returns {object}
  */
 tlv8.toolbar = function (div, insertitem, saveitem, deleteitem, refreshitem) {
@@ -1638,7 +1592,7 @@ tlv8.portal = {};
 /**
  * @name tlv8.portal.closeWindow
  * @description 关闭portle页面
- * @param tabId {string} -可以为空，为空时关闭当前窗口
+ * @param tabId -可以为空，为空时关闭当前窗口
  */
 tlv8.portal.closeWindow = function (tabId) {
     try {
@@ -1750,9 +1704,9 @@ tlv8.portal.dailog = {
      * @param width {number}
      * @param height {number}
      * @param callback {function}
-     * @param itemSetInit {object}  -{refreshItem:true,enginItem:true,CanclItem:true}
+     * @param itemSetInit  -{refreshItem:true,enginItem:true,CanclItem:true}
      * @param titleItem {boolean} -为false时掩藏标题栏
-     * @param urlParam {object} -JS任意类型可以直接传递到对话框页面 对话框页面通过函数getUrlParam获取
+     * @param urlParam -JS任意类型可以直接传递到对话框页面 对话框页面通过函数getUrlParam获取
      */
     openDailog: function (name, url, width, height, callback, itemSetInit,
                           titleItem, urlParam) {
@@ -1771,7 +1725,7 @@ tlv8.portal.dailog = {
             title: [name, 'font-size:18px;'],
             content: '<div id="dailogmsgDiv" style="width:99%;height:99%;overflow:hidden;border-top:1px solid #eee;border-bottom:1px solid #eee;"><iframe id="windowdialogIframe" style="border:none;width:100%;height:100%;"></iframe></div>',
             btn: itemSetInit === false ? [] : ['确定', '取消'],
-            yes: function (index, layero) {
+            yes: function (index) {
                 let dlw = J$("windowdialogIframe").contentWindow;
                 if (dlw.dailogEngin) {
                     let re = dlw.dailogEngin();
@@ -1784,12 +1738,12 @@ tlv8.portal.dailog = {
                     }
                 } else {
                     if (callback) {
-                        callback(re);
+                        callback();
                     }
                 }
                 layui.layer.close(index);
             },
-            btn2: function (index, layero) {
+            btn2: function (index) {
             },
             cancel: function () {// 右上角关闭回调
             }
@@ -2279,7 +2233,7 @@ String.prototype.rtrim = function () {
 /**
  * @name startWith
  * @description 是否以某个字符开始
- * @returns {string}
+ * @returns {boolean}
  */
 String.prototype.startWith = function (str) {
     return this.indexOf(str) === 0;
@@ -2302,7 +2256,7 @@ let replaceFirst = function (str, p, m) {
  * @returns {string}
  */
 String.prototype.replaceFirst = function (p, m) {
-    if (this.indexOf(p) == 0) {
+    if (this.indexOf(p) === 0) {
         return this.replace(p, m);
     }
     return this;
@@ -2319,8 +2273,11 @@ String.prototype.replaceAll = function (p, m) {
 };
 
 function closeself() {
-    window.opener = null;
-    window.open("", "_self");
+    try {
+        window.opener = null;
+        window.open("", "_self");
+    } catch (e) {
+    }
     window.close();
 }
 
@@ -2331,7 +2288,7 @@ Date.prototype.format = function (fmt) {
     let o = {
         "M+": this.getMonth() + 1,
         "d+": this.getDate(),
-        "h+": this.getHours() % 24 == 0 ? 24 : this.getHours() % 24,
+        "h+": this.getHours() % 24 === 0 ? 24 : this.getHours() % 24,
         "H+": this.getHours(),
         "m+": this.getMinutes(),
         "s+": this.getSeconds(),
@@ -2362,7 +2319,7 @@ Date.prototype.format = function (fmt) {
     }
     for (let k in o) {
         if (new RegExp("(" + k + ")").test(fmt)) {
-            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k])
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k])
                 : (("00" + o[k]).substr(("" + o[k]).length)));
         }
     }
@@ -2477,7 +2434,7 @@ tlv8.numberL2U = function (data) {
     if (output !== "" && output2 !== "0") {
         return (output + "元" + output2).replace(" ", "");
     } else {
-        if (output !== "" && output2 === 0) {
+        if (output !== "" && output2 === "0") {
             return (output + "元整").replace(" ", "");
         } else {
             let re = /^零/g;
@@ -2503,9 +2460,9 @@ tlv8.numberFormat = function (number, format) {
     }
     let fix = (format.split(".").length > 1) ? format.split(".")[1].length : 0;
     number = parseFloat(number);
-    let isfushu = false;
+    let isubh = false;
     if (number < 0) {
-        isfushu = true;
+        isubh = true;
         number = -number;
     }
     let val = number.toFixed(fix);
@@ -2544,7 +2501,7 @@ tlv8.numberFormat = function (number, format) {
     } else {
         result = val;
     }
-    if (isfushu) {
+    if (isubh) {
         result = "-" + result;
     }
     return result;
@@ -2634,7 +2591,7 @@ tlv8.CheckNumber = {
         }
     },
     valClip: function (ev) {
-        ev = ev || window.event;
+        //ev = ev || window.event;
         let content = window.clipboardData.getData('Text');
         if (content != null) {
             try {
@@ -2692,11 +2649,11 @@ tlv8.getIdCardInfo = function (id) {
         null, null, null, null, "国外"];
     let isid = tlv8.checkId(id);
     if (isid !== "true" && isid)
-        return "错误的身份证号码";
-    id = String(id), prov = arr[id.slice(0, 2)], sex = id.slice(14, 17) % 2 ? "男"
-        : "女";
-    let birthday = (new Date(id.slice(6, 10), id.slice(10, 12) - 1, id.slice(
-        12, 14))).format('yyyy-MM-dd');
+        return ["错误的身份证号码"];
+    id = String(id);
+    let prov = arr[id.slice(0, 2)];
+    let sex = id.slice(14, 17) % 2 ? "男" : "女";
+    let birthday = new Date(parseInt(id.slice(6, 10)), id.slice(10, 12) - 1, parseInt(id.slice(12, 14))).format('yyyy-MM-dd');
     return [prov, birthday, sex];
 };
 
@@ -2706,7 +2663,7 @@ tlv8.getIdCardInfo = function (id) {
 tlv8.checkId = function (pId) {
     let arrVerifyCode = [1, 0, "x", 9, 8, 7, 6, 5, 4, 3, 2];
     let Wi = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
-    let Checker = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 1];
+    //let Checker = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 1];
     let result = "";
     if (pId.length !== 15 && pId.length !== 18)
         result += "身份证号共有 15 码或18位";
@@ -2714,15 +2671,15 @@ tlv8.checkId = function (pId) {
         + pId.slice(6, 16);
     if (!/^\d+$/.test(Ai))
         result += "身份证除最后一位外，必须为数字！";
-    let yyyy = Ai.slice(6, 10), mm = Ai.slice(10, 12) - 1, dd = Ai
-        .slice(12, 14);
+    let yyyy = parseInt(Ai.slice(6, 10)), mm = parseInt(Ai.slice(10, 12)) - 1, dd = parseInt(Ai.slice(12, 14));
     let d = new Date(yyyy, mm, dd), now = new Date();
     let year = d.getFullYear(), mon = d.getMonth(), day = d.getDate();
     if (year !== yyyy || mon !== mm || day !== dd || d > now || year < 1940)
         result += "身份证输入错误！";
-    for (let i = 0, ret = 0; i < 17; i++)
+    let ret = 0;
+    for (let i = 0; i < 17; i++)
         ret += Ai.charAt(i) * Wi[i];
-    Ai += arrVerifyCode[ret %= 11];
+    Ai += arrVerifyCode[ret % 11];
     if (!result || result === "")
         return "true";
     return pId === (Ai) ? "true" : result;
@@ -3191,8 +3148,8 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
             + " where " + sID + " = '" + rowid + "' and " + random + "="
             + random;
         let r = tlv8.sqlQueryActionforJson(dbkey, sql);
-        let dilelist = [];
-        let transeJson = function (str) {
+        let duelist = [];
+        let transJson = function (str) {
             str = str.toString().replaceAll(":", ":\"");
             str = str.toString().replaceAll(",", "\",");
             str = str.toString().replaceAll("}", "\"}");
@@ -3209,21 +3166,21 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
                 }
                 if (datas && datas !== "") {
                     try {
-                        dilelist = eval("(" + datas + ")");
+                        duelist = eval("(" + datas + ")");
                     } catch (e) {
-                        dilelist = transeJson(datas);
+                        duelist = transJson(datas);
                     }
                 }
             }
         } catch (e) {
             alert(e.message);
         }
-        div.dilelist = dilelist;
+        div.dilelist = duelist;
         let fileIDs = [];
         let filenames = [];
-        for (let i = 0; i < dilelist.length; i++) {
-            fileIDs.push(dilelist[i].fileID);
-            filenames.push(dilelist[i].filename);
+        for (let i = 0; i < duelist.length; i++) {
+            fileIDs.push(duelist[i].fileID);
+            filenames.push(duelist[i].filename);
         }
         filetableBody = "<table>";
         docPath = docPath || "/";
@@ -3240,7 +3197,7 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
         if (filenames && filenames.length > 0) {
             for (i in filenames) {
                 let fileID = fileIDs[i];
-                filetableBody += "<tr style='width:100%;height:20px;padding:5px;'><td style='border:0px none;'>"
+                filetableBody += "<tr style='width:100%;height:20px;padding:5px;'><td style='border:0 none;'>"
                     + "<a style='font-size:12px;color:#0033FF;text-decoration: none;' href='javascript:void(0)' id=\""
                     + div.id
                     + "_titleItem\" title='"
@@ -3252,11 +3209,11 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
                     + "\")'>"
                     + filenames[i]
                     + "</a>&nbsp;&nbsp;</td>";
-                filetableBody += "<td width='40px;' style='border:0px none;'>"
+                filetableBody += "<td width='40px;' style='border:0 none;'>"
                     + "<a href='javascript:void(0)' style='font-size:12px;color:#0033FF;text-decoration: none;' title='文件属性' onclick='justep.Doc.openDocInfoDialog(\""
                     + fileID + "\")'>属性</a></td>";
                 if (canedit === true && !isTasksub) {
-                    filetableBody += "<td width='40px;' style='border:0px none;'><a href='javascript:void(0)' "
+                    filetableBody += "<td width='40px;' style='border:0 none;'><a href='javascript:void(0)' "
                         + "style='font-size:12px;color:#0033FF;text-decoration: none;' title='编辑文件' "
                         + "onclick='tlv8.trangereditfile(\""
                         + fileID
@@ -3277,13 +3234,13 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
                     filetableBody += "<td style='border:0 none;'></td>";
                 }
                 if (viewhistory === true) {
-                    filetableBody += "<td width='40px;' style='border:0px none;'><a href='javascript:void(0)' style='font-size:12px;color:#0033FF;text-decoration: none;' title='历史版本' onclick='justep.Doc.openDocHistoryDialog(null,\""
+                    filetableBody += "<td width='40px;' style='border:0 none;'><a href='javascript:void(0)' style='font-size:12px;color:#0033FF;text-decoration: none;' title='历史版本' onclick='justep.Doc.openDocHistoryDialog(null,\""
                         + fileID + "\")'>历史</a></td>";
                 } else {
                     filetableBody += "<td style='border:0 none;'></td>";
                 }
                 if (candelete !== false && !isTasksub) {
-                    filetableBody += "<td width='40px;' style='border:0px none;'><a href='javascript:void(0)' style='font-size:12px;color:#0033FF;text-decoration: none;' title='删除附件' onclick='tlv8.deletefile(\""
+                    filetableBody += "<td width='40px;' style='border:0 none;'><a href='javascript:void(0)' style='font-size:12px;color:#0033FF;text-decoration: none;' title='删除附件' onclick='tlv8.deletefile(\""
                         + fileID
                         + "\",\""
                         + filenames[i]
@@ -3300,8 +3257,8 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
                 } else {
                     filetableBody += "<td></td>";
                 }
-                if (download != false) {
-                    filetableBody += "<td width='40px;' style='border:0px none;'><a href='javascript:void(0)' style='font-size:12px;color:#0033FF;text-decoration: none;' title='下载附件' onclick='justep.Doc.downloadDocByFileID(\""
+                if (download !== false) {
+                    filetableBody += "<td width='40px;' style='border:0 none;'><a href='javascript:void(0)' style='font-size:12px;color:#0033FF;text-decoration: none;' title='下载附件' onclick='justep.Doc.downloadDocByFileID(\""
                         + docPath + "\",\"" + fileID + "\")'>下载</a></td>";
                 } else {
                     filetableBody += "<td style='border:0 none;'></td>";
@@ -3322,7 +3279,7 @@ tlv8.trangereditfile = function (fileID, fileName, docPath, dbkey,
                                  tablename, billid, cellname, comentid) {
     editFilecoment = comentid;
     if ('.doc.docx.xls.xlsx.ppt.pptx.mpp.vsd.dps.wps.et.'
-        .indexOf(String(/\.[^\.]+$/.exec(fileName)) + '.') < 0) {
+        .indexOf(String(/\.[^.]+$/.exec(fileName)) + '.') < 0) {
         alert("不支持非Office文件编辑");
         return;
     }
@@ -3364,7 +3321,7 @@ tlv8.isIE6 = function () {
     if (window.ActiveXObject) {
         let ua = navigator.userAgent.toLowerCase();
         let ie = ua.match(/msie ([\d.]+)/)[1];
-        if (ie === 6.0) {
+        if (parseFloat(ie) === 6.0) {
             return true;
         }
     }
@@ -3463,7 +3420,7 @@ function getIEVersion() {
 // 填写审批意见
 tlv8.writeOpinion = function (view) {
     let taptt = tlv8.RequestURLParam.getParam("activity-pattern");
-    let isTasksub = (taptt == "detail");
+    let isTasksub = (taptt === "detail");
     if (isTasksub) {
         alert("已办任务不能再填写意见!");
         return;
@@ -3641,9 +3598,9 @@ function DateDiff(startDate, endDate) {
                         opts.onLoadSuccess(optiondata);
                     }
                 },
-                error: function (errocode) {
+                error: function (errorcode) {
                     if (opts.onLoadError && typeof opts.onLoadError == "function") {
-                        opts.onLoadError(errocode);
+                        opts.onLoadError(errorcode);
                     }
                 }
             });

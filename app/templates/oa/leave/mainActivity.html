@@ -11,26 +11,26 @@
                         <div class="layui-inline">
                             <label class="layui-form-label" style="width: 110px;">申请人</label>
                             <div class="layui-input-inline">
-                                <input type="text" id="FCREATORNAME" name="FCREATORNAME" class="layui-input"
+                                <input type="text" id="fcreatorname" name="fcreatorname" class="layui-input"
                                        readonly="readonly">
                             </div>
                         </div>
                         <div class="layui-inline" style="display: none;">
                             <label class="layui-form-label">申请人</label>
                             <div class="layui-input-inline">
-                                <input type="text" id="FCREATORID" name="FCREATORID" class="layui-input">
+                                <input type="text" id="fcreatorid" name="fcreatorid" class="layui-input">
                             </div>
                         </div>
                         <div class="layui-inline" style="display: none;">
                             <label class="layui-form-label">申请人FID</label>
                             <div class="layui-input-inline">
-                                <input type="text" id="FCREATORFID" name="FCREATORFID" class="layui-input">
+                                <input type="text" id="fcreatorfid" name="fcreatorfid" class="layui-input">
                             </div>
                         </div>
                         <div class="layui-inline">
                             <label class="layui-form-label" style="width: 110px;">请假类型</label>
                             <div class="layui-input-inline">
-                                <select id="FLEAVETYPE" name="FLEAVETYPE" class="layui-input">
+                                <select id="fleavetype" name="fleavetype" class="layui-input">
                                     <option>事假</option>
                                     <option>病假</option>
                                     <option>其他</option>
@@ -42,20 +42,20 @@
                         <div class="layui-inline" style="display: none;">
                             <label class="layui-form-label">申请人FNAME</label>
                             <div class="layui-input-inline">
-                                <input type="text" id="FCREATORFNAME" name="FCREATORFNAME" class="layui-input">
+                                <input type="text" id="fcreatorfname" name="fcreatorfname" class="layui-input">
                             </div>
                         </div>
                         <div class="layui-inline">
                             <label class="layui-form-label" style="width: 110px;">申请时间</label>
                             <div class="layui-input-inline">
-                                <input type="text" id="FCREATEDATE" name="FCREATEDATE" class="layui-input"
+                                <input type="text" id="fcreatedate" name="fcreatedate" class="layui-input"
                                        readonly="readonly">
                             </div>
                         </div>
                         <div class="layui-inline">
                             <label class="layui-form-label" style="width: 110px;">请假天数</label>
                             <div class="layui-input-inline">
-                                <input type="number" id="FDAY" name="FDAY" class="layui-input">
+                                <input type="number" id="fday" name="fday" class="layui-input" lay-verify="required">
                             </div>
                         </div>
                     </div>
@@ -63,14 +63,16 @@
                         <div class="layui-inline">
                             <label class="layui-form-label" style="width: 110px;">开始时间</label>
                             <div class="layui-input-inline">
-                                <input type="text" id="FSTARTDATE" name="FSTARTDATE" autocomplete="off"
+                                <input type="text" id="fstartdate" name="fstartdate" autocomplete="off"
+                                       lay-verify="required"
                                        onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" class="layui-input Wdate">
                             </div>
                         </div>
                         <div class="layui-inline">
                             <label class="layui-form-label" style="width: 110px;">结束时间</label>
                             <div class="layui-input-inline">
-                                <input type="text" id="FENDDATE" name="FENDDATE" autocomplete="off"
+                                <input type="text" id="fenddate" name="fenddate" autocomplete="off"
+                                       lay-verify="required"
                                        onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" class="layui-input Wdate">
                             </div>
                         </div>
@@ -79,17 +81,18 @@
                         <div class="layui-inline" style="display: none;">
                             <label class="layui-form-label">申请状态</label>
                             <div class="layui-input-inline">
-                                <input type="text" id="FSTATE" name="FSTATE" class="layui-input">
+                                <input type="text" id="fstate" name="fstate" class="layui-input">
                             </div>
                         </div>
                     </div>
                     <div class="layui-form-item layui-form-text">
                         <label class="layui-form-label" style="width: 110px;">请假原因</label>
                         <div class="layui-input-block">
-                            <textarea id="FREASON" name="FREASON" class="layui-textarea"></textarea>
+                            <textarea id="freason" name="freason" class="layui-textarea"></textarea>
                         </div>
                     </div>
                     <div style="display: none">
+                        <input type="text" id="fid" name="fid" class="layui-input" style="display: none;">
                         <button id="mainfsub" class="layui-btn" lay-submit lay-filter="mainform">立即提交</button>
                         <button type="reset" class="layui-btn layui-btn-primary">重置</button>
                     </div>
@@ -103,16 +106,24 @@
 
         function init_toolbar() {
             let barDiv = J$("stander_bar");
-            let toolbar = new tlv8.toolbar(barDiv, false, true, "readonly",
-                true);
+            let toolbar = new tlv8.toolbar(barDiv, false, true, (activity === 'mainActivity'), true);
             toolbarItem = toolbar.items;
+        }
+
+        const MainData = new tlv8.Data();
+        MainData.setFormId("MAIN_DATA_FORM");
+        MainData.setQueryAction("/oa/leave/queryData");//定义数据查询动作
+        MainData.setDeleteAction("/oa/leave/deleteData");//定义数据删除动作
+
+        let activity = "{{ activity }}";
+
+        if (activity !== 'mainActivity') {
+            MainData.setReadonly(true); //如果不是第一个环节则设置表单只读
         }
 
         $(document).ready(function () {
             init_toolbar();
             flwComponent = new tlv8.flw("flowToolbar");
-
-            let activity = "{{ activity }}";
 
             if (flwComponent.taskID) {
                 flwComponent.setItemStatus({
@@ -121,13 +132,15 @@
                     out: true,
                     transmit: true,
                     pause: true,
-                    stop: (activity == 'mainActivity')
+                    stop: (activity === 'mainActivity')
                 });
             }
 
             let rowid = tlv8.RequestURLParam.getParam("sData1");
-            if (rowid && rowid != "") {
-
+            if (rowid && rowid !== "") {
+                //这里做数据加载
+                MainData.setRowId(rowid);
+                MainData.refreshData(true, false);
             } else {
                 initPsData();
             }
@@ -140,24 +153,32 @@
 
         //删除数据动作
         function dataDeleted() {
-
+            MainData.deleteData();
         }
 
         //初始化数据
         function initPsData() {
-            $("#FCREATORNAME").val(tlv8.Context.getCurrentPersonName());
-            $("#FCREATORID").val(tlv8.Context.getCurrentPersonID());
-            $("#FCREATORFID").val(tlv8.Context.getCurrentPersonFID());
-            $("#FCREATORFNAME").val(tlv8.Context.getCurrentPersonFName());
-            $("#FCREATEDATE").val(tlv8.System.Date.sysDateTime());
+            $("#fcreatorname").val(tlv8.Context.getCurrentPersonName());
+            $("#fcreatorid").val(tlv8.Context.getCurrentPersonID());
+            $("#fcreatorfid").val(tlv8.Context.getCurrentPersonFID());
+            $("#fcreatorfname").val(tlv8.Context.getCurrentPersonFName());
+            $("#fcreatedate").val(tlv8.System.Date.sysDateTime());
         }
 
         //监听表单提交
         layui.form.on('submit(mainform)', function (data) {
             // layui.layer.msg(JSON.stringify(data.field));
-            let rowid = new UUID().toString(); //MainData.saveData();
-            if (!flwComponent.taskID || flwComponent.taskID == "") {
-                flwComponent.flowStart(rowid);
+            let param = new tlv8.RequestParam();
+            param.set("field", JSON.stringify(data.field));
+            let r = tlv8.XMLHttpRequest("/oa/leave/saveData", param, 'post', false);
+            if (r.state === true) {
+                layui.layer.msg("保存成功~");
+                let rowid = r.rowid;
+                if (!flwComponent.taskID || flwComponent.taskID == "") {
+                    flwComponent.flowStart(rowid);
+                }
+            } else {
+                layui.layer.alert(r.msg);
             }
             return false;
         });

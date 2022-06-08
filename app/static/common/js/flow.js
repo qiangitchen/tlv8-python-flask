@@ -10,7 +10,7 @@ tlv8.flw = function (div, data, setting) {
         try {
             div = document.getElementById(div);
         } catch (e) {
-            mAlert("参数div:" + e.message);
+            layui.layer.alert("参数div:" + e.message);
             return false;
         }
     }
@@ -330,10 +330,9 @@ tlv8.flw.prototype.flowAudit = function (flowID, taskID, ePersonID, sData1) {
 /**
  @name flowStart
  @description 启动流程
- @param {string} billid -业务表单主键的值
+ @param billid {string}  -业务表单主键的值
  */
 tlv8.flw.prototype.flowStart = function (billid) {
-    let inFn;
     let flowComponent = this;
     let sData1 = billid || this.sData1;
     let param = new tlv8.RequestParam();
@@ -950,13 +949,13 @@ tlv8.flw.prototype.flowForward = function (flowID, taskID, ePersonID) {
                 try {
                     let reActData = r.data;
                     let activityListStr = reActData.activityList;
-                    let exe_selct_url = "/system/flow/flowDialog/Select_executor";
-                    exe_selct_url += "?flowID="
+                    let exe_select_url = "/system/flow/flowDialog/Select_executor";
+                    exe_select_url += "?flowID="
                         + reActData.flowID;
-                    exe_selct_url += "&taskID="
+                    exe_select_url += "&taskID="
                         + reActData.taskID;
                     tlv8.portal.dailog.openDailog('流程转发',
-                        exe_selct_url, 800, 600,
+                        exe_select_url, 800, 600,
                         flowTransEngion, null, null,
                         activityListStr);
                 } catch (e) {
@@ -1429,7 +1428,8 @@ tlv8.task = {
     },
     /**
      * 取消流程
-     * @param taskID
+     * @param taskID {string} -任务id
+     * @param callback {function} -回调函数
      */
     cancelTask: function (taskID, callback) {
         let param = new tlv8.RequestParam();
@@ -1440,7 +1440,7 @@ tlv8.task = {
                     layui.layer.alert("操作失败:" + r.msg);
                 } else {
                     layui.layer.msg("取消成功！");
-                    if (callback && typeof callback == "string") {
+                    if (callback && typeof callback == "function") {
                         callback(r);
                     }
                 }
@@ -1448,7 +1448,8 @@ tlv8.task = {
     },
     /**
      * 激活任务
-     * @param taskID
+     * @param taskID {string} -任务id
+     * @param callback {function} -回调函数
      */
     flowRestart: function (taskID, callback) {
         let param = new tlv8.RequestParam();
@@ -1459,7 +1460,7 @@ tlv8.task = {
                     layui.layer.alert("操作失败:" + r.msg);
                 } else {
                     layui.layer.msg("操作成功！");
-                    if (callback && typeof callback == "string") {
+                    if (callback && typeof callback == "function") {
                         callback(r);
                     }
                 }
@@ -1469,7 +1470,7 @@ tlv8.task = {
      @function
      @name tlv8.task.viewChart
      @description 查看流程图
-     @param {string} sData1
+     @param {string} sData1 -业务主键
      */
     viewChart: function (sData1) {
         let param = new tlv8.RequestParam();
