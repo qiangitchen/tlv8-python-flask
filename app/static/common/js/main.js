@@ -1,45 +1,41 @@
-var cpath = "";
+const cpath = "";
 /**
  * @name J$
  * @description 根据ID获取HTML的Element对象
- * @param {string}
- *            id
+ * @param id
  * @returns {HTMLElement}
  */
-var J$ = function (id) {
+const J$ = function (id) {
     return document.getElementById(id);
 };
 
 /**
  * @name J$n
  * @description 根据标签名称获取HTML的Element对象数组
- * @param {string}
- *            tagName
- * @returns {HTMLElements}
+ * @param tagName
+ * @returns {[HTMLElement]}
  */
-var J$n = function (tagName) {
+const J$n = function (tagName) {
     return document.getElementsByTagName(tagName);
 };
 
 /**
  * @name J_u_encode
  * @description 将字符串UTF-8编码
- * @param {string}
- *            str
+ * @param  str
  * @returns {string}
  */
-var J_u_encode = function (str) {
+const J_u_encode = function (str) {
     return encodeURIComponent(encodeURIComponent(str));
 };
 
 /**
  * @name J_u_decode
  * @description 将字符串UTF-8解码
- * @param {string}
- *            str
+ * @param str
  * @returns {string}
  */
-var J_u_decode = function (str) {
+const J_u_decode = function (str) {
     try {
         return decodeURIComponent(decodeURIComponent(str));
     } catch (e) {
@@ -52,10 +48,10 @@ var J_u_decode = function (str) {
  * @description 获取顶层窗口对象
  * @returns {window}
  */
-var topparent = function () {
-    var nowwdw = window;
-    var parentwdw = window.parent;
-    while (nowwdw != parentwdw) {
+const topparent = function () {
+    let nowwdw = window;
+    let parentwdw = window.parent;
+    while (nowwdw !== parentwdw) {
         nowwdw = parentwdw;
         parentwdw = nowwdw.parent;
     }
@@ -63,17 +59,17 @@ var topparent = function () {
 }();
 
 function checkEncode() {
-    var META = document.getElementsByTagName("META");
-    for (var i = 0; i < META.length; i++) {
+    let META = document.getElementsByTagName("META");
+    for (let i = 0; i < META.length; i++) {
         if (META[i].content.toLowerCase().indexOf("utf-8") > -1)
             return true;
     }
     return false;
 }
 
-var createMeta = function () {
-    var HTMLhead = document.getElementsByTagName('HEAD')[0];
-    var meta = document.createElement('meta');
+const createMeta = function () {
+    let HTMLhead = document.getElementsByTagName('HEAD')[0];
+    let meta = document.createElement('meta');
     meta.setAttribute("http-equiv", "content-type");
     meta.setAttribute("content", "text/html; charset=utf-8");
     HTMLhead.appendChild(meta);
@@ -84,29 +80,26 @@ if (!checkEncode())
 /**
  * 名空间
  */
-var tlv8 = {};
+const tlv8 = {};
 
 /**
  * 请求参数为了统一编码
  */
 tlv8.RequestParam = function () {
-    var params = new Map();
-    this.params = params;
-    var set = function (key, value) {
+    this.params = new Map();
+    this.set = function (key, value) {
         this.params.put(key, value);
     };
-    this.set = set;
-    var get = function (key) {
+    this.get = function (key) {
         return this.params.gut(key);
     };
-    this.get = get;
     return this;
 };
 /*
  * ajax
  */
 tlv8.xmlHttp = function () {
-    var xmlhttp;
+    let xmlhttp;
     if (window.XMLHttpRequest) {
         xmlhttp = new XMLHttpRequest();
     } else if (window.ActiveXObject) {
@@ -115,15 +108,19 @@ tlv8.xmlHttp = function () {
     return xmlhttp;
 };
 tlv8.getRequestURI = function () {
-    var url = window.location.pathname;
+    let url = window.location.pathname;
     return url.substring(0, url.lastIndexOf("/"));
 };
 
-function getHost() {
-    var surl = window.location.href;
-    var host = surl.substring(0, surl.indexOf(cpath)) + cpath;
-    return host;
-}
+/**
+ * 获取当前服务器地址
+ * @returns {string}
+ */
+tlv8.getHost = function () {
+    let surl = window.location.href;
+    let host = surl.substring(0, surl.indexOf(cpath));
+    return host + cpath;
+};
 
 /**
  * 显示loading状态
@@ -137,20 +134,34 @@ tlv8.showSate = function (state) {
     }
 };
 
+/**
+ * 添加事件
+ * @param elm
+ * @param evType
+ * @param fn
+ * @param useCapture
+ * @returns {boolean|*|void}
+ */
 function addEvent(elm, evType, fn, useCapture) {
     if (elm.addEventListener) {
         elm.addEventListener(evType, fn, useCapture);
         return true;
     } else if (elm.attachEvent) {
-        var r = elm.attachEvent('on' + evType, fn);
-        return r;
+        return elm.attachEvent('on' + evType, fn);
     } else {
         elm['on' + evType] = fn;
     }
 }
 
+/**
+ * 移除事件
+ * @param obj
+ * @param type
+ * @param fn
+ * @param cap
+ */
 function removeEvent(obj, type, fn, cap) {
-    var cap = cap || false;
+    cap = cap || false;
     if (obj.removeEventListener) {
         obj.removeEventListener(type, fn, cap);
     } else {
@@ -179,9 +190,8 @@ addEvent(window, "load", function () {
  * @callBack:回调函数
  * @unShowState:是否显示loading{true/false}
  */
-tlv8.XMLHttpRequest = function (actionName, param, post, ayn, callBack,
-                                unShowState) {
-    var localurl = window.location.href;
+tlv8.XMLHttpRequest = function (actionName, param, post, ayn, callBack, unShowState) {
+    let localurl = window.location.href;
     if (localurl.indexOf("file://") > -1) {
         return;
     }
@@ -189,13 +199,13 @@ tlv8.XMLHttpRequest = function (actionName, param, post, ayn, callBack,
         tlv8.showModelState(true);
         window.actiondoing = true;
     }
-    var paramMap = param ? param.params : new Map();
-    var params = "";
+    let paramMap = param ? param.params : new Map();
+    let params = "";
     if (paramMap) {
         if (!paramMap.isEmpty()) {
-            var list = paramMap.keySet();
-            for (var i = 0; i < list.length; i++) {
-                var sk = list[i];
+            let list = paramMap.keySet();
+            for (let i = 0; i < list.length; i++) {
+                let sk = list[i];
                 if (i > 0)
                     params += "&";
                 params += sk + "=" + J_u_encode(paramMap.get(sk));
@@ -203,8 +213,8 @@ tlv8.XMLHttpRequest = function (actionName, param, post, ayn, callBack,
         }
     }
     try {
-        var rs;
-        var hideModelState = function () {
+        let rs;
+        let hideModelState = function () {
             if (!unShowState) {
                 try {
                     tlv8.showModelState(false);
@@ -219,7 +229,7 @@ tlv8.XMLHttpRequest = function (actionName, param, post, ayn, callBack,
             url: actionName,
             data: params,
             // dataType : "json",
-            success: function (result, textStatus) {
+            success: function (result) {
                 rs = result;
                 try {
                     rs = window.eval("(" + rs + ")");
@@ -227,7 +237,7 @@ tlv8.XMLHttpRequest = function (actionName, param, post, ayn, callBack,
                 }
                 hideModelState();
                 try {
-                    if (rs.data.flag == "timeout") {
+                    if (rs.data.flag === "timeout") {
                         window.top.sessionTimeout();
                         return;
                     }
@@ -241,7 +251,7 @@ tlv8.XMLHttpRequest = function (actionName, param, post, ayn, callBack,
                     }
                 }
             },
-            error: function (xreq, xmsg, xep) {
+            error: function () {//xreq, xmsg, xep
                 hideModelState();
                 // alert("请求失败! \nurl:"+actionName+"\n错误信息："+xmsg);
             }
@@ -252,26 +262,18 @@ tlv8.XMLHttpRequest = function (actionName, param, post, ayn, callBack,
     }
 };
 
-// 初始化当前登陆人信息
-function initUserInfo() {
-    var personID = tlv8.Context.getCurrentPersonID();
-    var param = new tlv8.RequestParam();
-    param.set("personID", personID);
-    tlv8.XMLHttpRequest("InitUserInfo", param, "get", true, null, true);
-}
-
 /*
  * 写操作日志
  */
 function writeLog(ev, actionName, discription) {
-    if (window.isWriteLog == false)
+    if (window.isWriteLog === false)
         return;
     try {
-        var activateName = $("title").text();
-        var srcPath = window.location.pathname;
+        let activateName = $("title").text();
+        let srcPath = window.location.pathname;
         if (srcPath.indexOf("?") > 0)
             srcPath = srcPath.substring(0, srcPath.indexOf("?"));
-        var param = new tlv8.RequestParam();
+        let param = new tlv8.RequestParam();
         param.set("personID", tlv8.Context.getCurrentPersonID());
         param.set("processName", "");
         param.set("activateName", activateName);
@@ -291,22 +293,20 @@ tlv8.RequestURLParam = {
     /**
      * @name tlv8.RequestURLParam.getParam
      * @description 获取URL参数
-     * @param {string}
-     *            paramName
-     * @returns {string}
+     * @param name
      */
     getParam: function (name) {
-        var lurl = window.location.href;
+        let lurl = window.location.href;
         if (lurl.indexOf(name) < 0)
             return;
         if (lurl.indexOf("?") < 0) {
             return "";
         } else {
-            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-            var r = window.location.search.substr(1).match(reg);
+            let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            let r = window.location.search.substring(1).match(reg);
             if (r != null)
                 return J_u_decode(r[2]);
-            var par;
+            let par;
             if (lurl.indexOf("?" + name) > 0) {
                 par = lurl.substring(lurl.indexOf("?" + name) + 1, lurl.length);
             }
@@ -315,9 +315,9 @@ tlv8.RequestURLParam = {
             }
             if (!par)
                 return;
-            var start = name.length + 1;
-            var len = (par.indexOf("&") > 0) ? par.indexOf("&") : lurl.length;
-            var pav = par.substring(start, len);
+            let start = name.length + 1;
+            let len = (par.indexOf("&") > 0) ? par.indexOf("&") : lurl.length;
+            let pav = par.substring(start, len);
             return J_u_decode(pav);
         }
     },
@@ -327,7 +327,7 @@ tlv8.RequestURLParam = {
         if (lurl.indexOf("?") < 0) {
             return "";
         } else {
-            var par;
+            let par;
             if (lurl.indexOf("?" + name) > 0) {
                 par = lurl.substring(lurl.indexOf("?" + name) + 1, lurl.length);
             }
@@ -336,8 +336,8 @@ tlv8.RequestURLParam = {
             }
             if (!par)
                 return;
-            var start = name.length + 1;
-            var len = (par.indexOf("&") > 0) ? par.indexOf("&") : lurl.length;
+            let start = name.length + 1;
+            let len = (par.indexOf("&") > 0) ? par.indexOf("&") : lurl.length;
             return J_u_decode(par.substring(start, len));
         }
     }
@@ -356,15 +356,15 @@ tlv8.RequestURLParam = {
  * @returns {JSON}
  */
 tlv8.Queryaction = function (actionName, post, callBack, data, where, ays) {
-    var table = data ? data.table : "";
+    let table = data ? data.table : "";
     where = where ? where : "";
-    var dbkay = data ? data.dbkay : "";
-    var relation = data ? data.relation : "";
-    var orderby = data ? data.orderby : "";
-    if (!where || where == "") {
+    let dbkay = data ? data.dbkay : "";
+    let relation = data ? data.relation : "";
+    let orderby = data ? data.orderby : "";
+    if (!where || where === "") {
         where = tlv8.RequestURLParam.getParamByURL(actionName, "where");
     }
-    var param = new tlv8.RequestParam();
+    let param = new tlv8.RequestParam();
     param.set("dbkay", dbkay);
     param.set("table", table);
     param.set("relation", relation);
@@ -374,14 +374,14 @@ tlv8.Queryaction = function (actionName, post, callBack, data, where, ays) {
     } else {
         param.set("where", CryptoJS.AESEncrypt(where));
     }
-    var isay = (ays == false) ? ays : true;
-    var rscallBack = function (r) {
+    let isay = (ays === false) ? ays : true;
+    let rscallBack = function (r) {
         if (callBack)
             callBack(r.data);
     };
-    var result = tlv8.XMLHttpRequest(actionName, param, post, isay,
+    let result = tlv8.XMLHttpRequest(actionName, param, post, isay,
         rscallBack);
-    if (ays == false) {
+    if (ays === false) {
         if (callBack)
             callBack(result.data);
         return result.data;
@@ -401,26 +401,26 @@ tlv8.Queryaction = function (actionName, post, callBack, data, where, ays) {
  * @returns {JSON}
  */
 tlv8.Deleteaction = function (actionName, post, callBack, rowid, data, ays) {
-    if (!rowid || rowid == "") {
-        alert("rowid不能为空！");
+    if (!rowid || rowid === "") {
+        layui.layer.alert("rowid不能为空！");
         return;
     }
-    var table = data ? data.table : "";
-    var dbkay = data ? data.dbkay : "";
-    var Cascade = data ? data.Cascade : "";
-    var param = new tlv8.RequestParam();
+    let table = data ? data.table : "";
+    let dbkay = data ? data.dbkay : "";
+    let Cascade = data ? data.Cascade : "";
+    let param = new tlv8.RequestParam();
     param.set("dbkay", dbkay);
     param.set("table", table);
     param.set("rowid", rowid);
     param.set("Cascade", Cascade);
-    var isay = (ays == false) ? ays : true;
-    var rscallBack = function (r) {
+    let isay = (ays === false) ? ays : true;
+    let rscallBack = function (r) {
         if (callBack)
             callBack(r.data);
     };
-    var result = tlv8.XMLHttpRequest(actionName, param, post, isay,
+    let result = tlv8.XMLHttpRequest(actionName, param, post, isay,
         rscallBack);
-    if (ays == false) {
+    if (ays === false) {
         if (callBack)
             callBack(result.data);
         return result.data;
@@ -441,27 +441,27 @@ tlv8.Deleteaction = function (actionName, post, callBack, rowid, data, ays) {
  */
 tlv8.saveAction = function (actionName, post, callBack, data, allreturn,
                             ays) {
-    if (!data || data == "") {
+    if (!data || data === "") {
         return;
     }
-    var table = data.table;
-    var cells = data.cells;
-    var dbkay = data ? data.dbkay : "";
-    var param = new tlv8.RequestParam();
+    let table = data.table;
+    let cells = data.cells;
+    let dbkay = data ? data.dbkay : "";
+    let param = new tlv8.RequestParam();
     param.set("dbkay", dbkay);
     param.set("table", table);
     param.set("cells", cells);
-    var ays_true = (ays == false) ? ays : true;
-    var rscallBack = function (r) {
+    let ays_true = (ays === false) ? ays : true;
+    let rscallBack = function (r) {
         if (callBack && allreturn)
             callBack(r);
         else if (callBack) {
             callBack(r.data);
         }
     };
-    var result = tlv8.XMLHttpRequest(actionName, param, post, ays_true,
+    let result = tlv8.XMLHttpRequest(actionName, param, post, ays_true,
         rscallBack);
-    if (ays_true == false && result) {
+    if (ays_true === false && result) {
         if (callBack && allreturn)
             callBack(result);
         else if (callBack) {
@@ -475,96 +475,26 @@ tlv8.saveAction = function (actionName, post, callBack, data, allreturn,
  */
 tlv8.strToXML = function (str) {
     str = str.toString().replaceAll("&", "&amp;");
-    var x = "<?xml version=\"1.0\" encoding='UTF-8' ?>\n<root>\n" + str
+    let x = "<?xml version=\"1.0\" encoding='UTF-8' ?>\n<root>\n" + str
         + "</root>";
     if (window.ActiveXObject) {
-        var xmlDom = new ActiveXObject("Microsoft.XMLDOM");
+        let xmlDom = new ActiveXObject("Microsoft.XMLDOM");
         xmlDom.async = "false";
         xmlDom.loadXML(x);
         return xmlDom;
     } else if (document.implementation
         && document.implementation.createDocument) {
-        var parser = new DOMParser();
-        var xmlDom = parser.parseFromString(x, "text/xml");
-        return xmlDom;
+        let parser = new DOMParser();
+        return parser.parseFromString(x, "text/xml");
     }
 };
 
 /*
  * 信息提示
  */
-function sAlert(str, time) {
-    if (topparent != window && topparent.sAlert) {
-        topparent.sAlert(str, time);
-        return;
-    }
-    var sAlertDiv = document.getElementById("msgDiv");
-    if (sAlertDiv && sAlertDiv.tagName == "DIV") {
-        document.body.removeChild(sAlertDiv);
-    }
-    var msgw, msgh, bordercolor;
-    msgw = 100;
-    msgh = 20;
-    titleheight = 20;
-    bordercolor = "#ffffff";
-    titlecolor = "#FFFF66";
-    var sWidth, sHeight;
-    sWidth = document.body.clientWidth;
-    sHeight = document.body.clientHeight;
-    if (window.innerHeight && window.scrollMaxY) {
-        sHeight = window.innerHeight + window.scrollMaxY;
-    } else if (document.body.scrollHeight > document.body.offsetHeight) {
-        sHeight = document.body.scrollHeight;
-    } else {
-        sHeight = document.body.offsetHeight;
-    }
-    var msgObj = document.createElement("div");
-    msgObj.setAttribute("id", "msgDiv");
-    msgObj.setAttribute("align", "center");
-    msgObj.style.background = titlecolor;
-    msgObj.style.border = "1px solid " + bordercolor;
-    msgObj.style.position = "absolute";
-    msgObj.style.left = "88%";
-    msgObj.style.top = "1%";
-    msgObj.style.font = "12px/1.6em Verdana, Geneva, Arial, Helvetica, sans-serif";
-    msgObj.style.width = msgw + "px";
-    msgObj.style.height = msgh + "px";
-    msgObj.style.textAlign = "center";
-    msgObj.style.lineHeight = "2px";
-    msgObj.style.zIndex = "101";
-    var title = document.createElement("h4");
-    title.setAttribute("id", "msgTitle");
-    title.setAttribute("align", "center");
-    title.style.margin = "0";
-    title.style.padding = "3px";
-    title.style.background = titlecolor;
-    title.style.filter = "progid:DXImageTransform.Microsoft.Alpha(startX=20, startY=20, finishX=100, finishY=100,style=1,opacity=75,finishOpacity=100);";
-    title.style.opacity = "0.75";
-    title.style.height = "20px";
-    title.style.font = "12px Verdana, Geneva, Arial, Helvetica, sans-serif";
-    title.style.color = "#000000";
-    title.innerHTML = str;
-    title.onclick = function () {
-        document.getElementById("msgDiv").removeChild(title);
-        document.body.removeChild(msgObj);
-    };
-    document.body.appendChild(msgObj);
-    document.getElementById("msgDiv").appendChild(title);
-    var txt = document.createElement("p");
-    txt.style.margin = "1em 0";
-    txt.setAttribute("id", "msgTxt");
-    txt.innerHTML = str;
-    time = time ? time : 500;
-    setTimeout('displayActionMessage()', time);
+function sAlert(str, stime) {
+    layui.layer.msg(str, {time: stime});
 }
-
-var displayActionMessage = function () {
-    if (document.getElementById("msgTitle"))
-        document.getElementById("msgDiv").removeChild(
-            document.getElementById("msgTitle"));
-    if (document.getElementById("msgDiv"))
-        document.body.removeChild(document.getElementById("msgDiv"));
-};
 
 /**
  * @class tlv8.Data
@@ -590,35 +520,32 @@ tlv8.Data = function () {
     /**
      * @name setReadonly
      * @description 设置表单只读状态
-     * @param {boolean}
-     *            sta
+     * @param state
      */
-    this.setReadonly = function (sta) {
+    this.setReadonly = function (state) {
         try {
-            this.readonly = sta;
-            if (this.relation && this.relation != "") {
-                var relations = this.relation.split(",");
-                for (var i = 0; i < relations.length; i++) {
-                    var revalueEl = document.getElementById(relations[i]);
+            this.readonly = state;
+            if (this.relation && this.relation !== "") {
+                let relations = this.relation.split(",");
+                for (let i = 0; i < relations.length; i++) {
+                    let name = relations[i];
+                    let revalueEl = document.getElementById(this.formid)[name] || document.getElementById(name);
                     if (revalueEl) {
-                        if (this.readonly == true) {
+                        if (this.readonly === true) {
                             revalueEl.readOnly = true;
-                            if (revalueEl.parentNode.Check
-                                || revalueEl.parentNode.Radio) {
+                            if (revalueEl.parentNode.Check || revalueEl.parentNode.Radio) {
                                 revalueEl.parentNode.disabled = true;
                             }
-                            if (revalueEl.tagName == "DIV"
-                                || revalueEl.tagName == "SELECT") {
+                            if (revalueEl.tagName === "DIV" || revalueEl.tagName === "SELECT") {
                                 revalueEl.disabled = true;
                             }
                         } else {
                             revalueEl.readOnly = false;
-                            if (revalueEl.parentNode.Check
-                                || revalueEl.parentNode.Radio) {
+                            if (revalueEl.parentNode.Check || revalueEl.parentNode.Radio) {
                                 revalueEl.parentNode.disabled = false;
                             }
-                            if (revalueEl.tagName == "DIV"
-                                || revalueEl.tagName == "SELECT") {
+                            if (revalueEl.tagName === "DIV"
+                                || revalueEl.tagName === "SELECT") {
                                 revalueEl.disabled = false;
                             }
                         }
@@ -630,13 +557,11 @@ tlv8.Data = function () {
                     }
                 }
             } else if (this.formid) {
-                $("#" + this.formid).find("input").attr("readonly", "readonly");
-                $("#" + this.formid).find("textarea").attr("readonly",
-                    "readonly");
-                $("#" + this.formid).find("select")
-                    .attr("disabled", "disabled");
-                $("#" + this.formid).find("input[type='radio']").attr(
-                    "disabled", "disabled");
+                let form = $("#" + this.formid);
+                form.find("input").attr("readonly", "readonly");
+                form.find("textarea").attr("readonly", "readonly");
+                form.find("select").attr("disabled", "disabled");
+                form.find("input[type='radio']").attr("disabled", "disabled");
             }
         } catch (e) {
         }
@@ -644,8 +569,7 @@ tlv8.Data = function () {
     /**
      * @name setOrderby
      * @description 设置数据排序
-     * @param {string}
-     *            ob
+     * @param ob
      * @example data.setOrderby("FCODE asc,fNAME desc");
      */
     this.setOrderby = function (ob) {
@@ -657,8 +581,7 @@ tlv8.Data = function () {
     /**
      * @name setFilter
      * @description 设置过滤条件
-     * @param {string}
-     *            fil
+     * @param fil
      * @example data.setFilter("FCODE = '123'");
      */
     this.setFilter = function (fil) {
@@ -670,8 +593,7 @@ tlv8.Data = function () {
     /**
      * @name setCascade
      * @description 设置级联删除{表名:外键,表名:外键,...}
-     * @param {string}
-     *            cas
+     * @param cas
      * @example data.setCascade("OA_ALREADYBUY:fBillID");
      * @example data.setCascade("OA_ALREADYBUY:fBillID,OA_ALREADYBUY1:fBillID1");
      */
@@ -684,8 +606,7 @@ tlv8.Data = function () {
     /**
      * @name setRowId
      * @description 设置主键，记录表单当前正在编辑的数据主键。
-     * @param {string}
-     *            rowid
+     * @param id
      */
     this.setRowId = function (id) {
         try {
@@ -705,8 +626,7 @@ tlv8.Data = function () {
     /**
      * @name setDbkey
      * @description 设置关联数据库
-     * @param {string}
-     *            dbkey
+     * @param k
      * @example data.setDbkey("oa");
      */
     this.setDbkey = function (k) {
@@ -728,8 +648,7 @@ tlv8.Data = function () {
     /**
      * @name setFormId
      * @description 设置数据对应的FORM表单ID
-     * @param {string}
-     *            s
+     * @param  s
      * @example data.setFormId("main_form");
      */
     this.setFormId = function (s) {
@@ -742,13 +661,12 @@ tlv8.Data = function () {
         } catch (e) {
         }
     };
-    var onDataValueChanged;
-    var isEdited = false;
+    let onDataValueChanged;
+    let isEdited = false;
     /**
      * @name setonDataValueChanged
      * @description 设置表单值改变事件回调函数
-     * @param {function}
-     *            fn
+     * @param fn
      * @example data.setonDataValueChanged(function(event){});
      */
     this.setonDataValueChanged = function (fn) {
@@ -759,38 +677,37 @@ tlv8.Data = function () {
     /**
      * @name registerChangeEvent
      * @description 注册表单值改变事件,一般不需要主动调用
-     * @param {string}
-     *            formid
+     * @param formid
      * @example data.registerChangeEvent();
      */
     this.registerChangeEvent = function (formid) {
-        var dataform = formid || this.formid;
-        var mainform = document.getElementById(dataform);
-        var $JromTag = function (tagname) {
+        let dataform = formid || this.formid;
+        let mainform = document.getElementById(dataform);
+        let $JromTag = function (tagname) {
             return mainform.getElementsByTagName(tagname);
         };
-        var inputs = $JromTag("INPUT");
-        for (var i = 0; i < inputs.length; i++) {
-            if (inputs[i].type == "text" || inputs[i].type == "textarea"
-                || inputs[i].type == "password"
-                || inputs[i].type == "date" || inputs[i].type == "datetime"
-                || inputs[i].type == "hidden") {
-                var $rid = inputs[i].id;
-                if ($rid && $rid != ""
-                    && $rid.toUpperCase().substr(4, 12) != "_FIXFFCURSOR"
+        let inputs = $JromTag("INPUT");
+        for (let i = 0; i < inputs.length; i++) {
+            if (inputs[i].type === "text" || inputs[i].type === "textarea"
+                || inputs[i].type === "password"
+                || inputs[i].type === "date" || inputs[i].type === "datetime"
+                || inputs[i].type === "hidden") {
+                let $rid = inputs[i].id;
+                if ($rid && $rid !== ""
+                    && $rid.toUpperCase().substring(4, 12) !== "_FIXFFCURSOR"
                     && $rid.indexOf("_quick_text") < 0
                     && $rid.indexOf("_page") < 0
                     && $rid.indexOf("_editgridipt") < 0) {
                     addEvent(inputs[i], "change", function (evt) {
                         isEdited = true;
-                        var event = evt || window.event;
-                        var objEdit = event.srcElement ? event.srcElement
+                        let event = evt || window.event;
+                        let objEdit = event.srcElement ? event.srcElement
                             : event.target;
-                        var _dchg = onDataValueChanged;
+                        let _dchg = onDataValueChanged;
                         if (_dchg && typeof (_dchg) == "function") {
                             _dchg(evt, objEdit.id, objEdit
                                 .getAttribute("value"), objEdit.type);
-                        } else if (_dchg && _dchg != "") {
+                        } else if (_dchg && _dchg !== "") {
                             _dchg = eval(_dchg);
                             _dchg(evt, objEdit.id, objEdit
                                 .getAttribute("value"), objEdit.type);
@@ -799,23 +716,21 @@ tlv8.Data = function () {
                 }
             }
         }
-        var textareas = $JromTag("TEXTAREA");
-        for (var i = 0; i < textareas.length; i++) {
-            var $rid = textareas[i].id;
-            var $rval = textareas[i].getAttribute("value")
-                || textareas[i].innerHTML;
-            if ($rid && $rid != ""
-                && $rid.toUpperCase().substr(4, 12) != "_FIXFFCURSOR") {
+        let textareas = $JromTag("TEXTAREA");
+        for (let i = 0; i < textareas.length; i++) {
+            let $rid = textareas[i].id;
+            if ($rid && $rid !== ""
+                && $rid.toUpperCase().substring(4, 12) !== "_FIXFFCURSOR") {
                 addEvent(textareas[i], "change", function (evt) {
                     isEdited = true;
-                    var event = evt || window.event;
-                    var objEdit = event.srcElement ? event.srcElement
+                    let event = evt || window.event;
+                    let objEdit = event.srcElement ? event.srcElement
                         : event.target;
-                    var _dchg = onDataValueChanged;
+                    let _dchg = onDataValueChanged;
                     if (_dchg && typeof (_dchg) == "function") {
                         _dchg(evt, objEdit.id, objEdit.getAttribute("value"),
                             objEdit.type);
-                    } else if (_dchg && _dchg != "") {
+                    } else if (_dchg && _dchg !== "") {
                         _dchg = eval(_dchg);
                         _dchg(evt, objEdit.id, objEdit.getAttribute("value"),
                             objEdit.type);
@@ -823,22 +738,21 @@ tlv8.Data = function () {
                 }, true);
             }
         }
-        var selects = $JromTag("SELECT");
-        for (var i = 0; i < selects.length; i++) {
-            var $rid = selects[i].id;
-            var $rval = selects[i].getAttribute("value");
-            if ($rid && $rid != ""
-                && $rid.toUpperCase().substr(4, 12) != "_FIXFFCURSOR") {
+        let selects = $JromTag("SELECT");
+        for (let i = 0; i < selects.length; i++) {
+            let $rid = selects[i].id;
+            if ($rid && $rid !== ""
+                && $rid.toUpperCase().substring(4, 12) !== "_FIXFFCURSOR") {
                 addEvent(selects[i], "change", function (evt) {
                     isEdited = true;
-                    var event = evt || window.event;
-                    var objEdit = event.srcElement ? event.srcElement
+                    let event = evt || window.event;
+                    let objEdit = event.srcElement ? event.srcElement
                         : event.target;
-                    var _dchg = onDataValueChanged;
+                    let _dchg = onDataValueChanged;
                     if (_dchg && typeof (_dchg) == "function") {
                         _dchg(evt, objEdit.id, objEdit.getAttribute("value"),
                             objEdit.type);
-                    } else if (_dchg && _dchg != "") {
+                    } else if (_dchg && _dchg !== "") {
                         _dchg = eval(_dchg);
                         _dchg(evt, objEdit.id, objEdit.getAttribute("value"),
                             objEdit.type);
@@ -846,22 +760,21 @@ tlv8.Data = function () {
                 }, true);
             }
         }
-        var labels = $JromTag("LABEL");
-        for (var i = 0; i < labels.length; i++) {
-            var $rid = labels[i].id;
-            var $rval = labels[i].innerHTML;
-            if ($rid && $rid != ""
-                && $rid.toUpperCase().substr(4, 12) != "_FIXFFCURSOR") {
+        let labels = $JromTag("LABEL");
+        for (let i = 0; i < labels.length; i++) {
+            let $rid = labels[i].id;
+            if ($rid && $rid !== ""
+                && $rid.toUpperCase().substring(4, 12) !== "_FIXFFCURSOR") {
                 addEvent(labels[i], "change", function (evt) {
                     isEdited = true;
-                    var event = evt || window.event;
-                    var objEdit = event.srcElement ? event.srcElement
+                    let event = evt || window.event;
+                    let objEdit = event.srcElement ? event.srcElement
                         : event.target;
-                    var _dchg = onDataValueChanged;
+                    let _dchg = onDataValueChanged;
                     if (_dchg && typeof (_dchg) == "function") {
                         _dchg(evt, objEdit.id, objEdit.getAttribute("value"),
                             objEdit.type);
-                    } else if (_dchg && _dchg != "") {
+                    } else if (_dchg && _dchg !== "") {
                         _dchg = eval(_dchg);
                         _dchg(evt, objEdit.id, objEdit.getAttribute("value"),
                             objEdit.type);
@@ -873,8 +786,7 @@ tlv8.Data = function () {
     /**
      * @name setTable
      * @description 设置表单关联数据库表名
-     * @param {string}
-     *            tablename
+     * @param t
      * @example data.setTable("SA_OPPERSON");
      */
     this.setTable = function (t) {
@@ -890,83 +802,60 @@ tlv8.Data = function () {
     /**
      * @name setCells
      * @description 设置列的值
-     * @param {Map}
-     *            cells
-     * @example var cell=new Map(); cell.put("a","a"); cell.put("b","b");
+     * @param cells
+     * @example let cell=new Map(); cell.put("a","a"); cell.put("b","b");
      *          data.setCells(cell);
      */
-    this.setCells = function (cell) {
-        if (cell && typeof (cell) == "object") {
-            var keys = cell.keySet();
-            for (i in keys) {
-                var key = keys[i];
-                var value = cell.get(key);
-                try {
-                    value = value.replaceAll("<", "#lt;");
-                    value = value.replaceAll(">", "#gt;");
-                    value = value.replaceAll("&nbsp;", "#160;");
-                    value = value.replaceAll("'", "#apos;");
-                    value = value.replaceAll("&", "#amp;");
-                } catch (e) {
-                }
-                this.cells += "<" + key + "><![CDATA[" + value + "]]></" + key
-                    + ">";
-            }
-        } else if (typeof (cell) == "function") {
-            alert("传入的类型不能为：function");
-        } else if (!cell) {
-            this.cells = "";
-        } else {
-            this.cells += cell;
-        }
+    this.setCells = function (cells) {
+
     };
     /**
      * @name saveData
      * @description 保存数据
      * @returns {string}
-     * @example var rowid = data.saveData();
+     * @example let rowid = data.saveData();
      */
     this.saveData = function (formfield) {
-        if (!this.formid || this.formid == "") {
-            alert("未指定保存内容！");
+        if (!this.formid || this.formid === "") {
+            layui.layer.alert("未指定保存内容！");
             return false;
         }
-        var bfSave = document.getElementById(this.formid).getAttribute(
+        let bfSave = document.getElementById(this.formid).getAttribute(
             "beforeSave");
-        if (bfSave && bfSave != "") {
+        if (bfSave && bfSave !== "") {
             if (typeof bfSave == "function") {
-                var bfck = bfSave(this);
-                if (bfck == false)
+                let bfck = bfSave(this);
+                if (bfck === false)
                     return false;
             } else {
-                var bfS = window.eval(bfSave);
+                let bfS = window.eval(bfSave);
                 if (typeof bfS == "function") {
-                    var bfck = bfS(this);
-                    if (bfck == false)
+                    let bfck = bfS(this);
+                    if (bfck === false)
                         return false;
                 }
             }
         }
-        var mainform = document.getElementById(this.formid);
+        let mainform = document.getElementById(this.formid);
         mainform.data = this;
-        var cell = new Map();
-        var fdata = formfield || $(mainform).serializeJSON();
-        for (var cnm in fdata) {
+        let cell = new Map();
+        let fdata = formfield || $(mainform).serializeJSON();
+        for (let cnm in fdata) {
             cell.put(cnm, fdata[cnm]);
         }
-        var $JromTag = function (tagname) {
+        let $JromTag = function (tagname) {
             return mainform.getElementsByTagName(tagname);
         };
-        var labels = $JromTag("LABEL");
-        for (var i = 0; i < labels.length; i++) {
-            var $rid = labels[i].id;
-            var $rval = labels[i].innerHTML;
-            if ($rid && $rid != ""
-                && $rid.toUpperCase().substr(4, 12) != "_FIXFFCURSOR") {
+        let labels = $JromTag("LABEL");
+        for (let i = 0; i < labels.length; i++) {
+            let $rid = labels[i].id;
+            let $rval = labels[i].innerHTML;
+            if ($rid && $rid !== ""
+                && $rid.toUpperCase().substring(4, 12) !== "_FIXFFCURSOR") {
                 labels[i].title = $rval;
                 labels[i].setAttribute("value", $rval);
                 if ($(labels[i]).attr("format")
-                    && $(labels[i]).attr("format") != "") {
+                    && $(labels[i]).attr("format") !== "") {
                     try {
                         $rval = $rval.replaceAll(",", "");
                     } catch (e) {
@@ -976,7 +865,7 @@ tlv8.Data = function () {
                 cell.put($rid, $rval);
             }
         }
-        var rowid = $(mainform).attr("rowid") || mainform.getAttribute("rowid")
+        let rowid = $(mainform).attr("rowid") || mainform.getAttribute("rowid")
             || mainform.rowid;
         if (rowid) {
             cell.put("rowid", rowid);
@@ -986,19 +875,19 @@ tlv8.Data = function () {
         this.setCells("<root>");
         this.setCells(cell);
         this.setCells("</root>");
-        if (!this.savAction || this.savAction == "") {
+        if (!this.savAction || this.savAction === "") {
             this.setSaveAction("saveAction");
         } else {
             this.setSaveAction(this.savAction);
         }
-        var self = this;
-        var r = tlv8.saveAction(this.savAction, "post", null, this, true,
+        let self = this;
+        let r = tlv8.saveAction(this.savAction, "post", null, this, true,
             false);
         writeLog(window.event, "保存数据", "操作的表:" + this.dbkay + "." + this.table);
         if (r) {
             isEdited = false;
-            var msessage = "操作成功!";
-            if (r.data.flag != "true") {
+            let msessage = "操作成功!";
+            if (r.data.flag !== "true") {
                 msessage = r.data.message;
                 // 截取java异常
                 if (msessage.indexOf("Exception:") > 0) {
@@ -1011,7 +900,7 @@ tlv8.Data = function () {
                 this.version++;// 保存成功记录新的版本号
             }
             sAlert(msessage, 500);
-            var rRowID = r.data.rowid;
+            let rRowID = r.data.rowid;
             self.setRowId(rRowID);
             try {
                 mainform.setAttribute("rowid", rRowID);
@@ -1019,22 +908,22 @@ tlv8.Data = function () {
                 mainform.rowid = rRowID;
             }
             if (!self.childrenData.isEmpty()) {
-                var keyset = self.childrenData.keySet();
+                let keyset = self.childrenData.keySet();
                 for (i in keyset) {
                     key = keyset[i];
-                    var childData = self.childrenData.get(key);
-                    var isCsave = childData.saveData(event, self.refreshData);
-                    if (!isCsave || isCsave == false) {
+                    let childData = self.childrenData.get(key);
+                    let isCsave = childData.saveData(event, self.refreshData);
+                    if (!isCsave || isCsave === false) {
                         break;
                     }
                 }
             }
-            var afSave = mainform.getAttribute("afterSave");
-            if (afSave && afSave != "") {
+            let afSave = mainform.getAttribute("afterSave");
+            if (afSave && afSave !== "") {
                 if (typeof afSave == "function") {
                     afSave(this, r.data);
                 } else {
-                    var afS = window.eval(afSave);
+                    let afS = window.eval(afSave);
                     if (typeof afS == "function") {
                         afS(this, r.data);
                     }
@@ -1053,31 +942,30 @@ tlv8.Data = function () {
     /**
      * @name deleteData
      * @description 删除数据
-     * @param {boolean}
-     *            isconfirm -是否提示确认[默认是]
+     * @param isconfirm -是否提示确认[默认是]
      * @example data.deleteData();
      */
     this.deleteData = function (isconfirm) {
-        var bfDelete = document.getElementById(this.formid).getAttribute(
+        let bfDelete = document.getElementById(this.formid).getAttribute(
             "beforeDelete");
-        if (bfDelete && bfDelete != "") {
+        if (bfDelete && bfDelete !== "") {
             if (typeof bfDelete == "function") {
                 bfDelete(this);
             } else {
-                var bfd = window.eval(bfDelete);
+                let bfd = window.eval(bfDelete);
                 if (typeof bfd == "function") {
                     bfd(this);
                 }
             }
         }
-        if (!this.deleteAction || this.deleteAction == "") {
+        if (!this.deleteAction || this.deleteAction === "") {
             this.setDeleteAction("deleteAction");
         } else {
             this.setDeleteAction(this.deleteAction);
         }
         document.getElementById(this.formid).data = this;
-        var self = this;
-        if (isconfirm == false) {
+        let self = this;
+        if (isconfirm === false) {
             tlv8.Deleteaction(this.deleteAction, "post", function () {
                 self.afdelete(self);
             }, this.rowid, this);
@@ -1098,13 +986,13 @@ tlv8.Data = function () {
             document.getElementById(self.formid).reset();
         } catch (e) {
         }
-        var afDelete = document.getElementById(self.formid).getAttribute(
+        let afDelete = document.getElementById(self.formid).getAttribute(
             "afterDelete");
-        if (afDelete && afDelete != "") {
+        if (afDelete && afDelete !== "") {
             if (typeof afDelete == "function") {
                 afDelete(document.getElementById(self.formid).data);
             } else {
-                var afd = window.eval(afDelete);
+                let afd = window.eval(afDelete);
                 if (typeof afd == "function") {
                     afd(document.getElementById(self.formid).data);
                 }
@@ -1113,67 +1001,65 @@ tlv8.Data = function () {
     };
     /**
      * @name refreshData
-     * @param {boolean}
-     *            isconfirm -是否提示确认
-     * @param {boolean}
-     *            isrefreshSub -是否刷新关联的子表数据
+     * @param isconfirm {boolean} -是否提示确认
+     * @param isrefreshSub {boolean} -是否刷新关联的子表数据
      * @description 刷新数据
      * @description 只是重加载表单的数据，不刷新页面
      * @example data.refreshData();
      */
     this.refreshData = function (isconfirm, isrefreshSub) {
-        if (isEdited == true) {
-            if (isconfirm != false)
+        if (isEdited === true) {
+            if (isconfirm !== false)
                 if (!confirm("当前数据已更改，刷新数据更改后的数据将丢失，是否确定刷新?")) {
                     return false;
                 }
         }
-        var bfrefresh = document.getElementById(this.formid).getAttribute(
+        let bfrefresh = document.getElementById(this.formid).getAttribute(
             "beforeRefresh");
-        if (bfrefresh && bfrefresh != "") {
+        if (bfrefresh && bfrefresh !== "") {
             if (typeof bfrefresh == "function") {
                 bfrefresh(this);
             } else {
-                var bfr = window.eval(bfrefresh);
+                let bfr = window.eval(bfrefresh);
                 if (typeof bfr == "function") {
                     bfr(this);
                 }
             }
         }
         this.relation = "";
-        var mainform = document.getElementById(this.formid);
+        let mainform = document.getElementById(this.formid);
         mainform.reset();
-        var $JromTag = function (tagname) {
+        let $JromTag = function (tagname) {
             return mainform.getElementsByTagName(tagname);
         };
         mainform.isrefreshSub = isrefreshSub;
         mainform.data = this;
-        var rowid = $(mainform).attr("rowid") || mainform.getAttribute("rowid")
+        let rowid = $(mainform).attr("rowid") || mainform.getAttribute("rowid")
             || mainform.rowid;
-        if (rowid && rowid != "") {
+        if (rowid && rowid !== "") {
             this.setRowId(trim(rowid));
         }
-        if (!this.filter || this.filter == "") {
-            if (this.dbkay && this.dbkay != "system") {
+        if (!this.filter || this.filter === "") {
+            if (this.dbkay && this.dbkay !== "system") {
                 this.setFilter("fID='" + this.rowid + "'");
             } else {
                 this.setFilter("sID='" + this.rowid + "'");
             }
         }
-        if (this.dbkay && this.dbkay != "system") {
+        if (this.dbkay && this.dbkay !== "system") {
             this.relation += ",FID";
         } else {
             this.relation += ",SID";
         }
-        var inputs = $JromTag("INPUT");
-        for (var i = 0; i < inputs.length; i++) {
-            if (inputs[i].type == "text" || inputs[i].type == "textarea"
-                || inputs[i].type == "password" || inputs[i].type == "number"
-                || inputs[i].type == "date" || inputs[i].type == "datetime"
-                || inputs[i].type == "hidden") {
-                var $rid = inputs[i].id;
-                if ($rid && $rid != ""
-                    && $rid.toUpperCase().substr(4, 12) != "_FIXFFCURSOR"
+        let inputs = $JromTag("INPUT");
+        for (let i = 0; i < inputs.length; i++) {
+            if (inputs[i].type === "text" || inputs[i].type === "textarea"
+                || inputs[i].type === "password" || inputs[i].type === "number"
+                || inputs[i].type === "date" || inputs[i].type === "datetime"
+                || inputs[i].type === "hidden") {
+                let $rid = inputs[i].id;
+                if ($rid && $rid !== ""
+                    && $rid.toUpperCase().substr(4, 12) !== "_FIXFFCURSOR"
                     && $rid.indexOf("_editgridipt") < 0
                     && $rid.indexOf("_quick_text") < 0
                     && $rid.indexOf("_page") < 0) {
@@ -1181,234 +1067,77 @@ tlv8.Data = function () {
                 }
             }
         }
-        var textareas = $JromTag("TEXTAREA");
-        for (var i = 0; i < textareas.length; i++) {
-            var $rid = textareas[i].id;
-            if ($rid && $rid != ""
-                && $rid.toUpperCase().substr(4, 12) != "_FIXFFCURSOR") {
+        let textareas = $JromTag("TEXTAREA");
+        for (let i = 0; i < textareas.length; i++) {
+            let $rid = textareas[i].id;
+            if ($rid && $rid !== ""
+                && $rid.toUpperCase().substr(4, 12) !== "_FIXFFCURSOR") {
                 this.relation += "," + $rid;
             }
         }
-        var selects = $JromTag("SELECT");
-        for (var i = 0; i < selects.length; i++) {
-            var $rid = selects[i].id;
-            if ($rid && $rid != ""
-                && $rid.toUpperCase().substr(4, 12) != "_FIXFFCURSOR") {
+        let selects = $JromTag("SELECT");
+        for (let i = 0; i < selects.length; i++) {
+            let $rid = selects[i].id;
+            if ($rid && $rid !== ""
+                && $rid.toUpperCase().substr(4, 12) !== "_FIXFFCURSOR") {
                 this.relation += "," + $rid;
             }
         }
-        var labels = $JromTag("LABEL");
-        for (var i = 0; i < labels.length; i++) {
-            var $rid = labels[i].id;
-            if ($rid && $rid != ""
-                && $rid.toUpperCase().substr(4, 12) != "_FIXFFCURSOR") {
+        let labels = $JromTag("LABEL");
+        for (let i = 0; i < labels.length; i++) {
+            let $rid = labels[i].id;
+            if ($rid && $rid !== ""
+                && $rid.toUpperCase().substr(4, 12) !== "_FIXFFCURSOR") {
                 this.relation += "," + $rid;
             }
         }
         this.relation += ",VERSION";
         this.relation = this.relation.replace(",", "");
-        var self = this;
+        let self = this;
         tlv8.Queryaction("queryAction", "post", function (rd) {
             self.setData(rd, self.formid);
         }, this, this.filter, true);
         return true;
     };
     this.setData = function (data, nowformid) {
-        var taptt = tlv8.RequestURLParam.getParam("activity-pattern");
-        var isTasksub = (taptt == "detail");
+        let taptt = tlv8.RequestURLParam.getParam("activity-pattern");
+        let isTasksub = (taptt === "detail");
         if (isTasksub) {
             this.setReadonly(true);
         }
-        var message = "操作成功!";
-        if (data.flag == "false") {
+        let message = "操作成功!";
+        if (data.flag === "false") {
             msessage = r.data.message;
             if (msessage.indexOf("Exception:") > 0) {
                 msessage = msessage
                     .substring(msessage.indexOf("Exception:") + 10);
             }
-            alert(msessage);
+            layui.layer.alert(msessage);
         } else {
-            try {
-                var xmlElem = tlv8.strToXML(data.data);
-                var relations = data.relation.split(",");
-                var type = getOs();
-                for (var i = 0; i < relations.length; i++) {
-                    var revalueEl = document.getElementById(nowformid)[relations[i]]
-                        || document.getElementById(relations[i]);
-                    if (data.data && data.data != "") {
-                        var sValue = (type == "MSIE") ? xmlElem
-                                .getElementsByTagName(relations[i])[0].text
-                            : xmlElem.getElementsByTagName(relations[i])
-                                .item(0).textContent;
-                        if (relations[i] == "SID" || relations[i] == "FID") {
-                            document.getElementById(nowformid).rowid = sValue;
-                            document.getElementById(nowformid).setAttribute("rowid", sValue);
-                            $("#" + nowformid).attr("rowid", sValue);
-                            document.getElementById(nowformid).data.setRowId(sValue);
-                        }
-                        if (relations[i] == "VERSION") {
-                            document.getElementById(nowformid).data
-                                .setVersion(parseInt(sValue) || 0);
-                        }
-                    } else {
-                        document.getElementById(nowformid).rowid = "";
-                        document.getElementById(nowformid).data.setRowId("");
-                    }
-                    if (revalueEl && data.data && data.data != "") {
-                        var $dval = "";
-                        try {
-                            $dval = (type == "MSIE") ? xmlElem
-                                    .getElementsByTagName(relations[i])[0].text
-                                : xmlElem
-                                    .getElementsByTagName(relations[i])
-                                    .item(0).textContent
-                                || "";
-                            $dval = $dval.replaceAll("&amp;", "&");
-                        } catch (e) {
-                        }
-                        var elformat = "";
-                        try {
-                            elformat = revalueEl.getAttribute("format");
-                        } catch (e) {
-                        }
-                        if (elformat && elformat != "") {
-                            var Sdate = tlv8.System.Date.strToDate($dval);
-                            if (Sdate && elformat == "yyyy-MM-dd") {
-                                $dval = Sdate.format("yyyy-MM-dd");
-                            } else if (Sdate
-                                && elformat == "yyyy-MM-dd hh:mm:ss") {
-                                $dval = Sdate.format("yyyy-MM-dd hh:mm:ss");
-                            } else if (Sdate
-                                && elformat.indexOf("yyyy-MM-dd") > -1) {
-                                $dval = Sdate.format(elformat);
-                            } else if ($dval) {
-                                revalueEl.olvalue = $dval;
-                                $dval = tlv8.numberFormat($dval, elformat);
-                                if (!revalueEl.getAttribute("readonly")) {
-                                    revalueEl.onfocus = function () {
-                                        this
-                                            .setAttribute("value",
-                                                this.olvalue);
-                                    };
-                                    revalueEl.onblur = function () {
-                                        this.olvalue = this
-                                            .getAttribute("value");
-                                        this.setAttribute("value", tlv8
-                                            .numberFormat(this
-                                                    .getAttribute("value"),
-                                                this.format));
-                                    };
-                                }
-                            }
-                        } else {
-                            $dval = $dval.replaceAll("#160;", "&nbsp;");
-                            $dval = $dval.replaceAll("#lt;", "<");
-                            $dval = $dval.replaceAll("#gt;", ">");
-                            $dval = $dval.replaceAll("#apos;", "'");
-                            $dval = $dval.replaceAll("#amp;", "&");
-                        }
-                        if ("LABEL" == revalueEl.tagName) {
-                            try {
-                                revalueEl.innerHTML = $dval;
-                                revalueEl.title = $dval;
-                                revalueEl.setAttribute("value", $dval);
-                            } catch (e) {
-                            }
-                        } else if ("TEXTAREA" == revalueEl.tagName) {
-                            try {
-                                revalueEl.value = $dval;
-                                revalueEl.title = $dval;
-                                revalueEl.setAttribute("value", $dval);
-                                $(revalueEl).val($dval);
-                            } catch (e) {
-                            }
-                        } else {
-                            try {
-                                if (revalueEl.tagName == "DIV") {
-                                    revalueEl = revalueEl
-                                        .getElementsByTagName("input")[0] ? revalueEl
-                                            .getElementsByTagName("input")[0]
-                                        : revalueEl
-                                            .getElementsByTagName("select")[0];
-                                    revalueEl.setAttribute("value", $dval);
-                                    revalueEl.title = $dval;
-                                    revalueEl.value = $dval;
-                                } else {
-                                    revalueEl.setAttribute("value", $dval);
-                                    revalueEl.title = $dval;
-                                    revalueEl.value = $dval;
-                                }
-                                $(revalueEl).val($dval);
-                            } catch (e) {
-                            }
-                            try {
-                                // 单选框赋值
-                                document.getElementById(revalueEl.id
-                                    + "_compent").Radio.initData(revalueEl);
-                            } catch (e) {
-                            }
-                            try {
-                                // 单选框赋值
-                                var cellname = revalueEl.id || $(revalueEl).attr("name");
-                                $('input[name="' + cellname + '"][value="' + $dval + '"]').attr('checked', 'checked');
-                                layui.form.render('radio');
-                            } catch (e) {
-                            }
-                            try {
-                                // 多选框赋值
-                                document.getElementById(revalueEl.id
-                                    + "_compent").Check.initData(revalueEl);
-                            } catch (e) {
-                            }
-                            try {
-                                // easyUI下拉选择
-                                $("#" + relations[i]).combo("setValue", $dval);
-                            } catch (e) {
-                            }
-                            try {
-                                // easyUI下拉选择
-                                $("#" + relations[i]).combobox("setValue", $dval);
-                            } catch (e) {
-                            }
-                            try {
-                                // easyUI下拉选择
-                                $("#" + relations[i]).combotree("setValue", $dval);
-                            } catch (e) {
-                            }
-                            try {
-                                // easyUI下拉选择
-                                $("#" + relations[i]).combogrid("setValue", $dval);
-                            } catch (e) {
-                            }
-                        }
-                    }
-                }
-            } catch (e) {
-                alert(e.name + ":" + e.message);
-            }
+            //给表单赋值
         }
         isEdited = false;
-        var childrenData = document.getElementById(nowformid).data.childrenData;
-        var isrefreshSub = document.getElementById(nowformid).isrefreshSub;
-        if (!childrenData.isEmpty() && isrefreshSub != false) {
-            var keyset = childrenData.keySet();
-            for (i in keyset) {
+        let childrenData = document.getElementById(nowformid).data.childrenData;
+        let isrefreshSub = document.getElementById(nowformid).isrefreshSub;
+        if (!childrenData.isEmpty() && isrefreshSub !== false) {
+            let keyset = childrenData.keySet();
+            for (let i in keyset) {
                 try {
-                    key = keyset[i];
-                    var childData = childrenData.get(key);
+                    let key = keyset[i];
+                    let childData = childrenData.get(key);
                     childData.refreshData(null, false);
                 } catch (e) {
                 }
             }
         }
         tlv8.requerat();// 提示设置
-        var afrefresh = document.getElementById(nowformid).getAttribute(
+        let afrefresh = document.getElementById(nowformid).getAttribute(
             "afterRefresh");
-        if (afrefresh && afrefresh != "") {
+        if (afrefresh && afrefresh !== "") {
             if (typeof afrefresh == "function") {
                 afrefresh(document.getElementById(nowformid).data);
             } else {
-                var afr = window.eval(afrefresh);
+                let afr = window.eval(afrefresh);
                 if (typeof afr == "function") {
                     afr(document.getElementById(nowformid).data);
                 }
@@ -1418,45 +1147,43 @@ tlv8.Data = function () {
     };
     /**
      * @name getValueByName
-     * @param {string}
-     *            cellname -字段名（表单中INPUT、TEXTAREA等字段id）
+     * @param name {string}  -字段名（表单中INPUT、TEXTAREA等字段id）
      * @description 获取指定字段的值
      * @returns {string}
-     * @example var nmv = data.getValueByName("FNAME");
+     * @example let nmv = data.getValueByName("FNAME");
      */
     this.getValueByName = function (name) {
         try {
-            var revalueEl = document.getElementById(this.formid)[name]
-                || document.getElementById(name);
-            var elformat = revalueEl.getAttribute("format");
+            let revalueEl = document.getElementById(this.formid)[name] || document.getElementById(name);
+            let elformat = revalueEl.getAttribute("format");
             if (revalueEl) {
-                if (revalueEl.tagName == "INPUT"
-                    || revalueEl.tagName == "SELECT") {
-                    var $dval = $(revalueEl).val()
+                if (revalueEl.tagName === "INPUT"
+                    || revalueEl.tagName === "SELECT") {
+                    let $dval = $(revalueEl).val()
                         || revalueEl.getAttribute("value");
-                    if (!$dval || $dval == null || $dval == "null") {
+                    if (!$dval || $dval === "null") {
                         $dval = "";
                     }
                     try {
-                        if (elformat && elformat == "0,000.00") {
+                        if (elformat && elformat === "0,000.00") {
                             $dval = $dval.toString().replaceAll(",", "");
                         }
                     } catch (e) {
                     }
                     return $dval;
-                } else if (revalueEl.tagName == "LABEL") {
-                    var $dval = revalueEl.innerHTML;
+                } else if (revalueEl.tagName === "LABEL") {
+                    let $dval = revalueEl.innerHTML;
                     try {
-                        if (elformat && elformat == "0,000.00") {
+                        if (elformat && elformat === "0,000.00") {
                             $dval = $dval.toString().replaceAll(",", "");
                         }
                     } catch (e) {
                     }
                     return $dval;
                 } else {
-                    var $dval = $(revalueEl).val()
+                    let $dval = $(revalueEl).val()
                         || revalueEl.getAttribute("value");
-                    if (!$dval || $dval == null || $dval == "null") {
+                    if (!$dval || $dval === "null") {
                         $dval = "";
                     }
                     return $dval;
@@ -1471,21 +1198,19 @@ tlv8.Data = function () {
     };
     /**
      * @name setValueByName
-     * @param {string}
-     *            cellname -字段名（表单中INPUT、TEXTAREA等字段id）
-     * @param {string}
-     *            value -需要给的值
+     * @param name {string} -字段名（表单中INPUT、TEXTAREA等字段id）
+     * @param value {string} -需要给的值
      * @description 给指定字段赋值
      * @example data.setValueByName("FNAME","test");
      */
     this.setValueByName = function (name, value) {
         try {
-            var revalueEl = document.getElementById(this.formid)[name]
+            let revalueEl = document.getElementById(this.formid)[name]
                 || document.getElementById(name);
             if (revalueEl) {
                 revalueEl.title = value;
                 revalueEl.value = value;
-                if (revalueEl.tagName == "LABEL") {
+                if (revalueEl.tagName === "LABEL") {
                     revalueEl.innerHTML = value;
                     revalueEl.setAttribute("value", value);
                 } else {
@@ -1533,45 +1258,18 @@ tlv8.Data = function () {
 };
 
 /**
- * 获取浏览器类型
- */
-function getOs() {
-    var OsObject = "";
-    if (navigator.userAgent.indexOf("MSIE") > 0) {
-        return "MSIE";
-    }
-    if (isFirefox = navigator.userAgent.indexOf("Firefox") > 0) {
-        return "Firefox";
-    }
-    if (isSafari = navigator.userAgent.indexOf("Safari") > 0) {
-        return "Safari";
-    }
-    if (isCamino = navigator.userAgent.indexOf("Camino") > 0) {
-        return "Camino";
-    }
-    if (isMozilla = navigator.userAgent.indexOf("Gecko/") > 0) {
-        return "Gecko";
-    }
-}
-
-/**
  * @class tlv8.toolbar
  * @description 工具栏组件
- * @param {HTMLDivElement}
- *            div
- * @param {string}
- *            insertitem -("readonly":只读,true：可操作,false：不可见)
- * @param {string}
- *            saveitem -("readonly":只读,true：可操作,false：不可见)
- * @param {string}
- *            deleteitem -("readonly":只读,true：可操作,false：不可见)
- * @param {string}
- *            refreshitem -("readonly":只读,true：可操作,false：不可见)
+ * @param div {HTMLDivElement}
+ * @param insertitem {string} -("readonly":只读,true：可操作,false：不可见)
+ * @param saveitem {string} -("readonly":只读,true：可操作,false：不可见)
+ * @param deleteitem {string} -("readonly":只读,true：可操作,false：不可见)
+ * @param refreshitem {string} -("readonly":只读,true：可操作,false：不可见)
  * @returns {object}
  */
 tlv8.toolbar = function (div, insertitem, saveitem, deleteitem, refreshitem) {
     if (!div) return;
-    var items = {
+    let items = {
         insertAction: function () {
             if (div.getAttribute("insertAction")) {
                 eval(div.getAttribute("insertAction"));
@@ -1595,74 +1293,70 @@ tlv8.toolbar = function (div, insertitem, saveitem, deleteitem, refreshitem) {
         /**
          * @name setItemStatus
          * @description 工具栏组件设置按钮状态
-         * @param {string}
-         *            insertitem -("readonly":只读,true：可操作,false：不可见)
-         * @param {string}
-         *            saveitem -("readonly":只读,true：可操作,false：不可见)
-         * @param {string}
-         *            deleteitem -("readonly":只读,true：可操作,false：不可见)
-         * @param {string}
-         *            refreshitem -("readonly":只读,true：可操作,false：不可见)
+         * @param insertitem {string} -("readonly":只读,true：可操作,false：不可见)
+         * @param saveitem {string} -("readonly":只读,true：可操作,false：不可见)
+         * @param deleteitem {string} -("readonly":只读,true：可操作,false：不可见)
+         * @param  refreshitem {string} -("readonly":只读,true：可操作,false：不可见)
          */
         setItemStatus: function (insertitem, saveitem, deleteitem, refreshitem) {
-            var taptt = tlv8.RequestURLParam.getParam("activity-pattern");
-            var isTasksub = (taptt == "detail");
-            var insert_item = document.getElementById(div.id + "insert-item");
-            var insert_item_img = document.getElementById(div.id
+            let taptt = tlv8.RequestURLParam.getParam("activity-pattern");
+            let isTasksub = (taptt === "detail");
+            let insert_item = document.getElementById(div.id + "insert-item");
+            let insert_item_img = document.getElementById(div.id
                 + "insert-item-img");
-            var save_item = document.getElementById(div.id + "save-item");
-            var save_item_img = document.getElementById(div.id
+            let save_item = document.getElementById(div.id + "save-item");
+            let save_item_img = document.getElementById(div.id
                 + "save-item-img");
-            var delete_item = document.getElementById(div.id + "delete-item");
-            var delete_item_img = document.getElementById(div.id
+            let delete_item = document.getElementById(div.id + "delete-item");
+            let delete_item_img = document.getElementById(div.id
                 + "delete-item-img");
-            var refresh_item = document.getElementById(div.id + "refresh-item");
-            var refresh_item_img = document.getElementById(div.id
+            let refresh_item = document.getElementById(div.id + "refresh-item");
+            let refresh_item_img = document.getElementById(div.id
                 + "refresh-item-img");
-            var ienable = $dpimgpath + "toolbar/insert.gif";
-            var iread = $dpimgpath + "toolbar/un_insert.gif";
-            var senable = $dpimgpath + "toolbar/save.gif";
-            var sread = $dpimgpath + "toolbar/un_save.gif";
-            var denable = $dpimgpath + "toolbar/remove.gif";
-            var dread = $dpimgpath + "toolbar/un_remove.gif";
-            var renable = $dpimgpath + "toolbar/refreshbill.png";
-            var rread = $dpimgpath + "toolbar/un_refreshbill.png";
-            if (insertitem == false) {
+            let ienable = $dpimgpath + "toolbar/insert.gif";
+            let iread = $dpimgpath + "toolbar/un_insert.gif";
+            let senable = $dpimgpath + "toolbar/save.gif";
+            let sread = $dpimgpath + "toolbar/un_save.gif";
+            let denable = $dpimgpath + "toolbar/remove.gif";
+            let dread = $dpimgpath + "toolbar/un_remove.gif";
+            let renable = $dpimgpath + "toolbar/refreshbill.png";
+            let rread = $dpimgpath + "toolbar/un_refreshbill.png";
+            if (insertitem === false) {
                 document.getElementById(div.id + "insert-item-tr").style.display = "none";
-            } else if (insertitem == "readonly" || isTasksub) {
+            } else if (insertitem === "readonly" || isTasksub) {
                 insert_item_img.src = iread;
                 insert_item.onclick = null;
-            } else if (insertitem == true) {
+            } else if (insertitem === true) {
                 document.getElementById(div.id + "insert-item-tr").style.display = "";
                 insert_item_img.src = ienable;
                 insert_item.onclick = items.insertAction;
             }
-            if (saveitem == false) {
+            if (saveitem === false) {
                 document.getElementById(div.id + "save-item-tr").style.display = "none";
-            } else if (saveitem == "readonly" || isTasksub) {
+            } else if (saveitem === "readonly" || isTasksub) {
                 save_item_img.src = sread;
                 save_item.onclick = null;
-            } else if (saveitem == true) {
+            } else if (saveitem === true) {
                 document.getElementById(div.id + "save-item-tr").style.display = "";
                 save_item_img.src = senable;
                 save_item.onclick = items.saveAction;
             }
-            if (deleteitem == false) {
+            if (deleteitem === false) {
                 document.getElementById(div.id + "delete-item-tr").style.display = "none";
-            } else if (deleteitem == "readonly" || isTasksub) {
+            } else if (deleteitem === "readonly" || isTasksub) {
                 delete_item_img.src = dread;
                 delete_item.onclick = null;
-            } else if (deleteitem == true) {
+            } else if (deleteitem === true) {
                 document.getElementById(div.id + "delete-item-tr").style.display = "";
                 delete_item_img.src = denable;
                 delete_item.onclick = items.deleteAction;
             }
-            if (refreshitem == false) {
+            if (refreshitem === false) {
                 document.getElementById(div.id + "refresh-item-tr").style.display = "none";
-            } else if (refreshitem == "readonly" || isTasksub) {
+            } else if (refreshitem === "readonly" || isTasksub) {
                 refresh_item_img.src = rread;
                 refresh_item.onclick = null;
-            } else if (refreshitem == true) {
+            } else if (refreshitem === true) {
                 document.getElementById(div.id + "refresh-item-tr").style.display = "";
                 refresh_item_img.src = renable;
                 refresh_item.onclick = items.refreshAction;
@@ -1673,7 +1367,7 @@ tlv8.toolbar = function (div, insertitem, saveitem, deleteitem, refreshitem) {
     if (!checkPathisHave($dpcsspath + "toolbar.css"))
         createStyleSheet($dpcsspath + "toolbar.css");
     div.style.overflow = "hidden";
-    var Stander = "<table style='align:left;' class='standard_toolbar' border='0' id='toolbar'><tr>"
+    div.innerHTML = "<table class='standard_toolbar' border='0' id='toolbar'><tr>"
         + "<td width='75px' align='left' id='"
         + div.id
         + "insert-item-tr'><button class='btn btn-default btn-sm' style='float:left;margin-right:5px;' id='"
@@ -1710,7 +1404,6 @@ tlv8.toolbar = function (div, insertitem, saveitem, deleteitem, refreshitem) {
         + "refresh-item-img' src='"
         + $dpimgpath
         + "toolbar/refreshbill.png' style='height:20px;margin-top:-2px;'/></span></button></td></tr></table>";
-    div.innerHTML = Stander;
     div.items = items;
     this.items.setItemStatus(insertitem, saveitem, deleteitem, refreshitem);
     return this;
@@ -1725,13 +1418,13 @@ tlv8.toolbar = function (div, insertitem, saveitem, deleteitem, refreshitem) {
  * @param ispdf
  */
 tlv8.exportbar = function (div, expid, canprint, isword, isexcel, ispdf) {
-    var $commonpath = $dpjspath.replace("/js/", "/");
+    let $commonpath = $dpjspath.replace("/js/", "/");
     if (!checkPathisHave($dpcsspath + "toolbar.css"))
         createStyleSheet($dpcsspath + "toolbar.css");
     if (!checkPathisHave($commonpath + "print/print.js"))
         createJSSheet($commonpath + "print/print.js");
     div.style.overflow = "hidden";
-    var Stander = "<table style='align:left;' class='standard_toolbar' border='0' id='"
+    let Stander = "<table style='align:left;' class='standard_toolbar' border='0' id='"
         + div.id + "exportbar'><tr>";
     if (canprint) {
         Stander += "<td width='70px' align='left' id='"
@@ -1780,11 +1473,11 @@ tlv8.exportbar = function (div, expid, canprint, isword, isexcel, ispdf) {
     Stander += "</tr></table>";
     div.innerHTML = Stander;
     div.getHead = function () {
-        var head = "";
+        let head = "";
         $(document)
             .find("link")
             .filter(function () {
-                return $(this).attr("rel").toLowerCase() == "stylesheet";
+                return $(this).attr("rel").toLowerCase() === "stylesheet";
             })
             .each(
                 function () {
@@ -1794,13 +1487,13 @@ tlv8.exportbar = function (div, expid, canprint, isword, isexcel, ispdf) {
         return head;
     }
     $("#" + div.id + "print-item").click(function () {
-        var tableToPrint = $("#" + expid).clone();
+        let tableToPrint = $("#" + expid).clone();
         // tableToPrint.css("width", "100%");
-        var phtml = $("<div></div>").append(tableToPrint).html();
-        var pwdoc = "<html><head>" + div.getHead() + "</head><body>" + phtml + "</body></html>";
+        let phtml = $("<div></div>").append(tableToPrint).html();
+        let pwdoc = "<html lang='zh'><head>" + div.getHead() + "</head><body>" + phtml + "</body></html>";
         // console.log(pwdoc);
-        var windowAttr = "location=yes,statusbar=no,directories=no,menubar=no,titlebar=no,toolbar=no,dependent=no";
-        var newWin = window.open("", "_blank", windowAttr);
+        let windowAttr = "location=yes,statusbar=no,directories=no,menubar=no,titlebar=no,toolbar=no,dependent=no";
+        let newWin = window.open("", "_blank", windowAttr);
         newWin.document.write(pwdoc);
         newWin.document.close();
         newWin.focus();
@@ -1811,39 +1504,39 @@ tlv8.exportbar = function (div, expid, canprint, isword, isexcel, ispdf) {
     });
     $("#" + div.id + "word-item").click(
         function () {
-            var tableToPrint = $("#" + expid).clone();
+            let tableToPrint = $("#" + expid).clone();
             // tableToPrint.css("width", "100%");
             // console.log(div.getHead());
-            var htmcontext = div.getHead() + $("<div></div>").append(tableToPrint).html();
+            let htmcontext = div.getHead() + $("<div></div>").append(tableToPrint).html();
             // console.log(htmcontext);
-            var form = $("<form></form>")
+            let form = $("<form></form>")
                 .attr("action", "exportWordAction").attr("method",
                     "post");
-            form.append($("<input></input>").attr("type", "hidden").attr(
+            form.append($("<input>").attr("type", "hidden").attr(
                 "name", "htmcontext").attr("value",
                 J_u_encode(htmcontext)));
             form.appendTo('body').submit().remove();
         });
     $("#" + div.id + "excel-item").click(
         function () {
-            var tableToPrint = $("#" + expid).clone();
+            let tableToPrint = $("#" + expid).clone();
             // tableToPrint.css("width", "100%");
-            var htmcontext = $("<div></div>").append(tableToPrint).html();
-            var form = $("<form></form>").attr("action",
+            let htmcontext = $("<div></div>").append(tableToPrint).html();
+            let form = $("<form></form>").attr("action",
                 "exportExcelAction").attr("method", "post");
-            form.append($("<input></input>").attr("type", "hidden").attr(
+            form.append($("<input>").attr("type", "hidden").attr(
                 "name", "htmcontext").attr("value",
                 J_u_encode(htmcontext)));
             form.appendTo('body').submit().remove();
         });
     $("#" + div.id + "pdf-item").click(
         function () {
-            var tableToPrint = $("#" + expid).clone();
+            let tableToPrint = $("#" + expid).clone();
             // tableToPrint.css("width", "100%");
-            var htmcontext = $("<div></div>").append(tableToPrint).html();
-            var form = $("<form></form>").attr("action", "exportPdfAction")
+            let htmcontext = $("<div></div>").append(tableToPrint).html();
+            let form = $("<form></form>").attr("action", "exportPdfAction")
                 .attr("method", "post");
-            form.append($("<input></input>").attr("type", "hidden").attr(
+            form.append($("<input>").attr("type", "hidden").attr(
                 "name", "htmcontext").attr("value",
                 J_u_encode(htmcontext)));
             form.appendTo('body').submit().remove();
@@ -1854,13 +1547,14 @@ tlv8.exportbar = function (div, expid, canprint, isword, isexcel, ispdf) {
  * @class Map
  * @description jsMap对象
  */
-var Map = function () {
-    var struct = function (key, value) {
+let Map = function () {
+    this.arr = [];
+    let struct = function (key, value) {
         this.key = key;
         this.value = value;
     };
-    var put = function (key, value) {
-        for (var i = 0; i < this.arr.length; i++) {
+    this.put = function (key, value) {
+        for (let i = 0; i < this.arr.length; i++) {
             if (this.arr[i].key === key) {
                 this.arr[i].value = value;
                 return;
@@ -1868,17 +1562,17 @@ var Map = function () {
         }
         this.arr[this.arr.length] = new struct(key, value);
     };
-    var get = function (key) {
-        for (var i = 0; i < this.arr.length; i++) {
+    this.get = function (key) {
+        for (let i = 0; i < this.arr.length; i++) {
             if (this.arr[i].key === key) {
                 return this.arr[i].value;
             }
         }
         return null;
     };
-    var remove = function (key) {
-        var v;
-        for (var i = 0; i < this.arr.length; i++) {
+    this.remove = function (key) {
+        let v;
+        for (let i = 0; i < this.arr.length; i++) {
             v = this.arr.pop();
             if (v.key === key) {
                 continue;
@@ -1886,57 +1580,48 @@ var Map = function () {
             this.arr.unshift(v);
         }
     };
-    var size = function () {
+    this.size = function () {
         return this.arr.length;
     };
-    var isEmpty = function () {
+    this.isEmpty = function () {
         return this.arr.length <= 0;
     };
-    var containsKey = function (key) {
-        var result = false;
-        for (var i = 0; i < this.arr.length; i++) {
+    this.containsKey = function (key) {
+        let result = false;
+        for (let i = 0; i < this.arr.length; i++) {
             if (this.arr[i].key === key) {
                 result = true;
             }
         }
         return result;
     };
-    var containsValue = function (value) {
-        var result = false;
-        for (var i = 0; i < this.arr.length; i++) {
+    this.containsValue = function (value) {
+        let result = false;
+        for (let i = 0; i < this.arr.length; i++) {
             if (this.arr[i].value === value) {
                 result = true;
             }
         }
         return result;
     };
-    var keySet = function () {
-        var result = new Array();
-        for (var i = 0; i < this.arr.length; i++) {
+    this.keySet = function () {
+        let result = [];
+        for (let i = 0; i < this.arr.length; i++) {
             result.push(this.arr[i].key);
         }
         return result;
     };
-    this.arr = new Array();
-    this.struct = struct;
-    this.get = get;
-    this.put = put;
-    this.remove = remove;
-    this.size = size;
-    this.isEmpty = isEmpty;
-    this.containsKey = containsKey;
-    this.containsValue = containsValue;
-    this.keySet = keySet;
     return this;
 };
+
 /**
  * @name toString
  * @description Map对象转换为字符串
  * @returns {string}
  */
 Map.prototype.toString = function () {
-    var rs = "{";
-    for (var i = 0; i < this.arr.length; i++) {
+    let rs = "{";
+    for (let i = 0; i < this.arr.length; i++) {
         if (i > 0)
             rs += ",";
         rs += "\"" + this.arr[i].key + "\":\"" + this.arr[i].value + "\"";
@@ -1953,12 +1638,11 @@ tlv8.portal = {};
 /**
  * @name tlv8.portal.closeWindow
  * @description 关闭portle页面
- * @param {string}
- *            tabId -可以为空，为空时关闭当前窗口
+ * @param tabId {string} -可以为空，为空时关闭当前窗口
  */
 tlv8.portal.closeWindow = function (tabId) {
     try {
-        var currentTabId = tabId ? tabId : topparent.$.jpolite.getTabID();
+        let currentTabId = tabId ? tabId : topparent.$.jpolite.getTabID();
         topparent.$.jpolite.removeTab(currentTabId);
     } catch (e) {
         window.opener = null;
@@ -1983,32 +1667,29 @@ tlv8.portal.currentTabId = function () {
 /**
  * @name tlv8.portal.openWindow
  * @description 打开指定的portlet
- * @param {string}
- *            name -标签名称
- * @param {string}
- *            url -页面地址
- * @param {string}
- *            param -传递的参数
+ * @param name {string} -标签名称
+ * @param url {string} -页面地址
+ * @param param -传递的参数
  */
 tlv8.portal.openWindow = function (name, url, param) {
     try {
         if (url.indexOf("?") > 0) {
-            var reUrl = url.substring(0, url.indexOf("?"));
-            var rePar = url.substring(url.indexOf("?") + 1);
-            var parPe = rePar.split("&");
-            for (var i = 0; i < parPe.length; i++) {
-                var perP = parPe[i];
+            let reUrl = url.substring(0, url.indexOf("?"));
+            let rePar = url.substring(url.indexOf("?") + 1);
+            let parPe = rePar.split("&");
+            for (let i = 0; i < parPe.length; i++) {
+                let perP = parPe[i];
                 parPe[i] = perP.split("=")[0] + "="
                     + J_u_encode(J_u_decode(perP.split("=")[1]));
             }
             url = reUrl + "?" + parPe.join("&");
         }
-        var option = {name: name, title: name, url: url, param: param};
+        let option = {name: name, title: name, url: url, param: param};
         topparent.$.X.runFunc(option, param);
         // topparent.justep.Portal.Tab.open(name, url, param);
     } catch (e) {
-        if ((url.substring(0, 4)).toLowerCase() != "http") {
-            var serverPath = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split("/")[1];
+        if ((url.substring(0, 4)).toLowerCase() !== "http") {
+            let serverPath = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split("/")[1];
             url = serverPath + url;
         }
         window.open(url, name);
@@ -2019,20 +1700,17 @@ tlv8.portal.openWindow = function (name, url, param) {
 /**
  * @name tlv8.portal.callBack
  * @description 回调指定页面的函数
- * @param {string}
- *            tabID -页面ID
- * @param {string}
- *            FnName -回调函数名
- * @param {string}
- *            param -传递的参数
+ * @param tabID {string} -页面ID
+ * @param FnName {string} -回调函数名
+ * @param param -传递的参数
  */
 tlv8.portal.callBack = function (tabID, FnName, param) {
     try {
-        var t = topparent.$.jpolite.getTab(tabID);
-        if (t && t != null && t != undefined) {
-            var containers = t.tabLayoutDiv.get(0);
-            var pTabIframe = containers.getElementsByTagName("iframe")[0].contentWindow;
-            var callFn = pTabIframe[FnName];
+        let t = topparent.$.jpolite.getTab(tabID);
+        if (t) {
+            let containers = t.tabLayoutDiv.get(0);
+            let pTabIframe = containers.getElementsByTagName("iframe")[0].contentWindow;
+            let callFn = pTabIframe[FnName];
             callFn(param);
         } else {
             topparent.tlv8.portal.callBack(tabID, FnName, param);
@@ -2048,15 +1726,15 @@ tlv8.portal.dailog = {
     transeUrl: function (url) {
         // 路径转换[utf-8编码]
         if (url.indexOf("http://") < 0 && url.indexOf("https://") < 0
-            && url.indexOf(cpath) != 0) {
+            && url.indexOf(cpath) !== 0) {
             url = cpath + url;
         }
         if (url.indexOf("?") > 0) {
-            var reUrl = url.substring(0, url.indexOf("?"));
-            var rePar = url.substring(url.indexOf("?") + 1);
-            var parPe = rePar.split("&");
-            for (var i = 0; i < parPe.length; i++) {
-                var perP = parPe[i];
+            let reUrl = url.substring(0, url.indexOf("?"));
+            let rePar = url.substring(url.indexOf("?") + 1);
+            let parPe = rePar.split("&");
+            for (let i = 0; i < parPe.length; i++) {
+                let perP = parPe[i];
                 parPe[i] = perP.split("=")[0] + "="
                     + J_u_encode(J_u_decode(perP.split("=")[1]));
             }
@@ -2067,22 +1745,14 @@ tlv8.portal.dailog = {
     /**
      * @name tlv8.portal.dailog.openDailog
      * @description 打开对话框
-     * @param {string}
-     *            name
-     * @param {string}
-     *            url
-     * @param {number}
-     *            width
-     * @param {number}
-     *            height
-     * @param {function}
-     *            callback
-     * @param {object}
-     *            itemSetInit -{refreshItem:true,enginItem:true,CanclItem:true}
-     * @param {boolean}
-     *            titleItem -为false时掩藏标题栏
-     * @param {object}
-     *            urlParam -JS任意类型可以直接传递到对话框页面 对话框页面通过函数getUrlParam获取
+     * @param name {string}
+     * @param url {string}
+     * @param width {number}
+     * @param height {number}
+     * @param callback {function}
+     * @param itemSetInit {object}  -{refreshItem:true,enginItem:true,CanclItem:true}
+     * @param titleItem {boolean} -为false时掩藏标题栏
+     * @param urlParam {object} -JS任意类型可以直接传递到对话框页面 对话框页面通过函数getUrlParam获取
      */
     openDailog: function (name, url, width, height, callback, itemSetInit,
                           titleItem, urlParam) {
@@ -2092,20 +1762,20 @@ tlv8.portal.dailog = {
             layui.layer.close(this.dindex);// 防止打开多个
             this.dindex = null;
         }
-        var ww = $(window).width() - 20;
-        var hh = $(window).height() - 20;
+        let ww = $(window).width() - 20;
+        let hh = $(window).height() - 20;
         this.dindex = layui.layer.open({
             type: 1,
             maxmin: true,
             area: [Math.min(width, ww) + 'px', Math.min(height, hh) + 'px'],
             title: [name, 'font-size:18px;'],
-            content: '<div id="dailogmsgDiv" style="width:99%;height:99%;overflow:hidden;border-top:1px solid #eee;border-bottom:1px solid #eee;"><iframe id="windowdialogIframe" frameborder="0" style="border:none;width:100%;height:100%;"></iframe></div>',
-            btn: itemSetInit == false ? [] : ['确定', '取消'],
+            content: '<div id="dailogmsgDiv" style="width:99%;height:99%;overflow:hidden;border-top:1px solid #eee;border-bottom:1px solid #eee;"><iframe id="windowdialogIframe" style="border:none;width:100%;height:100%;"></iframe></div>',
+            btn: itemSetInit === false ? [] : ['确定', '取消'],
             yes: function (index, layero) {
-                var dlw = J$("windowdialogIframe").contentWindow;
+                let dlw = J$("windowdialogIframe").contentWindow;
                 if (dlw.dailogEngin) {
-                    var re = dlw.dailogEngin();
-                    if ((typeof re == "boolean") && re == false) {
+                    let re = dlw.dailogEngin();
+                    if ((typeof re == "boolean") && re === false) {
                         return false;
                     } else {
                         if (callback) {
@@ -2126,11 +1796,11 @@ tlv8.portal.dailog = {
         });
         $("#windowdialogIframe").attr("src", url);
         try {
-            var func_iframe = document.getElementById("windowdialogIframe");
+            let func_iframe = document.getElementById("windowdialogIframe");
             if (func_iframe.attachEvent) {
                 func_iframe.attachEvent("onload", function () {
                     try {
-                        var dialogWin = func_iframe.contentWindow;
+                        let dialogWin = func_iframe.contentWindow;
                         if (dialogWin.getUrlParam) {
                             dialogWin.getUrlParam(urlParam);
                         }
@@ -2140,7 +1810,7 @@ tlv8.portal.dailog = {
             } else {
                 func_iframe.onload = function () {
                     try {
-                        var dialogWin = func_iframe.contentWindow;
+                        let dialogWin = func_iframe.contentWindow;
                         if (dialogWin.getUrlParam) {
                             dialogWin.getUrlParam(urlParam);
                         }
@@ -2157,13 +1827,13 @@ tlv8.portal.dailog = {
     /**
      * @name tlv8.portal.dailog.dailogEngin
      * @description 自定义对话框确定
-     * @param {object}
-     *            data
+     * @param data {object}
+     * @param b_g
      */
     dailogEngin: function (data, b_g) {
         this.returnData = data ? data : this.returnData;
         try {
-            var callbackFn;
+            let callbackFn;
             if (b_g) {
                 callbackFn = tlv8.portal.dailog.callback;
             } else {
@@ -2175,7 +1845,7 @@ tlv8.portal.dailog = {
         } catch (e) {
         }
         try {
-            var index = window.parent.layui.layer.getFrameIndex(window.name); // 先得到当前iframe层的索引
+            let index = window.parent.layui.layer.getFrameIndex(window.name); // 先得到当前iframe层的索引
             window.parent.layui.layer.close(index); // 再执行关闭
             window.parent.layui.layer.closeAll();
         } catch (e) {
@@ -2190,13 +1860,13 @@ tlv8.portal.dailog = {
      */
     dailogReload: function () {
         try {
-            var dialogview = parent.document.getElementById("dailogmsgDiv");
+            let dialogview = parent.document.getElementById("dailogmsgDiv");
             if (dialogview)
                 parent.document.getElementById("windowdialogIframe").contentWindow.location
                     .reload();
         } catch (e) {
         }
-        var dialogview = document.getElementById("dailogmsgDiv");
+        let dialogview = document.getElementById("dailogmsgDiv");
         if (dialogview)
             document.getElementById("windowdialogIframe").contentWindow.location
                 .reload();
@@ -2207,7 +1877,7 @@ tlv8.portal.dailog = {
      */
     dailogCancel: function () {
         try {
-            var index = window.parent.layui.layer.getFrameIndex(window.name); // 先得到当前iframe层的索引
+            let index = window.parent.layui.layer.getFrameIndex(window.name); // 先得到当前iframe层的索引
             window.parent.layui.layer.close(index); // 再执行关闭
             window.parent.layui.layer.closeAll();
         } catch (e) {
@@ -2218,11 +1888,11 @@ tlv8.portal.dailog = {
 };
 
 function setTab(n) {
-    var tli = document.getElementById("menu").getElementsByTagName("li");
-    var mli = document.getElementById("tab_view").getElementsByTagName("ul");
-    for (var i = 0; i < tli.length; i++) {
-        tli[i].className = i == n ? "hover" : "";
-        mli[i].style.display = i == n ? "block" : "none";
+    let tli = document.getElementById("menu").getElementsByTagName("li");
+    let mli = document.getElementById("tab_view").getElementsByTagName("ul");
+    for (let i = 0; i < tli.length; i++) {
+        tli[i].className = i === n ? "hover" : "";
+        mli[i].style.display = i === n ? "block" : "none";
     }
 }
 
@@ -2543,7 +2213,7 @@ tlv8.Context = {
         return this.userInfo.orgfname;
     },
     init: function () {
-        if (topparent != window) {
+        if (topparent !== window) {
             try {
                 if (topparent.$.jpolite.clientInfo && topparent.$.jpolite.clientInfo.personid) {
                     this.userInfo = topparent.$.jpolite.clientInfo;
@@ -2552,7 +2222,7 @@ tlv8.Context = {
             } catch (e) {
             }
         }
-        var result = tlv8
+        let result = tlv8
             .XMLHttpRequest("/system/User/initPortalInfo");
         if (!result)
             return;
@@ -2562,8 +2232,8 @@ tlv8.Context = {
         this.userInfo = window["eval"]("(" + result[0].data + ")");
     },
     checklogin: function () {
-        if (!this.userInfo.personid || this.userInfo.personid == ""
-            || this.userInfo.personid == "null") {
+        if (!this.userInfo.personid || this.userInfo.personid === ""
+            || this.userInfo.personid === "null") {
             this.init();
         }
     }
@@ -2575,7 +2245,7 @@ tlv8.Context = {
  * @returns {string}
  */
 function trim(text) {
-    if (text == undefined) {
+    if (text === undefined) {
         return "";
     } else {
         return text.replace(/(^\s*)|(\s*$)/g, "");
@@ -2612,24 +2282,22 @@ String.prototype.rtrim = function () {
  * @returns {string}
  */
 String.prototype.startWith = function (str) {
-    return this.indexOf(str) == 0;
+    return this.indexOf(str) === 0;
 };
-var reMoveStr = function (str1, str2) {
+let reMoveStr = function (str1, str2) {
     if (str1.indexOf(str2) > -1)
         str1 = str1.replace(str2, "");
     return str1;
 };
-var replaceFirst = function (str, p, m) {
-    if (str.indexOf(p) == 0)
+let replaceFirst = function (str, p, m) {
+    if (str.indexOf(p) === 0)
         str = str.replace(p, m);
     return str;
 };
 /**
  * @name replaceFirst
- * @param {string}
- *            p
- * @param {string}
- *            m
+ * @param p {string}
+ * @param m {string}
  * @description 替换字符串中的第一个p字符为m
  * @returns {string}
  */
@@ -2641,10 +2309,8 @@ String.prototype.replaceFirst = function (p, m) {
 };
 /**
  * @name replaceAll
- * @param {string}
- *            p
- * @param {string}
- *            m
+ * @param p {string}
+ * @param m {string}
  * @description 替换字符串中的所有p字符为m
  * @returns {string}
  */
@@ -2662,7 +2328,7 @@ function closeself() {
  * 日期格式化
  */
 Date.prototype.format = function (fmt) {
-    var o = {
+    let o = {
         "M+": this.getMonth() + 1,
         "d+": this.getDate(),
         "h+": this.getHours() % 24 == 0 ? 24 : this.getHours() % 24,
@@ -2672,7 +2338,7 @@ Date.prototype.format = function (fmt) {
         "q+": Math.floor((this.getMonth() + 3) / 3),
         "S": this.getMilliseconds()
     };
-    var week = {
+    let week = {
         "0": "\u65e5",
         "1": "\u4e00",
         "2": "\u4e8c",
@@ -2694,7 +2360,7 @@ Date.prototype.format = function (fmt) {
                     : "")
                 + week[this.getDay() + ""]);
     }
-    for (var k in o) {
+    for (let k in o) {
         if (new RegExp("(" + k + ")").test(fmt)) {
             fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k])
                 : (("00" + o[k]).substr(("" + o[k]).length)));
@@ -2702,17 +2368,17 @@ Date.prototype.format = function (fmt) {
     }
     return fmt;
 };
-var daxieshuzhu = new Array("零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖");
-var danwei = new Array("仟", "佰", "拾", "");
-var dadanwei = new Array(" ", "万", "亿", "万亿");
-var input = new Array();
-var zhuanhuan = function () {
-    this.input = new Array();
+let daxieshuzhu = ["零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖"];
+let danwei = ["仟", "佰", "拾", ""];
+let dadanwei = [" ", "万", "亿", "万亿"];
+let input = [];
+let zhuanhuan = function () {
+    this.input = [];
     this.jsq = 0;
-    this.output = new Array();
+    this.output = [];
     this.daxiezhuanhuan = function () {
         this.strtemp = "";
-        for (var jwq = 0; jwq < this.input.length; jwq++) {
+        for (let jwq = 0; jwq < this.input.length; jwq++) {
             this.strtemp += daxieshuzhu[this.input[jwq]] + danwei[jwq];
         }
         this.strtemp += " ";
@@ -2720,7 +2386,7 @@ var zhuanhuan = function () {
         this.strtemp = this.strtemp.replace(this.re, "零");
         this.re = /零$/g;
         this.strtemp = this.strtemp.replace(this.re, "");
-        if (this.strtemp != "") {
+        if (this.strtemp !== "") {
             this.output[this.jsq] = this.strtemp.replace(" ", "")
                 + dadanwei[this.jsq];
         } else {
@@ -2731,24 +2397,24 @@ var zhuanhuan = function () {
     this.taifen = function (input, pb) {
         this.pb = pb;
         this.input = input;
-        var Ainput = new Array();
-        var Atemp = new Array(0, 0, 0, 0);
-        for (var temp = this.input.length - 1, temp2 = 3, jwq = 0; temp >= 0; temp--, temp2--) {
+        let Ainput = [];
+        let Atemp = [0, 0, 0, 0];
+        for (let temp = this.input.length - 1, temp2 = 3, jwq = 0; temp >= 0; temp--, temp2--) {
             if (temp2 < 0) {
                 temp2 = 3;
             }
             Atemp[temp2] = input.substr(temp, 1);
-            if ((temp2 % 4) == 0) {
+            if ((temp2 % 4) === 0) {
                 Ainput[jwq] = Atemp;
                 jwq++;
-                Atemp = new Array(0, 0, 0, 0);
-            } else if (temp == 0) {
+                Atemp = [0, 0, 0, 0];
+            } else if (temp === 0) {
                 Ainput[jwq] = Atemp;
             }
         }
-        if (this.pb == 1) {
-            var Ainput2 = new Array();
-            for (var temp = 1; temp < Ainput[0].length; temp++) {
+        if (this.pb === 1) {
+            let Ainput2 = [];
+            for (let temp = 1; temp < Ainput[0].length; temp++) {
                 Ainput2[temp - 1] = Ainput[0][temp];
             }
             Ainput2[3] = 0;
@@ -2761,7 +2427,7 @@ var zhuanhuan = function () {
     this.zhuanhuandaxie = function (Ainput, pb) {
         this.pb = pb;
         this.Ainput = Ainput;
-        for (var temp = 0; temp < this.Ainput.length; temp++) {
+        for (let temp = 0; temp < this.Ainput.length; temp++) {
             this.input = Ainput[temp];
             this.daxiezhuanhuan();
         }
@@ -2771,10 +2437,10 @@ var zhuanhuan = function () {
         this.pb = pb;
         this.output = output;
         this.Stroutput = "";
-        for (var temp = this.output.length - 1; temp >= 0; temp--) {
+        for (let temp = this.output.length - 1; temp >= 0; temp--) {
             this.Stroutput += this.output[temp];
         }
-        if (this.pb == 1) {
+        if (this.pb === 1) {
             return this.Stroutput.replace("仟", "角").replace("佰", "分").replace(
                 "拾", "厘");
         } else {
@@ -2788,33 +2454,33 @@ var zhuanhuan = function () {
  * 数字转换为大写
  */
 tlv8.numberL2U = function (data) {
-    var input = (data) ? data.toString() : "0";
-    var xiaoshu = 0;
-    var re = /^0+/g;
-    var xiaoshu = 0;
-    var output = "", output2 = "";
-    var chafen = new Array();
+    let input = (data) ? data.toString() : "0";
+    let xiaoshu = 0;
+    let re = /^0+/g;
+    let output = "";
+    let output2 = "";
+    let chafen = [];
     chafen = input.split(".");
-    if (chafen.length == 2) {
+    if (chafen.length === 2) {
         xiaoshu = chafen[1];
     }
     input = chafen[0];
-    var myzhuanhuan = new zhuanhuan();
+    let myzhuanhuan = new zhuanhuan();
     output = myzhuanhuan.taifen(input, 0);
-    if (xiaoshu != 0) {
-        for (var temp = 3 - xiaoshu.length; temp > 0; temp--) {
+    if (xiaoshu !== 0) {
+        for (let temp = 3 - xiaoshu.length; temp > 0; temp--) {
             xiaoshu += "0";
         }
-        var myzhuanhuan = new zhuanhuan();
+        let myzhuanhuan = new zhuanhuan();
         output2 = myzhuanhuan.taifen(xiaoshu, 1);
     }
-    if (output != "" && output2 != 0) {
+    if (output !== "" && output2 !== "0") {
         return (output + "元" + output2).replace(" ", "");
     } else {
-        if (output != "" && output2 == 0) {
+        if (output !== "" && output2 === 0) {
             return (output + "元整").replace(" ", "");
         } else {
-            var re = /^零/g;
+            let re = /^零/g;
             return "";
         }
     }
@@ -2823,57 +2489,56 @@ tlv8.numberL2U = function (data) {
  * 数字格式化
  */
 tlv8.numberFormat = function (number, format) {
-    var result = "";
+    let result = "";
     try {
         if (number && !isNaN(parseInt(number)) && number.indexOf("E") > 0) {
-            var tempNumD = number.split("E")[0];
-            var tempNumEx = number.split("E")[1];
-            var newNum = tempNumD * Math.pow(10, tempNumEx);
-            number = newNum;
+            let tempNumD = number.split("E")[0];
+            let tempNumEx = number.split("E")[1];
+            number = tempNumD * Math.pow(10, tempNumEx);
         }
     } catch (e) {
     }
-    if (number && number != "") {
+    if (number && number !== "") {
         number = number.toString().replaceAll(",", "");
     }
-    var fix = (format.split(".").length > 1) ? format.split(".")[1].length : 0;
+    let fix = (format.split(".").length > 1) ? format.split(".")[1].length : 0;
     number = parseFloat(number);
-    var isfushu = false;
+    let isfushu = false;
     if (number < 0) {
         isfushu = true;
         number = -number;
     }
-    var val = number.toFixed(fix);
+    let val = number.toFixed(fix);
     if (format.split(".")[0].indexOf(",") > 0) {
-        var sfa = format.split(".")[0].split(",");
-        var scl = sfa[sfa.length - 1].length;
-        var numList = new Array();
-        var inNum = val.split(".")[0];
-        var n = 0;
-        var m = inNum.length;
-        for (var i = inNum.length; i > 0; i--) {
-            if (i - scl > 0 && n % scl == 0) {
+        let sfa = format.split(".")[0].split(",");
+        let scl = sfa[sfa.length - 1].length;
+        let numList = [];
+        let inNum = val.split(".")[0];
+        let n = 0;
+        let m = inNum.length;
+        for (let i = inNum.length; i > 0; i--) {
+            if (i - scl > 0 && n % scl === 0) {
                 numList.push(inNum.substring(i - scl, i));
                 m = m - scl;
-            } else if (i == 1) {
+            } else if (i === 1) {
                 numList.push(inNum.substring(0, m));
             }
             n++;
         }
         for (k in numList) {
-            if (result != "") {
+            if (result !== "") {
                 result = numList[k] + "," + result;
             } else
                 result = numList[k];
         }
-        var zer = "";
-        for (var i = 0; i < fix; i++) {
+        let zer = "";
+        for (let i = 0; i < fix; i++) {
             zer += "0";
         }
         if (val.split(".").length > 1)
             result = result + "." + val.split(".")[1];
         else {
-            if (zer != "")
+            if (zer !== "")
                 result = result + "." + zer;
         }
     } else {
@@ -2888,7 +2553,7 @@ tlv8.numberFormat = function (number, format) {
  * 检查电子邮箱地址
  */
 tlv8.CheckMail = function (mail) {
-    var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    let filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
     if (filter.test(mail))
         return true;
     else {
@@ -2900,7 +2565,7 @@ tlv8.CheckMail = function (mail) {
  * 检查日期格式
  */
 tlv8.checkdate = function (date) {
-    var filter = /^(\d{4})+\/|-([1-9]|0+[1-9]|1+[0-2])+\/|-([1-9]|0+[1-9]|[1-2]+[0-9]|3+[0-1])+$/;
+    let filter = /^(\d{4})+\/|-([1-9]|0+[1-9]|1+[0-2])+\/|-([1-9]|0+[1-9]|[1-2]+[0-9]|3+[0-1])+$/;
     if (filter.test(date))
         return true;
     else {
@@ -2914,15 +2579,15 @@ tlv8.checkdate = function (date) {
 tlv8.CheckNumber = {
     valNum: function (event) {
         event = event || window.event;
-        var e = event.keyCode;
-        var objEdit = event.srcElement ? event.srcElement : event.target;
-        if (e != 48 && e != 49 && e != 50 && e != 51 && e != 52 && e != 53
-            && e != 54 && e != 55 && e != 56 && e != 57 && e != 96
-            && e != 97 && e != 98 && e != 99 && e != 100 && e != 101
-            && e != 102 && e != 103 && e != 104 && e != 105 && e != 109
-            && e != 37 && e != 39 && e != 13 && e != 8 && e != 46
-            && e != 190 && e != 110 && e != 189 && e != 229) {
-            if (event.ctrlKey == false) {
+        let e = event.keyCode;
+        let objEdit = event.srcElement ? event.srcElement : event.target;
+        if (e !== 48 && e !== 49 && e !== 50 && e !== 51 && e !== 52 && e !== 53
+            && e !== 54 && e !== 55 && e !== 56 && e !== 57 && e !== 96
+            && e !== 97 && e !== 98 && e !== 99 && e !== 100 && e !== 101
+            && e !== 102 && e !== 103 && e !== 104 && e !== 105 && e !== 109
+            && e !== 37 && e !== 39 && e !== 13 && e !== 8 && e !== 46
+            && e !== 190 && e !== 110 && e !== 189 && e !== 229) {
+            if (event.ctrlKey === false) {
                 if (event.preventDefault) {
                     event.preventDefault();
                 } else {
@@ -2932,8 +2597,8 @@ tlv8.CheckNumber = {
             } else {
                 tlv8.CheckNumber.valClip(event);
             }
-        } else if (e == 109 || e == 189 || e == 190 || e == 110) {
-            if ((e == 189 || e == 109)
+        } else if (e === 109 || e === 189 || e === 190 || e === 110) {
+            if ((e === 189 || e === 109)
                 && objEdit.getAttribute("value").indexOf("-") > -1) {
                 if (event.preventDefault) {
                     event.preventDefault();
@@ -2942,7 +2607,7 @@ tlv8.CheckNumber = {
                 }
                 return false;
             }
-            if ((e == 190 || e == 110)
+            if ((e === 190 || e === 110)
                 && objEdit.getAttribute("value").indexOf(".") > -1) {
                 if (event.preventDefault) {
                     event.preventDefault();
@@ -2951,18 +2616,18 @@ tlv8.CheckNumber = {
                 }
                 return false;
             }
-        } else if (e == 229) {
+        } else if (e === 229) {
             addEvent(objEdit, 'keyup', function (event) {
                 tlv8.CheckNumber.checkValNum(objEdit);
             }, true);
         }
     },
     checkValNum: function (obj) {
-        if (obj.getAttribute("value") == "") {
-        } else if (Number(obj.getAttribute("value")) == "NaN") {
-            var str = (obj.getAttribute("value") || "").toString();
+        if (obj.getAttribute("value") === "") {
+        } else if (Number(obj.getAttribute("value")) === "NaN") {
+            let str = (obj.getAttribute("value") || "").toString();
             obj.setAttribute("value", str.substring(0, str.length - 1));
-        } else if (obj.getAttribute("value") == "NaN") {
+        } else if (obj.getAttribute("value") === "NaN") {
             obj.setAttribute("value", "");
         } else {
             obj.setAttribute("value", Number(obj.getAttribute("value")));
@@ -2970,15 +2635,15 @@ tlv8.CheckNumber = {
     },
     valClip: function (ev) {
         ev = ev || window.event;
-        var content = window.clipboardData.getData('Text');
+        let content = window.clipboardData.getData('Text');
         if (content != null) {
             try {
-                var test = parseFloat(content);
-                var str = "" + test;
-                if (isNaN(test) == true) {
+                let test = parseFloat(content);
+                let str = "" + test;
+                if (isNaN(test) === true) {
                     window.clipboardData.setData("Text", "");
                 } else {
-                    if (str != content)
+                    if (str !== content)
                         window.clipboardData.setData("Text", str);
                 }
             } catch (e) {
@@ -2989,22 +2654,21 @@ tlv8.CheckNumber = {
 };
 tlv8.String = {};
 tlv8.String.isin = function (abs, str) {
-    var substr = abs.split(',');
-    for (var i = 0; i < substr.length; i++) {
-        if (str == substr[i])
+    let substr = abs.split(',');
+    for (let i = 0; i < substr.length; i++) {
+        if (str === substr[i])
             return true;
     }
-    if (abs.indexOf(str) > -1)
-        return true;
-    return false;
+    return abs.indexOf(str) > -1;
 };
+
 /*
  * 是否包含
  */
 tlv8.String.isHave = function (abs, str) {
-    var substr = abs.split(',');
-    for (var i = 0; i < substr.length; i++) {
-        if (str == substr[i])
+    let substr = abs.split(',');
+    for (let i = 0; i < substr.length; i++) {
+        if (str === substr[i])
             return true;
     }
     return false;
@@ -3017,7 +2681,7 @@ tlv8.String.isHave = function (abs, str) {
  * @returns {String[]}
  */
 tlv8.getIdCardInfo = function (id) {
-    var arr = [null, null, null, null, null, null, null, null, null, null,
+    let arr = [null, null, null, null, null, null, null, null, null, null,
         null, "北京", "天津", "河北", "山西", "内蒙古", null, null, null, null, null,
         "辽宁", "吉林", "黑龙江", null, null, null, null, null, null, null, "上海",
         "江苏", "浙江", "安微", "福建", "江西", "山东", null, null, null, "河南", "湖北",
@@ -3026,47 +2690,48 @@ tlv8.getIdCardInfo = function (id) {
         "新疆", null, null, null, null, null, "台湾", null, null, null, null,
         null, null, null, null, null, "香港", "澳门", null, null, null, null,
         null, null, null, null, "国外"];
-    var isid = tlv8.checkId(id);
-    if (isid != "true" && isid)
+    let isid = tlv8.checkId(id);
+    if (isid !== "true" && isid)
         return "错误的身份证号码";
-    var id = String(id), prov = arr[id.slice(0, 2)], sex = id.slice(14, 17) % 2 ? "男"
+    id = String(id), prov = arr[id.slice(0, 2)], sex = id.slice(14, 17) % 2 ? "男"
         : "女";
-    var birthday = (new Date(id.slice(6, 10), id.slice(10, 12) - 1, id.slice(
+    let birthday = (new Date(id.slice(6, 10), id.slice(10, 12) - 1, id.slice(
         12, 14))).format('yyyy-MM-dd');
     return [prov, birthday, sex];
 };
+
 /*
  * 检查身份证号是否合法
  */
 tlv8.checkId = function (pId) {
-    var arrVerifyCode = [1, 0, "x", 9, 8, 7, 6, 5, 4, 3, 2];
-    var Wi = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
-    var Checker = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 1];
-    var result = "";
-    if (pId.length != 15 && pId.length != 18)
+    let arrVerifyCode = [1, 0, "x", 9, 8, 7, 6, 5, 4, 3, 2];
+    let Wi = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
+    let Checker = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 1];
+    let result = "";
+    if (pId.length !== 15 && pId.length !== 18)
         result += "身份证号共有 15 码或18位";
-    var Ai = pId.length == 18 ? pId.substring(0, 17) : pId.slice(0, 6) + "19"
+    let Ai = pId.length === 18 ? pId.substring(0, 17) : pId.slice(0, 6) + "19"
         + pId.slice(6, 16);
     if (!/^\d+$/.test(Ai))
         result += "身份证除最后一位外，必须为数字！";
-    var yyyy = Ai.slice(6, 10), mm = Ai.slice(10, 12) - 1, dd = Ai
+    let yyyy = Ai.slice(6, 10), mm = Ai.slice(10, 12) - 1, dd = Ai
         .slice(12, 14);
-    var d = new Date(yyyy, mm, dd), now = new Date();
-    var year = d.getFullYear(), mon = d.getMonth(), day = d.getDate();
-    if (year != yyyy || mon != mm || day != dd || d > now || year < 1940)
+    let d = new Date(yyyy, mm, dd), now = new Date();
+    let year = d.getFullYear(), mon = d.getMonth(), day = d.getDate();
+    if (year !== yyyy || mon !== mm || day !== dd || d > now || year < 1940)
         result += "身份证输入错误！";
-    for (var i = 0, ret = 0; i < 17; i++)
+    for (let i = 0, ret = 0; i < 17; i++)
         ret += Ai.charAt(i) * Wi[i];
     Ai += arrVerifyCode[ret %= 11];
-    if (!result || result == "")
+    if (!result || result === "")
         return "true";
-    return pId == (Ai) ? "true" : result;
+    return pId === (Ai) ? "true" : result;
 };
 /*
  * 手机号格式验证
  */
 tlv8.Telephone = function (date) {
-    var filter = /(\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$/;
+    let filter = /(\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$/;
     if (filter.test(date))
         return true;
     else {
@@ -3078,18 +2743,18 @@ tlv8.Telephone = function (date) {
  * 获取周工作日
  */
 tlv8.getworkdays = function (starttime) {
-    var date = justep.System.datetime();
-    var createweek = starttime.getDay();
-    var num = justep.Date.diff(starttime, date, 'd');
-    var weekwork = 0;
-    var holiday = Math.round(num / 7) * 2;
+    let date = justep.System.datetime();
+    let createweek = starttime.getDay();
+    let num = justep.Date.diff(starttime, date, 'd');
+    let weekwork = 0;
+    let holiday = Math.round(num / 7) * 2;
     if (num > 7) {
         weekwork = num - holiday;
     } else {
-        var week = date.getDay();
-        if (week == 6) {
+        let week = date.getDay();
+        if (week === 6) {
             weekwork = num - 1;
-        } else if (weekwork - createweek <= 0 && num != 0) {
+        } else if (weekwork - createweek <= 0 && num !== 0) {
             weekwork = num - 2;
         } else {
             weekwork = num;
@@ -3106,10 +2771,10 @@ tlv8.System.Date = {
      * @returns {string}
      */
     sysDate: function () {
-        var param = new tlv8.RequestParam();
-        var r = tlv8.XMLHttpRequest("/getSystemDate", param, "post", false,
+        let param = new tlv8.RequestParam();
+        let r = tlv8.XMLHttpRequest("/getSystemDate", param, "post", false,
             null, true);
-        var rdate = tlv8.System.Date.strToDate(r.sysdate);
+        let rdate = tlv8.System.Date.strToDate(r.sysdate);
         return rdate.format("yyyy-MM-dd");
     },
     /**
@@ -3118,53 +2783,52 @@ tlv8.System.Date = {
      * @returns {string}
      */
     sysDateTime: function () {
-        var param = new tlv8.RequestParam();
-        var r = tlv8.XMLHttpRequest("/getSystemDateTime", param, "post",
+        let param = new tlv8.RequestParam();
+        let r = tlv8.XMLHttpRequest("/getSystemDateTime", param, "post",
             false, null, true);
         return r.sysdate;
     },
     /**
      * @name tlv8.System.Date.strToDate
      * @description 日期字符串转日期对象
-     * @param {string}
-     *            datestr
+     * @param str {string}
      * @returns {Date}
      */
     strToDate: function (str) {
-        if (!str || str == "" || str.indexOf("-") < 0) {
+        if (!str || str === "" || str.indexOf("-") < 0) {
             return;
         }
         str = trim(str);
-        var val = str.split(" ");
-        var newDate;
+        let val = str.split(" ");
+        let newDate;
         if (val.length > 1) {
-            var sdate = val[0].split("-");
-            var sTime = val[1].split(":");
+            let sdate = val[0].split("-");
+            let sTime = val[1].split(":");
             newDate = new Date(sdate[0], sdate[1] - 1, sdate[2], sTime[0],
                 sTime[1], sTime[2]);
         } else {
-            var sdate = val[0].split("-");
+            let sdate = val[0].split("-");
             newDate = new Date(sdate[0], sdate[1] - 1, sdate[2]);
         }
         return newDate;
     }
 };
-var $dpjspath = null;
-var scripts = document.getElementsByTagName("script");
+let $dpjspath = null;
+let scripts = document.getElementsByTagName("script");
 for (i = 0; i < scripts.length; i++) {
-    if (scripts[i].src.substring(scripts[i].src.length - 7).toLowerCase() == 'main.js') {
+    if (scripts[i].src.substring(scripts[i].src.length - 7).toLowerCase() === 'main.js') {
         $dpjspath = scripts[i].src.substring(0, scripts[i].src.length - 7);
         break;
     }
 }
-var $dpcsspath = $dpjspath ? $dpjspath.replace("/js/", "/css/") : null;
-var $dpimgpath = $dpjspath ? $dpjspath.replace("/js/", "/image/") : null;
+let $dpcsspath = $dpjspath ? $dpjspath.replace("/js/", "/css/") : null;
+let $dpimgpath = $dpjspath ? $dpjspath.replace("/js/", "/image/") : null;
 /*
  * 添加JS引用
  */
-var createJSSheet = function (jsPath) {
-    var head = document.getElementsByTagName('HEAD')[0];
-    var script = document.createElement('script');
+let createJSSheet = function (jsPath) {
+    let head = document.getElementsByTagName('HEAD')[0];
+    let script = document.createElement('script');
     script.src = jsPath;
     script.type = 'text/javascript';
     $(script).attr("charset", 'utf-8');
@@ -3173,9 +2837,9 @@ var createJSSheet = function (jsPath) {
 /*
  * 添加CSS引用
  */
-var createStyleSheet = function (cssPath) {
-    var head = document.getElementsByTagName('HEAD')[0];
-    var style = document.createElement('link');
+let createStyleSheet = function (cssPath) {
+    let head = document.getElementsByTagName('HEAD')[0];
+    let style = document.createElement('link');
     style.href = cssPath;
     style.rel = 'stylesheet';
     style.type = 'text/css';
@@ -3184,16 +2848,16 @@ var createStyleSheet = function (cssPath) {
 /*
  * 检查引用文件是否已存在
  */
-var checkPathisHave = function (path) {
-    var Hhead = document.getElementsByTagName('HEAD')[0];
-    var Hscript = Hhead.getElementsByTagName("SCRIPT");
-    for (var i = 0; i < Hscript.length; i++) {
-        if (Hscript[i].src == path)
+let checkPathisHave = function (path) {
+    let Hhead = document.getElementsByTagName('HEAD')[0];
+    let Hscript = Hhead.getElementsByTagName("SCRIPT");
+    for (let i = 0; i < Hscript.length; i++) {
+        if (Hscript[i].src === path)
             return true;
     }
-    var Hstyle = Hhead.getElementsByTagName("LINK");
-    for (var i = 0; i < Hstyle.length; i++) {
-        if (Hstyle[i].href == path)
+    let Hstyle = Hhead.getElementsByTagName("LINK");
+    for (let i = 0; i < Hstyle.length; i++) {
+        if (Hstyle[i].href === path)
             return true;
     }
     return false;
@@ -3202,7 +2866,7 @@ var checkPathisHave = function (path) {
 
 tlv8.fileupload = function (dbkey, docPath, tablename, cellname, rowid,
                             callback) {
-    var url = "/comon/fileupload/upload";
+    let url = "/comon/fileupload/upload";
     url += "?dbkey=" + dbkey;
     url += "&docPath=" + docPath;
     url += "&tablename=" + (tablename ? tablename : "undefined");
@@ -3211,12 +2875,13 @@ tlv8.fileupload = function (dbkey, docPath, tablename, cellname, rowid,
     url += "&personID=" + tlv8.Context.getCurrentPersonID();
     tlv8.portal.dailog.openDailog('文件上传', url, 350, 200, callback, false);
 };
+
 tlv8.dowloadfile = function (fileID, filename) {
-    var xmlHttp = tlv8.xmlHttp();
+    let xmlHttp = tlv8.xmlHttp();
     xmlHttp.onreadystatechange = function () {
-        if (xmlHttp.readyState == 4) {
-            if (xmlHttp.status == 200) {
-                var r = eval('(' + xmlHttp.responseText + ')');
+        if (xmlHttp.readyState === 4) {
+            if (xmlHttp.status === 200) {
+                let r = eval('(' + xmlHttp.responseText + ')');
             }
         }
     };
@@ -3224,37 +2889,37 @@ tlv8.dowloadfile = function (fileID, filename) {
         + "&filename=" + J_u_encode(filename), false);
     xmlHttp.send(null);
     try {
-        var r = eval('(' + xmlHttp.responseText + ')');
+        let r = eval('(' + xmlHttp.responseText + ')');
     } catch (e) {
     }
     if (!r) {
         alert("获取文件信息失败!可能文档服务配置错误，请联系管理员");
         return;
     }
-    if (r.url && r.url != "err")
+    if (r.url && r.url !== "err")
         window.open(r.url, "文件下载", "height=" + (screen.availHeight - 60)
             + ",width=" + (screen.availWidth)
             + ",toolbar=no,menubar=no,status=no,location=no,top=0,left=0");
     else
         alert("下载失败!");
-    return;
 };
+
 tlv8.deletefile = function (fileID, filename, dbkey, tablename, cellname,
                             rowid, callback) {
-    if (!fileID || fileID == "" || !filename)
+    if (!fileID || fileID === "" || !filename)
         return;
     if (confirm("确定删除文件'" + filename + "'吗？")) {
-        var url = cpath + "/deleteFileAction?fileID=" + fileID;
+        let url = cpath + "/deleteFileAction?fileID=" + fileID;
         url += "&filename=" + J_u_encode(filename);
         url += "&dbkey=" + dbkey;
         url += "&tablename=" + tablename;
         url += "&cellname=" + cellname;
         url += "&rowid=" + rowid;
-        var xmlHttp = tlv8.xmlHttp();
+        let xmlHttp = tlv8.xmlHttp();
         xmlHttp.onreadystatechange = function () {
-            if (xmlHttp.readyState == 4) {
-                if (xmlHttp.status == 200) {
-                    var r = eval('(' + xmlHttp.responseText + ')');
+            if (xmlHttp.readyState === 4) {
+                if (xmlHttp.status === 200) {
+                    let r = eval('(' + xmlHttp.responseText + ')');
                     if (callback)
                         callback(r);
                 }
@@ -3298,15 +2963,15 @@ UUID.prototype.toString = function () {
  * @returns {string}
  */
 UUID.prototype.createUUID = function () {
-    var dg = new Date(1582, 10, 15, 0, 0, 0, 0);
-    var dc = new Date();
-    var t = dc.getTime() - dg.getTime();
-    var tl = UUID.getIntegerBits(t, 0, 31);
-    var tm = UUID.getIntegerBits(t, 32, 47);
-    var thv = UUID.getIntegerBits(t, 48, 59) + '1';
-    var csar = UUID.getIntegerBits(UUID.rand(4095), 0, 7);
-    var csl = UUID.getIntegerBits(UUID.rand(4095), 0, 7);
-    var n = UUID.getIntegerBits(UUID.rand(8191), 0, 7)
+    let dg = new Date(1582, 10, 15, 0, 0, 0, 0);
+    let dc = new Date();
+    let t = dc.getTime() - dg.getTime();
+    let tl = UUID.getIntegerBits(t, 0, 31);
+    let tm = UUID.getIntegerBits(t, 32, 47);
+    let thv = UUID.getIntegerBits(t, 48, 59) + '1';
+    let csar = UUID.getIntegerBits(UUID.rand(4095), 0, 7);
+    let csl = UUID.getIntegerBits(UUID.rand(4095), 0, 7);
+    let n = UUID.getIntegerBits(UUID.rand(8191), 0, 7)
         + UUID.getIntegerBits(UUID.rand(8191), 8, 15)
         + UUID.getIntegerBits(UUID.rand(8191), 0, 7)
         + UUID.getIntegerBits(UUID.rand(8191), 8, 15)
@@ -3314,15 +2979,15 @@ UUID.prototype.createUUID = function () {
     return tl + tm + thv + csar + csl + n;
 };
 UUID.getIntegerBits = function (val, start, end) {
-    var base16 = UUID.returnBase(val, 16);
-    var quadArray = new Array();
-    var quadString = '';
-    var i = 0;
+    let base16 = UUID.returnBase(val, 16);
+    let quadArray = [];
+    let quadString = '';
+    let i = 0;
     for (i = 0; i < base16.length; i++) {
         quadArray.push(base16.substring(i, i + 1));
     }
     for (i = Math.floor(start / 4); i <= Math.floor(end / 4); i++) {
-        if (!quadArray[i] || quadArray[i] == '')
+        if (!quadArray[i] || quadArray[i] === '')
             quadString += '0';
         else
             quadString += quadArray[i];
@@ -3335,9 +3000,10 @@ UUID.returnBase = function (number, base) {
 UUID.rand = function (max) {
     return Math.floor(Math.random() * (max + 1));
 };
+
 tlv8.ExcelImp = function (dbkey, table, relation, confirmXmlName, callback) {
-    var srcPath = tlv8.getRequestURI();
-    var url = "/comon/report/import-compent";
+    let srcPath = tlv8.getRequestURI();
+    let url = "/comon/report/import-compent";
     url += "?srcPath=" + srcPath;
     url += "&dbkey=" + dbkey;
     url += "&table=" + table;
@@ -3346,10 +3012,11 @@ tlv8.ExcelImp = function (dbkey, table, relation, confirmXmlName, callback) {
     tlv8.portal.dailog.openDailog('Excel导入', url, 350, 350, callback,
         false);
 };
+
 tlv8.ExcelExp = function (dbkey, table, relation, labels, where, orderby) {
-    var srcPath = tlv8.getRequestURI();
-    var url = "/comon/report/export-compent";
-    var params = {
+    let srcPath = tlv8.getRequestURI();
+    let url = "/comon/report/export-compent";
+    let params = {
         dbkey: dbkey,
         table: table,
         relation: relation,
@@ -3360,9 +3027,10 @@ tlv8.ExcelExp = function (dbkey, table, relation, labels, where, orderby) {
     tlv8.portal.dailog.openDailog('导出Excel', url, 350, 400, null, false,
         null, params);
 };
+
 tlv8.encodeURIComponent = function (str) {
     try {
-        var $rval = str.toString().replaceAll("<", "#lt;");
+        let $rval = str.toString().replaceAll("<", "#lt;");
         $rval = $rval.replaceAll(">", "#gt;");
         $rval = $rval.replaceAll("&nbsp;", "#160;");
         $rval = $rval.replaceAll("'", "#apos;");
@@ -3371,10 +3039,11 @@ tlv8.encodeURIComponent = function (str) {
         return "";
     }
 };
+
 tlv8.decodeURIComponent = function (str) {
     try {
         str = decodeURIComponent(decodeURIComponent(str));
-        var sValue = str.toString().replaceAll("#160;", "&nbsp;");
+        let sValue = str.toString().replaceAll("#160;", "&nbsp;");
         sValue = sValue.replaceAll("#lt;", "<");
         sValue = sValue.replaceAll("#gt;", ">");
         sValue = sValue.replaceAll("#apos;", "'");
@@ -3395,11 +3064,11 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
     try {
         upload = layui.upload;
     } catch (e) {
-        var $rp = $dpjspath.replace("/common/js/", "/");
+        let $rp = $dpjspath.replace("/common/js/", "/");
         createStyleSheet($rp + "layui/css/layui.css");
         createJSSheet($rp + "layui/layui.js");
     }
-    var $commonpath = $dpjspath.replace("/js/", "/");
+    let $commonpath = $dpjspath.replace("/js/", "/");
     if (!checkPathisHave(cpath + "/common/doc_ocx/docUtil.js")
         && !checkPathisHave($commonpath + "doc_ocx/docUtil.js")) {
         createJSSheet($commonpath + "doc_ocx/docUtil.js");
@@ -3411,7 +3080,7 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
     this.div = div;
     this.CimitDataParam = function (docName, kind, size, cacheName,
                                     revisionCacheName, commentFileContent, filecount, compment) {
-        var pa_log = {};
+        let pa_log = {};
         pa_log.dbkey = data.dbkay;
         pa_log.docPath = docPath || "/root";
         pa_log.tablename = data.table;
@@ -3423,15 +3092,15 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
         pa_log.cacheName = cacheName;
         compment.div.writedata.push(pa_log);
         compment.uploadcount++;
-        if (compment.uploadcount == filecount) {
+        if (compment.uploadcount === filecount) {
             compment.comitDataFn();
         }
     };
     this.comitDataFn = function () {
-        var paramlog = JSON.stringify(this.div.writedata);
-        var pas = new tlv8.RequestParam();
+        let paramlog = JSON.stringify(this.div.writedata);
+        let pas = new tlv8.RequestParam();
         pas.set("writelog", paramlog);
-        var self = this;
+        let self = this;
         tlv8.XMLHttpRequest("writeUploadDataAction", pas, "POST", true,
             function (r) {
                 self.uploadcallback(r, self);
@@ -3440,12 +3109,12 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
     };
     this.uploadcallback = function (r, compment) {
         compment.$refreshFileComp();
-        compment.div.writedata = new Array();
+        compment.div.writedata = [];
     };
-    var taptt = tlv8.RequestURLParam.getParam("activity-pattern");
-    var isTasksub = (taptt == "detail");
-    var fiTablehead = "<table style='width:100%;' border='0'>";
-    if (false != canupload && !isTasksub) {
+    let taptt = tlv8.RequestURLParam.getParam("activity-pattern");
+    let isTasksub = (taptt === "detail");
+    let fiTablehead = "<table style='width:100%;' border='0'>";
+    if (false !== canupload && !isTasksub) {
         fiTablehead += "<tr id=\""
             + div.id
             + "_uploadTR\"><td colspan='6' align='left' style='width:100%;height:20px;border:0px none;'><div style='position:relative;'>"
@@ -3453,9 +3122,9 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
             + div.id
             + "_uploadItem'  title='上传文件' style='font-size:12px;color:#0033FF;text-decoration: none;'>上传文件</a><hr/></div></td></tr>";
     }
-    var filetableBody = "<tr><td valign='top' style='border:0px none;'><div id='"
+    let filetableBody = "<tr><td valign='top' style='border:0 none;'><div id='"
         + div.id + "_fileList'></div></td></tr>";
-    var filetableFooter = "<tr><td style='border:0px none;'></td></tr></table>";
+    let filetableFooter = "<tr><td style='border:0 none;'></td></tr></table>";
     this.div.innerHTML = fiTablehead + filetableBody + filetableFooter;
     this.createUploader = function () {
         layui.upload.render({
@@ -3470,11 +3139,11 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
             },
             done: function (res, index, upload) {
                 layui.layer.closeAll('loading');
-                if (res.code != '-1') {
+                if (res.code !== '-1') {
                     layui.layer.msg('上传成功.', {icon: 1, time: 1000});
                     div.refreshFileComp();
                     try {
-                        var puploadcallback = $(div).attr("onuploaded");
+                        let puploadcallback = $(div).attr("onuploaded");
                         if (typeof puploadcallback == "string") {
                             puploadcallback = window.eval(puploadcallback);
                         }
@@ -3495,14 +3164,14 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
         });
     };
     div.createUploader = this.createUploader;
-    if (false != canupload && !isTasksub) {
+    if (false !== canupload && !isTasksub) {
         setTimeout(function () {
-            if (data.rowid && data.rowid != "") {
+            if (data.rowid && data.rowid !== "") {
                 div.createUploader();
             } else {
                 $('#' + div.id + '_uploadItem').click(function () {
-                    var rowid = data.saveData();
-                    if (!rowid || rowid == "") {
+                    let rowid = data.saveData();
+                    if (!rowid || rowid === "") {
                         layui.layer.msg("数据保存失败,请先保存数据!");
                     } else {
                         $('#' + div.id + '_uploadItem').unbind("click");
@@ -3513,33 +3182,32 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
         }, 500);
     }
     this.$refreshFileComp = function () {
-        var dbkey = data.dbkay;
-        var tablename = data.table;
-        var rowid = data.rowid;
-        var sID = (dbkey == "system" || !dbkey) ? "SID" : "fID";
-        var random = Math.random();
-        var sql = "select " + cellname + " FILECOMPE from " + tablename
+        let dbkey = data.dbkay;
+        let tablename = data.table;
+        let rowid = data.rowid;
+        let sID = (dbkey === "system" || !dbkey) ? "SID" : "fID";
+        let random = Math.random();
+        let sql = "select " + cellname + " FILECOMPE from " + tablename
             + " where " + sID + " = '" + rowid + "' and " + random + "="
             + random;
-        var r = tlv8.sqlQueryActionforJson(dbkey, sql);
-        var dilelist = [];
-        var transeJson = function (str) {
+        let r = tlv8.sqlQueryActionforJson(dbkey, sql);
+        let dilelist = [];
+        let transeJson = function (str) {
             str = str.toString().replaceAll(":", ":\"");
             str = str.toString().replaceAll(",", "\",");
             str = str.toString().replaceAll("}", "\"}");
             str = str.toString().replaceAll("}{", "},{");
             str = str.toString().replaceAll(";", "\",");
-            var filelist = eval("([" + str + "])");
-            return filelist;
+            return eval("([" + str + "])");
         };
         try {
-            if (r.data != "") {
-                var datas = r.data[0];
+            if (r.data !== "") {
+                let datas = r.data[0];
                 datas = datas.FILECOMPE;
-                if ("null" == datas) {
+                if ("null" === datas) {
                     datas = "";
                 }
-                if (datas && datas != "") {
+                if (datas && datas !== "") {
                     try {
                         dilelist = eval("(" + datas + ")");
                     } catch (e) {
@@ -3551,16 +3219,16 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
             alert(e.message);
         }
         div.dilelist = dilelist;
-        var fileIDs = new Array();
-        var filenames = new Array();
-        for (var i = 0; i < dilelist.length; i++) {
+        let fileIDs = [];
+        let filenames = [];
+        for (let i = 0; i < dilelist.length; i++) {
             fileIDs.push(dilelist[i].fileID);
             filenames.push(dilelist[i].filename);
         }
         filetableBody = "<table>";
         docPath = docPath || "/";
         try {
-            if (limit && limit != -1 && limit <= filenames.length) {
+            if (limit && limit !== -1 && limit <= filenames.length) {
                 document.getElementById(div.id + "_uploadItem").style.display = "none";
                 $("#" + div.id + "_uploadDocItemDiv").remove();
                 div.uploader = null;
@@ -3571,7 +3239,7 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
         }
         if (filenames && filenames.length > 0) {
             for (i in filenames) {
-                var fileID = fileIDs[i];
+                let fileID = fileIDs[i];
                 filetableBody += "<tr style='width:100%;height:20px;padding:5px;'><td style='border:0px none;'>"
                     + "<a style='font-size:12px;color:#0033FF;text-decoration: none;' href='javascript:void(0)' id=\""
                     + div.id
@@ -3587,7 +3255,7 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
                 filetableBody += "<td width='40px;' style='border:0px none;'>"
                     + "<a href='javascript:void(0)' style='font-size:12px;color:#0033FF;text-decoration: none;' title='文件属性' onclick='justep.Doc.openDocInfoDialog(\""
                     + fileID + "\")'>属性</a></td>";
-                if (canedit == true && !isTasksub) {
+                if (canedit === true && !isTasksub) {
                     filetableBody += "<td width='40px;' style='border:0px none;'><a href='javascript:void(0)' "
                         + "style='font-size:12px;color:#0033FF;text-decoration: none;' title='编辑文件' "
                         + "onclick='tlv8.trangereditfile(\""
@@ -3606,15 +3274,15 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
                         + cellname
                         + "\",\"" + div.id + "\")'>编辑</a></td>";
                 } else {
-                    filetableBody += "<td style='border:0px none;'></td>";
+                    filetableBody += "<td style='border:0 none;'></td>";
                 }
-                if (viewhistory == true) {
+                if (viewhistory === true) {
                     filetableBody += "<td width='40px;' style='border:0px none;'><a href='javascript:void(0)' style='font-size:12px;color:#0033FF;text-decoration: none;' title='历史版本' onclick='justep.Doc.openDocHistoryDialog(null,\""
                         + fileID + "\")'>历史</a></td>";
                 } else {
-                    filetableBody += "<td style='border:0px none;'></td>";
+                    filetableBody += "<td style='border:0 none;'></td>";
                 }
-                if (candelete != false && !isTasksub) {
+                if (candelete !== false && !isTasksub) {
                     filetableBody += "<td width='40px;' style='border:0px none;'><a href='javascript:void(0)' style='font-size:12px;color:#0033FF;text-decoration: none;' title='删除附件' onclick='tlv8.deletefile(\""
                         + fileID
                         + "\",\""
@@ -3636,7 +3304,7 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
                     filetableBody += "<td width='40px;' style='border:0px none;'><a href='javascript:void(0)' style='font-size:12px;color:#0033FF;text-decoration: none;' title='下载附件' onclick='justep.Doc.downloadDocByFileID(\""
                         + docPath + "\",\"" + fileID + "\")'>下载</a></td>";
                 } else {
-                    filetableBody += "<td style='border:0px none;'></td>";
+                    filetableBody += "<td style='border:0 none;'></td>";
                 }
                 filetableBody += "</tr>";
             }
@@ -3648,12 +3316,6 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
     div.compment = this;
     this.$refreshFileComp();
 };
-var editFilecoment;
-
-function rahgereditercalback() {
-    var reloadfilefn = document.getElementById(editFilecoment).refreshFileComp;
-    reloadfilefn();
-}
 
 // office、wps文件在线编辑
 tlv8.trangereditfile = function (fileID, fileName, docPath, dbkey,
@@ -3664,7 +3326,7 @@ tlv8.trangereditfile = function (fileID, fileName, docPath, dbkey,
         alert("不支持非Office文件编辑");
         return;
     }
-    var edurl = "/comon/doc_ocx/tangerOffice/officeediter?fileID="
+    let edurl = "/comon/doc_ocx/tangerOffice/officeediter?fileID="
         + fileID + "&fileName=" + J_u_encode(fileName) + "&dbkey="
         + dbkey + "&tablename=" + tablename + "&billid=" + billid
         + "&cellname=" + cellname + "&callerName="
@@ -3672,275 +3334,37 @@ tlv8.trangereditfile = function (fileID, fileName, docPath, dbkey,
     //tlv8.portal.openWindow("文件" + fileName + "编辑",edurl);
     window.open(cpath + edurl);
 };
-tlv8.changeLog = {
-    items: [],
-    autoCreateVersion: 0,
-    createVersionLogs: [],
-    "operate": "",
-    "url": "",
-    process: "",
-    activity: ""
-};
-tlv8.updateDoc = function (docID, fileID, docPath, docName, kind, size,
-                           cacheName, revisionCacheName, commentFileContent, createVersion) {
-    var node = justep.Doc.evalChangeLog(tlv8.changeLog, docID);
-    if (node) {
-        var version = node.version;
-        var parentID = node.parent_id;
-        var displayPath = node.doc_display_path;
-        var docVersionID = node.doc_version_id;
-        var description = node.description;
-        var classification = node.classification;
-        var keywords = node.keywords;
-        var finishTime = node.finish_time;
-        var serialNumber = node.serial_number;
-        justep.Doc.modifyChangeLog(node,
-            [version, fileID, docVersionID, docName, kind, size, parentID,
-                docPath, displayPath, description, classification,
-                keywords, finishTime, serialNumber], ["attachment",
-                cacheName, revisionCacheName, commentFileContent]);
-    } else {
-        var row = justep.Doc.queryDoc(docID, undefined, ["VERSION",
-            "SPARENTID", "SDOCDISPLAYPATH", "SDOCLIVEVERSIONID",
-            "SDESCRIPTION", "SCLASSIFICATION", "SKEYWORDS", "SFINISHTIME",
-            "SDOCSERIALNUMBER"], undefined, undefined, "single");
-        var version = row.VERSION;
-        var parentID = row.SPARENTID;
-        var displayPath = row.SDOCDISPLAYPATH;
-        var docVersionID = row.SDOCLIVEVERSIONID;
-        var description = row.SDESCRIPTION;
-        var classification = row.SCLASSIFICATION;
-        var keywords = row.SKEYWORDS;
-        var finishTime = !row.SFINISHTIME ? "" : row.SFINISHTIME;
-        var serialNumber = row.SDOCSERIALNUMBER;
-        justep.Doc.addChangeLog(tlv8.changeLog, "edit", [docID, version,
-            fileID, docVersionID, docName, kind, size, parentID, docPath,
-            displayPath, description, classification, keywords, finishTime,
-            serialNumber], ["attachment", cacheName, revisionCacheName,
-            commentFileContent]);
-    }
-    if (fileID) {
-        justep.Doc.commitDocCache(docID, tlv8.changeLog);
-    }
-    if (createVersion && fileID) {
-        tlv8.createVersion(docID, fileID, docName, docPath);
-    }
-};
-tlv8.createVersion = function (docID, fileID, docName, docPath) {
-    if (fileID == '') {
-        return;
-    }
-    if ('.doc.docx.xls.xlsx.ppt.mpp.vsd.'.indexOf(String(/\.[^\.]+$/
-            .exec(docName))
-        + '.') < 0) {
-        alert("不支持非Office文件成文");
-        return;
-    }
-    var currentNode = justep.Doc.evalChangeLog(tlv8.changeLog, docID);
-    if (currentNode != null) {
-        justep.Doc.removeChangeLog(tlv8.changeLog, docID);
-    }
-    justep.Doc.createVersion(docID);
-};
-tlv8.getDocIdByFileId = function (fileID) {
-    var r = tlv8.sqlQueryAction("system",
-        "select SID from sa_docnode where (sfileid='" + fileID + "')");
-    if (r.getCount() > 0) {
-        return r.getValueByName("SID");
-    }
-};
-/*
- * 图片组件
- */
-tlv8.picComponent = function (div, data, cellname, canEdit) {
-    if (!div || !data || !cellname) {
-        mAlert("tlv8.picComponent：参数无效");
-        return;
-    }
-    div.style.position = "relative";
-    div.style.border = "1px solid #eee";
-    var $CompPath = $dpimgpath.replace("/image", "") + "picCompant/";
-    var bsPIC = false;
-    var lookPIC = function () {
-        var dbkey = data.dbkay ? data.dbkay : "system";
-        var tablename = data.table;
-        var rowid = data.rowid;
-        if (!rowid) {
-            div.innerHTML = "<img src='" + $CompPath
-                + "pic/img.gif' style='width:" + div.clientWidth
-                + ";height:" + div.clientHeight + ";z-index:-1;'/>";
-            return;
-        }
-        var url = $dpimgpath.replace("/image", "");
-        url += "picCompant/Pic-read?dbkey=" + dbkey + "&tablename="
-            + tablename + "&cellname=" + cellname + "&fID=" + rowid
-            + "&Temp=" + new UUID().toString();
-        var image = "<img src='" + url + "' style='width:" + div.clientWidth
-            + ";height:" + div.clientHeight + ";'/>";
-        bsPIC = true;
-        div.innerHTML = image;
-    };
-    div.lookPIC = lookPIC;
-    var picBorder = function () {
-        // $("#" + div.id + "_edit_bar").remove();
-        var editBar = document.getElementById(div.id + "_edit_bar");
-        if (editBar) {
-            return;
-        }
-        var editBar = document.createElement("div");
-        editBar.setAttribute("id", div.id + "_edit_bar");
-        editBar.style.background = "#eee";
-        editBar.style.border = "0";
-        editBar.style.position = "absolute";
-        editBar.style.left = "0px";
-        editBar.style.top = "0px";
-        editBar.style.font = "12px/1.6em Verdana, Geneva, Arial, Helvetica, sans-serif";
-        editBar.style.width = div.offsetWidth;
-        editBar.style.height = div.offsetHeight;
-        editBar.style.textAlign = "right";
-        editBar.style.lineHeight = "18px";
-        editBar.style.filter = "alpha(opacity = 30)";
-        editBar.style.opacity = 0.3;
-        editBar.style.zIndex = 99;
-        $(editBar).css("opacity", "0.3");
-        $(editBar).css("-moz-opacity", "0.3");
-        var dataTable = "<table id='"
-            + div.id
-            + "_table' style='width:100%;height:100%;z-index:999;'><tr><td colspan='3'></td></tr><tr style='width:100%;height:20px;align:right;'><td></td>";
-        dataTable += "<td style='width:20px;'><a href='javascript:void(0)' style='color:#eee;' onclick='document.getElementById(\""
-            + div.id
-            + "\").uploadPIC()'><img src='"
-            + $CompPath
-            + "pic/edit.gif' title='上传图片' style='width:18px;'/></a></td>";
-        dataTable += "<td style='width:20px;'><a href='javascript:void(0)' style='color:#eee;' onclick='document.getElementById(\""
-            + div.id
-            + "\").deletePIC()'><img src='"
-            + $CompPath
-            + "pic/remove.gif' title='删除图片' style='width:18px;'/></a></td>";
-        dataTable += "</tr></table>";
-        editBar.innerHTML = dataTable;
-        // document.body.appendChild(editBar);
-        $(div).append(editBar);
-        var removeBar = function () {
-            var editBar = document.getElementById(div.id + "_edit_bar");
-            if (editBar) {
-                div.removeChild(editBar);
-            }
-        };
-        addEvent(document.getElementById(div.id + "_edit_bar"), "mouseout",
-            removeBar, false);
-    };
-    div.picBorder = picBorder;
-    if (canEdit != false) {
-        addEvent(div, "mouseover", picBorder, false);
-    }
-    var uploadPIC = function () {
-        var dbkey = data.dbkay ? data.dbkay : "system";
-        var tablename = data.table;
-        var rowid = data.saveData();
-        // if (!rowid || rowid == "") {
-        // alert("请先保存数据！");
-        // return;
-        // }
-        var url = "/comon/picCompant/Imag-upload";
-        url += "?dbkey=" + dbkey;
-        url += "&tablename=" + tablename;
-        url += "&cellname=" + cellname;
-        url += "&rowid=" + rowid;
-        var upLcallback = function () {
-            document.getElementById(div.id).lookPIC();
-        };
-        tlv8.portal.dailog.openDailog('图片上传', url, 285, 225, upLcallback);
-    };
-    div.uploadPIC = uploadPIC;
-    var deletePIC = function () {
-        if (!bsPIC)
-            return;
-        var dbkey = data.dbkay;
-        var tablename = data.table;
-        var rowid = data.rowid;
-        if (!rowid || rowid == "") {
-            return;
-        }
-        if (confirm("确定删除图片吗？")) {
-            var dbkey = data.dbkay ? data.dbkay : "system";
-            var tablename = data.table;
-            var rowid = data.rowid;
-            var url = cpath + "/ImageDeleteAction";
-            url += "?dbkey=" + dbkey;
-            url += "&tablename=" + tablename;
-            url += "&cellname=" + cellname;
-            url += "&rowid=" + rowid;
-            var xmlHttp = tlv8.xmlHttp();
-            xmlHttp.onreadystatechange = function () {
-                if (xmlHttp.readyState == 4) {
-                    if (xmlHttp.status == 200) {
-                        var r = eval('(' + xmlHttp.responseText + ')');
-                        if (r.flag == "false") {
-                            alert(r.caption);
-                        } else {
-                            document.getElementById(div.id).lookPIC();
-                        }
-                    }
-                }
-            };
-            xmlHttp.open("post", url, true);
-            xmlHttp.send(null);
-        }
-    };
-    div.deletePIC = deletePIC;
-    $(div).css("overflow", "hidden");
-    lookPIC();
-    return this;
-};
-var mAlert = function (msg, img) {
-    try {
-        var allviewcap = document.createElement("div");
-        allviewcap.setAttribute("id", "mAlertmsgDiv");
-        allviewcap.style.left = "0px";
-        allviewcap.style.top = "0px";
-        allviewcap.style.width = document.body.clientWidth;
-    } catch (e) {
-        alert(msg);
-        return;
-    }
-};
+
 
 function Confirm(msg, okcallFn, cancelcallFn, img) {
     layui.layer.confirm(msg, okcallFn, cancelcallFn);
 }
 
 tlv8.isHaveAuthorization = function (url) {
-    var orgFID = tlv8.Context.getCurrentPersonFID();
-    var param = new tlv8.RequestParam();
+    let orgFID = tlv8.Context.getCurrentPersonFID();
+    let param = new tlv8.RequestParam();
     param.set("orgFID", orgFID);
     param.set("url", url);
-    var callBackfn = function (r) {
-        if (r.data.flag == "false") {
+    let callBackfn = function (r) {
+        if (r.data.flag === "false") {
             alert(r.data.message);
         } else {
-            if (r.data.data == "true")
-                return true;
-            else
-                return false;
+            return r.data.data === "true";
         }
     };
-    var r = tlv8.XMLHttpRequest("HaveFunctionAuthority", param, "get",
+    let r = tlv8.XMLHttpRequest("HaveFunctionAuthority", param, "get",
         false, callBackfn);
-    if (r.data.flag == "false") {
+    if (r.data.flag === "false") {
         alert(r.data.message);
     } else {
-        if (r.data.data == "true")
-            return true;
-        else
-            return false;
+        return r.data.data === "true";
     }
 };
 tlv8.isIE6 = function () {
     if (window.ActiveXObject) {
-        var ua = navigator.userAgent.toLowerCase();
-        var ie = ua.match(/msie ([\d.]+)/)[1];
-        if (ie == 6.0) {
+        let ua = navigator.userAgent.toLowerCase();
+        let ie = ua.match(/msie ([\d.]+)/)[1];
+        if (ie === 6.0) {
             return true;
         }
     }
@@ -3948,8 +3372,8 @@ tlv8.isIE6 = function () {
 };
 tlv8.islowIE10 = function () {
     if (window.ActiveXObject) {
-        var ua = navigator.userAgent.toLowerCase();
-        var ie = ua.match(/msie ([\d.]+)/)[1];
+        let ua = navigator.userAgent.toLowerCase();
+        let ie = ua.match(/msie ([\d.]+)/)[1];
         if (parseInt(ie) < 10) {
             return true;
         }
@@ -3957,54 +3381,8 @@ tlv8.islowIE10 = function () {
     return false;
 };
 tlv8.isIE = function () { // ie?
-    if (!!window.ActiveXObject || "ActiveXObject" in window)
-        return true;
-    else
-        return false;
+    return !!window.ActiveXObject || "ActiveXObject" in window;
 }
-
-if (!JSON)
-    var JSON = {};
-JSON.parse = function (jsonStr) {
-    try {
-        return eval("(" + jsonStr + ")");
-    } catch (e) {
-        alert("JSON.parse: " + e);
-    }
-};
-String.prototype.toJSON = function () {
-    try {
-        return eval("(" + this + ")");
-    } catch (e) {
-        alert("toJSON: " + e);
-    }
-};
-JSON.toString = function (jsonObj) {
-    if (jsonObj.toString().indexOf(",") < 0) {
-        var str = "{";
-        for (var k in jsonObj) {
-            str += ",\"" + k + "\":\"" + jsonObj[k] + "\"";
-        }
-        str += "}";
-        str = str.replace(",", "");
-        return str;
-    } else {
-        var str = "[";
-        for (var i = 0; i < jsonObj.length; i++) {
-            if (i > 0)
-                str += ",";
-            var ostr = "{";
-            for (var k in jsonObj[i]) {
-                ostr += ",\"" + k + "\":\"" + jsonObj[i][k] + "\"";
-            }
-            ostr += "}";
-            ostr = ostr.replace(",", "");
-            str += ostr;
-        }
-        str += "]";
-        return str;
-    }
-};
 
 /**
  * @des 显示loading信息 模式
@@ -4013,7 +3391,7 @@ JSON.toString = function (jsonObj) {
  *            提示信息
  */
 tlv8.showModelState = function (state, msg) {
-    if (state && state == true) {
+    if (state && state === true) {
         tlv8.loadindex = layui.layer.load(2);
     } else {
         if (tlv8.loadindex) {
@@ -4023,7 +3401,7 @@ tlv8.showModelState = function (state, msg) {
     }
 };
 tlv8.DateAdd = function (strInterval, date, Number) {
-    var dtTmp = date;
+    let dtTmp = date;
     switch (strInterval) {
         case 's':
             return new Date(Date.parse(dtTmp) + (1000 * Number));
@@ -4070,189 +3448,30 @@ function getNevType() {
 }
 
 function getIEVersion() {
-    if (navigator.appVersion.match(/6./i) == "6.") {
+    if (navigator.appVersion.match(/6./i) === "6.") {
         return "IE6";
-    } else if (navigator.appVersion.match(/7./i) == "7.") {
+    } else if (navigator.appVersion.match(/7./i) === "7.") {
         return "IE7";
-    } else if (navigator.appVersion.match(/8./i) == "8.") {
+    } else if (navigator.appVersion.match(/8./i) === "8.") {
         return "IE8";
-    } else if (navigator.appVersion.match(/9./i) == "9.") {
+    } else if (navigator.appVersion.match(/9./i) === "9.") {
         return "IE9";
     }
     return "Other";
 }
 
-if (topparent != window) {
-    // if (!checkPathisHave(cpath+"/comon/js/jquery/jquery.min.js")
-    // && !checkPathisHave($dpjspath + "jquery/jquery.min.js")) {
-    // createJSSheet($dpjspath + "jquery/jquery.min.js");
-    // }
-}
-
-tlv8.requerat = function () {
-    $("[rel='remind']").each(function () {
-        var val = $(this).val();
-        if (!val || val == "") {
-            $(this).val($(this).attr("rel-value"));
-            $(this).css("color", "blue");
-        }
-        $(this).unbind("focus");
-        $(this).bind('focus', function () {
-            var val = $(this).val();
-            if (val && val == $(this).attr("rel-value")) {
-                $(this).val("");
-            }
-        });
-        $(this).unbind("blur");
-        $(this).bind('blur', function () {
-            var val = $(this).val();
-            if (!val || val == "") {
-                $(this).val($(this).attr("rel-value"));
-                $(this).css("color", "blue");
-            } else {
-                $(this).css("color", "#000");
-            }
-        });
-    });
-};
-
-$(document).ready(function () {
-    tlv8.requerat();
-});
-
-/**
- * @folder 目录 如："/行政审批/会议纪要"
- * @title 标题
- * @table 业务数据表
- * @billid 单据主键
- * @surl 查看页面地址
- */
-tlv8.docpigeonhole = function (folder, title, table, billid, surl) {
-    var param = new tlv8.RequestParam();
-    param.set("folder", folder);
-    param.set("title", title);
-    param.set("table", table);
-    param.set("billid", billid);
-    param.set("surl", surl);
-    tlv8.XMLHttpRequest("docpigeonholeAction", param, "POST", false);
-};
-
-/**
- * @title 标题
- * @table 业务数据表
- * @billid 单据主键
- * @surl 查看页面地址
- */
-tlv8.Mydocpigeonhole = function (title, table, billid, surl) {
-    var newid = new UUID().toString();
-    var filename = "<a href=\"javascript:tlv8.docOpendeatail(''" + title
-        + "'',''" + surl + "'',''" + billid + "'')\">" + title + "</a>";
-    tlv8.portal.dailog
-        .openDailog(
-            "选择归档目录",
-            "/SA/docnode/dialog/myFolderSelect.html",
-            300,
-            400,
-            function (rdata) {
-                var sql = "insert into PERSONAL_FILE(SID,SFILENAME,SCREATORID,SCREATORNAME,SMASTERID,VERSION)"
-                    + " select '"
-                    + newid
-                    + "','"
-                    + filename
-                    + "','"
-                    + tlv8.Context.getCurrentPersonID()
-                    + "',"
-                    + "'"
-                    + tlv8.Context.getCurrentPersonName()
-                    + "','" + rdata + "',0 from dual";
-                tlv8.sqlUpdateAction("system", sql, function (re) {
-                    if (re.flag == "false") {
-                        alert(re.message);
-                    } else {
-                        alert("归档成功!");
-                    }
-                }, true);
-            });
-};
-
-/**
- * @title 标题
- * @table 业务数据表
- * @billid 单据主键
- * @surl 查看页面地址
- */
-tlv8.ognDocpigeonhole = function (title, table, billid, surl) {
-    var selsql = "select * from oa_dz_filecabinet where FMAINID='" + billid
-        + "'";
-    var result = tlv8.sqlQueryActionforJson("oa", selsql);
-    if (result.data.length > 0) {
-        if (confirm("文件已归过档,是否更换文件夹")) {
-            tlv8.portal.dailog.openDailog("选择归档目录",
-                "/SA/docnode/dialog/ognFolderSelect.html", 300, 400,
-                function (rdata) {
-                    var sql = "update oa_dz_filecabinet set FMASTERID='"
-                        + rdata + "' where FMAINID='" + billid + "'";
-                    tlv8.sqlUpdateAction("oa", sql);
-                    alert("归档成功!");
-                });
-        }
-    } else {
-        var newid = new UUID().toString();
-        var filename = "<a href=\"javascript:tlv8.docOpendeatail(''"
-            + title + "'',''" + surl + "'',''" + billid + "'')\">" + title
-            + "</a>";
-        tlv8.portal.dailog
-            .openDailog(
-                "选择归档目录",
-                "/SA/docnode/dialog/ognFolderSelect.html",
-                300,
-                400,
-                function (rdata) {
-                    var sql = "insert into oa_dz_filecabinet(FID,FFILENAME,FCREATORID,FCREATORNAME,FMASTERID,FMAINID,VERSION)"
-                        + " select '"
-                        + newid
-                        + "','"
-                        + filename
-                        + "','"
-                        + tlv8.Context.getCurrentPersonID()
-                        + "',"
-                        + "'"
-                        + tlv8.Context.getCurrentPersonName()
-                        + "','"
-                        + rdata
-                        + "','"
-                        + billid
-                        + "',0 from dual";
-                    tlv8.sqlUpdateAction("oa", sql, function (re) {
-                        if (re.flag == "false") {
-                            alert(re.message);
-                        } else {
-                            alert("归档成功!");
-                        }
-                    }, true);
-                });
-    }
-};
-/*
- * 查看归档文件详细
- */
-tlv8.docOpendeatail = function (name, surl, billid) {
-    var url = cpath + surl + "?sData1=" + billid;
-    tlv8.portal.openWindow(name, url);
-};
-
 // 填写审批意见
 tlv8.writeOpinion = function (view) {
-    var taptt = tlv8.RequestURLParam.getParam("activity-pattern");
-    var isTasksub = (taptt == "detail");
+    let taptt = tlv8.RequestURLParam.getParam("activity-pattern");
+    let isTasksub = (taptt == "detail");
     if (isTasksub) {
         alert("已办任务不能再填写意见!");
         return;
     }
-    var sData1 = tlv8.RequestURLParam.getParam("sData1");
-    var flowID = tlv8.RequestURLParam.getParam("flowID");
-    var taskID = tlv8.RequestURLParam.getParam("taskID");
-    var url = "/flw/flwcommo/flowDialog/processAudit.html";
+    let sData1 = tlv8.RequestURLParam.getParam("sData1");
+    let flowID = tlv8.RequestURLParam.getParam("flowID");
+    let taskID = tlv8.RequestURLParam.getParam("taskID");
+    let url = "/flw/flwcommo/flowDialog/processAudit.html";
     url += "?flowID=" + flowID;
     url += "&taskID=" + taskID;
     url += "&sData1=" + sData1;
@@ -4265,44 +3484,43 @@ tlv8.writeOpinion = function (view) {
 
 // 加载审核意见
 tlv8.loadOption = function (viewID, sData1) {
-    var param = new tlv8.RequestParam();
+    let param = new tlv8.RequestParam();
     param.set("fbillID", sData1);
     param.set("fopviewID", viewID);
-    var re = tlv8.XMLHttpRequest("LoadAuditOpinionAction", param, "POST", false);
-    var redata = re.data.data;
+    let re = tlv8.XMLHttpRequest("LoadAuditOpinionAction", param, "POST", false);
+    let redata = re.data.data;
     try {
         redata = window.eval("(" + redata + ")");
     } catch (e) {
     }
-    var viewHTml = "<ul style='width:100%;font-size:14px;display: block;overflow:hidden;'>";
-    for (var i = 0; i < redata.length; i++) {
-        var opinion = redata[i].FAGREETEXT;
-        var writeDate = redata[i].FCREATETIME;
-        var personid = redata[i].FCREATEPERID;
-        var personname = redata[i].FCREATEPERNAME;
-        var psign = redata[i].FSIGN;
-        if (writeDate && writeDate != "") {
+    let viewHTml = "<ul style='width:100%;font-size:14px;display: block;overflow:hidden;'>";
+    for (let i = 0; i < redata.length; i++) {
+        let opinion = redata[i].FAGREETEXT;
+        let writeDate = redata[i].FCREATETIME;
+        let personid = redata[i].FCREATEPERID;
+        let personname = redata[i].FCREATEPERNAME;
+        let psign = redata[i].FSIGN;
+        if (writeDate && writeDate !== "") {
             writeDate = tlv8.System.Date.strToDate(writeDate);
             writeDate = writeDate.format("yyyy-MM-dd HH:mm");
         }
-        var hdws = viewID + "_handwrite";
-        if (psign && psign != "") {
+        let hdws = viewID + "_handwrite";
+        if (psign && psign !== "") {
             writpsm = '<img src="data:image/png;base64,' + psign + '" style="height:30px;">&nbsp;&nbsp;';
         } else {
-            var param1 = new tlv8.RequestParam();
+            let param1 = new tlv8.RequestParam();
             param1.set("personid", personid);
-            var pcre = tlv8.XMLHttpRequest("LoadAuditOpinionAction", param1, "POST", false);
-            var picID = "";
+            let pcre = tlv8.XMLHttpRequest("LoadAuditOpinionAction", param1, "POST", false);
+            let picID = "";
             if (pcre.data.length > 0) {
                 picID = pcre.data[0].SID;
             }
-            var url = cpath + "/comon/picCompant/Pic-read?dbkey=sa"
-                + "&tablename=SA_HANDWR_SIGNATURE&cellname=SHSPIC&fID=" + picID
+            let url = cpath + "/common/picCompact/Pic-read?dbkey=sa"
+                + "&tablename=sa_handwr_signature&cellname=shspic&fID=" + picID
                 + "&Temp=" + new UUID().toString();
-            var image = "<img src='" + url
-                + "' style='width:100px;;height:30px;'></img>";
-            var writpsm = personname;
-            if (picID && picID != "") {
+            let image = "<img src='" + url + "' style='width:100px;;height:30px;'></img>";
+            let writpsm = personname;
+            if (picID && picID !== "") {
                 writpsm = image;
             }
         }
@@ -4320,12 +3538,13 @@ tlv8.loadOption = function (viewID, sData1) {
         viewHTml += "</li>";
     }
     viewHTml += "</ul>";
-    var oph = redata.length * 30 + 30;
-    $("#" + viewID).css("width", "100%");
-    $("#" + viewID).css("min-height", oph + "px");
-    $("#" + viewID).html(viewHTml);
-    if ($("#" + viewID).parent().height() < $("#" + viewID).height()) {
-        $("#" + viewID).parent().height($("#" + viewID).height() + 10);
+    let oph = redata.length * 30 + 30;
+    let view = $("#" + viewID);
+    view.css("width", "100%");
+    view.css("min-height", oph + "px");
+    view.html(viewHTml);
+    if (view.parent().height() < view.height()) {
+        view.parent().height(view.height() + 10);
     }
 };
 
@@ -4336,11 +3555,11 @@ function disbackspace() {
             "keydown",
             function (event) {
                 event = event || window.event;
-                var elem = event.srcElement ? event.srcElement
+                let elem = event.srcElement ? event.srcElement
                     : event.target;
-                if (event.keyCode == 8) {
-                    var name = elem.nodeName;
-                    if (name != 'INPUT' && name != 'TEXTAREA') {
+                if (event.keyCode === 8) {
+                    let name = elem.nodeName;
+                    if (name !== 'INPUT' && name !== 'TEXTAREA') {
                         if (event.preventDefault) {
                             event.preventDefault();
                         } else {
@@ -4348,11 +3567,11 @@ function disbackspace() {
                         }
                         return false;
                     }
-                    var type_e = elem.type.toUpperCase();
-                    if (name == 'INPUT'
-                        && (type_e != 'TEXT'
-                            && type_e != 'TEXTAREA'
-                            && type_e != 'PASSWORD' && type_e != 'FILE')) {
+                    let type_e = elem.type.toUpperCase();
+                    if (name === 'INPUT'
+                        && (type_e !== 'TEXT'
+                            && type_e !== 'TEXTAREA'
+                            && type_e !== 'PASSWORD' && type_e !== 'FILE')) {
                         if (event.preventDefault) {
                             event.preventDefault();
                         } else {
@@ -4360,8 +3579,8 @@ function disbackspace() {
                         }
                         return false;
                     }
-                    if (name == 'INPUT'
-                        && (elem.readOnly == true || elem.disabled == true)) {
+                    if (name === 'INPUT'
+                        && (elem.readOnly === true || elem.disabled === true)) {
                         if (event.preventDefault) {
                             event.preventDefault();
                         } else {
@@ -4381,7 +3600,7 @@ $(document).ready(function () {
  * sDate1和sDate2是2002-12-18格式
  */
 function DateDiff(startDate, endDate) {
-    var aDate, oDate1, oDate2, iDays;
+    let aDate, oDate1, oDate2, iDays;
     aDate = startDate.split("-");
     oDate1 = new Date(aDate[1] + '-' + aDate[2] + '-' + aDate[0]); // 转换为12-18-2002格式
     aDate = endDate.split("-");
@@ -4400,15 +3619,15 @@ function DateDiff(startDate, endDate) {
  */
 (function ($) {
     $.fn.gridSelect = function (options) {
-        var defaults = {
+        let defaults = {
             editable: false,
             valueField: "id",
             textField: "text",
             method: "get"
         };
-        var opts = $.extend(defaults, options);
-        var _this = $(this);
-        var optiondata;
+        let opts = $.extend(defaults, options);
+        let _this = $(this);
+        let optiondata;
         if (opts.data) {
             optiondata = opts.data;
         } else if (opts.url) {
@@ -4429,8 +3648,8 @@ function DateDiff(startDate, endDate) {
                 }
             });
         }
-        var selectob;
-        if (this.tagName == "SELECT") {
+        let selectob;
+        if (this.tagName === "SELECT") {
             selectob = _this;
         } else {
             selectob = $("<select></select>")
@@ -4441,22 +3660,22 @@ function DateDiff(startDate, endDate) {
         }
         selectob.append("<option></option>");
         if (optiondata && optiondata.length > 0) {
-            for (var o = 0; o < optiondata.length; o++) {
-                var opdata = optiondata[o];
-                var op = $("<option></option>");
+            for (let o = 0; o < optiondata.length; o++) {
+                let opdata = optiondata[o];
+                let op = $("<option></option>");
                 op.attr("value", opdata[opts.valueField]);
                 if (opts.textField.indexOf(",") < 0) {
                     op.text(opdata[opts.textField]);
                 } else {
-                    var tfields = opts.textField.split(",");
-                    var optexts = [];
-                    for (var t = 0; t < tfields.length; t++) {
-                        var field = tfields[t];
+                    let tfields = opts.textField.split(",");
+                    let optexts = [];
+                    for (let t = 0; t < tfields.length; t++) {
+                        let field = tfields[t];
                         optexts.push(opdata[field]);
                     }
                     op.text(optexts.join(" "));
                 }
-                for (var pk in opdata) {
+                for (let pk in opdata) {
                     op.attr(pk, opdata[pk]);
                 }
                 selectob.append(op);
@@ -4464,8 +3683,8 @@ function DateDiff(startDate, endDate) {
             }
         }
         selectob.change(function () {
-            var selop = $(this).children('option:selected');
-            var selopob = selop.get(0);
+            let selop = $(this).children('option:selected');
+            let selopob = selop.get(0);
             if (opts.onSelect && typeof opts.onSelect == "function") {
                 opts.onSelect(selopob.rec, selopob);
             }
