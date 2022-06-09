@@ -1,0 +1,20 @@
+<html lang="zh_CN">
+{% include "common/tree_page_head.html" %}
+<script type="text/javascript" src="{{ url_for('static',filename='common/StaticGrid/StaticGrid.js') }}"></script>
+<script type="text/javascript"
+        src="{{ url_for('static',filename='system/dialog/singleSelectPsn.js',v='1.0.20220609') }}"></script>
+<body>
+<div id="MyDiv" class="easyui-layout" fit="true">
+    <div data-options="region:'west',split:true" style="width: 230px; overflow: hidden;">
+        <form id="main_org_trr" style="display: none;"></form>
+        <div style="overflow:auto; width:100%; height:100%;overflow: hidden;">
+            <ul id="JtreeDemo" class="ztree"></ul>
+        </div>
+    </div>
+    <div data-options="region:'center'" style="overflow: hidden;">
+        <div id="main-grid-view" style="width: 100%; height: 100%; align: left;">
+        </div>
+    </div>
+</div>
+</body>
+</html>

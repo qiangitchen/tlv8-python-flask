@@ -1,38 +1,380 @@
 <html lang="zh_CN">
 {% include "common/tab_page_head.html" %}
-<body style="overflow: hidden;">
-<div id="tabveiw1" class="easyui-tabs" fit="true" data-options="onSelect:tabsselected,border:false">
+<script type="text/javascript" src="{{ url_for('static',filename='common/js/flow.js') }}"></script>
+<body style="overflow: hidden;" onload="loadProcessList()">
+<div id="tabveiw1" class="easyui-tabs" data-options="onSelect:tabsselected,border:false,fit:true">
     <div id="detail_01" title="流程实例" style="overflow: hidden; padding: 10px;">
-        <table class="layui-table" lay-data="{height:'full-60', page:true, id:'grid_flowView'}" lay-filter="grid_flowView">
-            <thead>
-            <tr>
-                <th lay-data="{field:'sid', hide:true}"></th>
-                <th lay-data="{field:'num', width:60}">序号</th>
-                <th lay-data="{field:'sname'}">流程名称</th>
-                <th lay-data="{field:'sflowname'}">流程标题</th>
-                <th lay-data="{field:'screatetime',width:160}">创建时间</th>
-                <th lay-data="{field:'sepersonname',width:90}">创建人</th>
-                <th lay-data="{field:'sstatusid', hide:true}"></th>
-                <th lay-data="{field:'sstatusname',width:90}">状态名称</th>
-            </tr>
-            </thead>
-        </table>
+        <div style="width: 100%; height: 35px;">
+            <button class="layui-btn  layui-btn-sm layui-btn-disabled" type="button" style="float: left;"
+                    id="calweckupItem" onclick="awakenFlow()" disabled>唤醒
+            </button>
+            <button class="layui-btn  layui-btn-sm layui-btn-normal layui-btn-disabled" type="button"
+                    style="float: left;"
+                    id="restartItem" onclick="restartFlow()" disabled>启动流程
+            </button>
+            <div class='input-group input-group-sm'
+                 style='width:80px;margin-left: 5px; margin-right:5px; height: 30px; float: left;'>
+                <select id='status_select' lay-filter='status_select1' class='form-control'
+                        onchange="statusChange()">
+                    <option value='all'>全部</option>
+                    <option value='tesExecuting'>正在处理</option>
+                    <option value='tesFinished'>已完成</option>
+                    <option value='tesCanceled'>已取消</option>
+                    <option value='tesPause'>已暂停</option>
+                    <option value='tesAborted'>已终止</option>
+                </select>
+            </div>
+            <div class='input-group input-group-sm'
+                 style='width:80px;margin-left: 5px; margin-right:5px; height: 30px; float: left;'>
+                <select onchange='selectOrgFilter(this)' id='Org_select' lay-filter='Org_select1' value='本人'
+                        class='form-control'>
+                    <!--
+                    <option value='all'>全部</option>
+                    -->
+                    <option value='myself'>本人</option>
+                    <option value='select'>选择...</option>
+                </select>
+            </div>
+            <div class='input-group input-group-sm' style='float:left; width:280px; height: 30px;'>
+                <input type="text" id="search_text" placeholder="快速查询..." class='form-control'>
+                <span class='input-group-btn'>
+                        <button class='btn btn-default' onclick="loadProcessList()"><span
+                                class='glyphicon glyphicon-search'></span>查询</button>
+                    </span>
+            </div>
+        </div>
+        <div style="width: 100%;">
+            <table class="layui-table" lay-data="{height:'full-100', page:true,even:true, id:'grid_flowView'}"
+                   lay-filter="grid_flowView">
+                <thead>
+                <tr>
+                    <th lay-data="{field:'sid', hide:true}"></th>
+                    <th lay-data="{field:'sflowid', hide:true}"></th>
+                    <th lay-data="{field:'no', width:60}">序号</th>
+                    <th lay-data="{field:'sflowname'}">任务标题</th>
+                    <th lay-data="{field:'sname'}">流程名称</th>
+                    <th lay-data="{field:'sstatusid', hide:true}"></th>
+                    <th lay-data="{field:'sstatusname',width:90}">状态名称</th>
+                    <th lay-data="{field:'screatetime',width:160}">创建时间</th>
+                    <th lay-data="{field:'sepersonname',width:90}">创建人</th>
+                    <th lay-data="{field:'sefname'}">创建人全称</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
     </div>
-    <div id="detail_02" title="任务列表" style="overflow: hidden;">
-        <div component="dataGrid" id="grid_taskWindow" style="width:100%;height:100%;"
-             onselected="grid_task_selected"></div>
+    <div id="detail_02" title="任务列表" style="overflow: hidden; padding: 10px;">
+        <div style="width: 100%; height: 35px;">
+            <button class="layui-btn  layui-btn-sm layui-btn-disabled" type="button" style="float: left;"
+                    id="do_task_Item" onclick="doTask()" disabled>任务处理
+            </button>
+            <button class="layui-btn  layui-btn-sm layui-btn-normal layui-btn-disabled" type="button"
+                    style="float: left;"
+                    id="SpecFlowoutItem" onclick="SpecFlowOut()" disabled>特送
+            </button>
+            <button class="layui-btn  layui-btn-sm layui-btn-warm layui-btn-disabled" type="button" style="float: left;"
+                    id="changeExcutor_Item" onclick="changeExecutor()" disabled>修改执行人
+            </button>
+            <button class="layui-btn  layui-btn-sm layui-btn-danger layui-btn-disabled" type="button"
+                    style="float: left;"
+                    id="puse_Item" onclick="cancelTask()" disabled>取消待办
+            </button>
+            <button class="layui-btn  layui-btn-sm layui-btn-danger layui-btn-disabled" type="button"
+                    style="float: left;"
+                    id="start_Item" onclick="restartTask()" disabled>激活待办
+            </button>
+            <div class='input-group input-group-sm' style='float:left; width:280px; height: 30px; margin-left: 10px;'>
+                <input type="text" id="search_task" placeholder="快速查询..." class='form-control'>
+                <span class='input-group-btn'>
+                        <button class='btn btn-default' onclick="loadTaskList()"><span
+                                class='glyphicon glyphicon-search'></span>查询</button>
+                    </span>
+            </div>
+        </div>
+        <div style="width: 100%;">
+            <table class="layui-table" lay-data="{height:'full-100', page:true,even:true, id:'grid_taskWindow'}"
+                   lay-filter="grid_taskWindow">
+                <thead>
+                <tr>
+                    <th lay-data="{field:'sid', hide:true}"></th>
+                    <th lay-data="{field:'sflowid', hide:true}"></th>
+                    <th lay-data="{field:'no', width:60}">序号</th>
+                    <th lay-data="{field:'sname'}">名称</th>
+                    <th lay-data="{field:'sstatusid', hide:true}"></th>
+                    <th lay-data="{field:'sstatusname',width:90}">状态名称</th>
+                    <th lay-data="{field:'sepersonname',width:90}">处理人</th>
+                    <th lay-data="{field:'sexecutetime',width:160}">处理时间</th>
+                    <th lay-data="{field:'scpersonname',width:90}">创建人</th>
+                    <th lay-data="{field:'screatetime',width:160}">创建时间</th>
+                    <th lay-data="{field:'sefname'}">处理人全称</th>
+                    <th lay-data="{field:'scfname'}">创建人全称</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
     </div>
     <div id="detail_03" title="流程轨迹" style="height:100%;overflow: hidden;">
-        <iframe id="frame_flowChart" src="" frameborder="0" style="width:100%;height:100%;"></iframe>
+        <iframe id="frame_flowChart" src="" frameborder="0" style="width:100%;height:100%;border: 0 none;"></iframe>
     </div>
     <div id="detail_04" title="流程数据" style="height:100%;overflow: hidden;">
-        <iframe id="frame_flowData" src="" frameborder="0" style="width:100%;height:100%;"></iframe>
+        <iframe id="frame_flowData" src="" frameborder="0" style="width:100%;height:100%;border: 0 none;"></iframe>
     </div>
 </div>
 </body>
 <script type="text/javascript">
-    function tabsselected(title, index) {
+    let currentRow = {};//记录当前选中的流程实例
+    let currentTask = {};//记录当前选中的任务
 
+    //改变选项卡时触发
+    function tabsselected(title, index) {
+        if (index === 0) {
+            if (!currentRow.sid) {
+                loadProcessList();
+            }
+        }
+        if (index === 1) {
+            loadTaskList();
+        }
+        if (index === 2) {
+            tab_flowChart();
+        }
+        if (index === 3) {
+            tab_flowData();
+        }
     }
+
+    //触发行单击事件
+    layui.table.on('row(grid_flowView)', function (obj) {
+        //console.log(obj.tr) //得到当前行元素对象
+        //console.log(obj.data) //得到当前行数据
+        obj.tr.parent().find('tr').removeClass('active')
+        obj.tr.addClass('active') //选中行加特殊背景颜色
+        currentRow = obj.data;
+        let calweckupItemObj = $("#calweckupItem");
+        if (currentRow.sstatusid === 'tesPause') {
+            calweckupItemObj.removeAttr("disabled");
+            calweckupItemObj.removeClass("layui-btn-disabled");
+        } else {
+            calweckupItemObj.attr("disabled", "disabled");
+            calweckupItemObj.addClass("layui-btn-disabled");
+        }
+        let restartItemObj = $("#restartItem");
+        if (currentRow.sstatusid === 'tesAborted') {
+            restartItemObj.removeAttr("disabled");
+            restartItemObj.removeClass("layui-btn-disabled");
+        } else {
+            restartItemObj.attr("disabled", "disabled");
+            restartItemObj.addClass("layui-btn-disabled");
+        }
+    });
+
+    //触发行双击事件
+    layui.table.on('rowDouble(grid_flowView)', function () {
+        $("#tabveiw1").tabs('select', 1);
+    });
+
+    //加载流程实例列表数据
+    function loadProcessList() {
+        let search_text = $("#search_text").val();
+        let surl = '/system/flow/monitor/processDataList?search_text=' + J_u_encode(search_text);
+        let status = $("#status_select").val();
+        if (status && status !== "") {
+            surl += "&status=" + J_u_encode(status);
+        }
+        let orgs = $("#Org_select").val();
+        if (orgs !== "select") {
+            surl += "&orgs=" + J_u_encode(orgs);
+        }
+        layui.table.reload('grid_flowView', {
+            url: surl,
+            done: function () {//res, curr, count
+                $("#search_text").val(search_text);
+            }
+        });
+    }
+
+    //唤醒流程
+    function awakenFlow() {
+        layui.layer.confirm("唤醒流程将会把已暂停的任务恢复到待办，确认唤醒吗？", function () {
+            let param = new tlv8.RequestParam();
+            param.set("flowID", currentRow.sflowid);
+            param.set("status", "tesPause");
+            tlv8.XMLHttpRequest("/flowControl/flowAwakenAction", param, "post", true, function (r) {
+                if (r.state === true) {
+                    layui.layer.msg("唤醒成功~");
+                    loadProcessList();
+                } else {
+                    layui.layer.alert(r.msg);
+                }
+            });
+        });
+    }
+
+    //启动流程
+    function restartFlow() {
+        layui.layer.confirm("确定重启已终止的流程吗？", function () {
+            let param = new tlv8.RequestParam();
+            param.set("flowID", currentRow.sflowid);
+            param.set("status", "tesAborted");
+            tlv8.XMLHttpRequest("/flowControl/flowAwakenAction", param, "post", true, function (r) {
+                if (r.state === true) {
+                    layui.layer.msg("启动成功~");
+                    loadProcessList();
+                } else {
+                    layui.layer.alert(r.msg);
+                }
+            });
+        });
+    }
+
+    function statusChange() {
+        loadProcessList();
+    }
+
+    function selectOrgFilter(obj) {
+        alert(obj);
+    }
+
+    //加载任务列表
+    function loadTaskList() {
+        let search_text = $("#search_task").val();
+        let surl = '/system/flow/monitor/taskDataList?search_text=' + J_u_encode(search_text);
+        surl += "&flowid=" + J_u_encode(currentRow.sflowid);
+        layui.table.reload('grid_taskWindow', {
+            url: surl,
+            done: function () {//res, curr, count
+                $("#search_task").val(search_text);
+            }
+        });
+    }
+
+    //触发行单击事件
+    layui.table.on('row(grid_taskWindow)', function (obj) {
+        obj.tr.parent().find('tr').removeClass('active')
+        obj.tr.addClass('active') //选中行加特殊背景颜色
+        currentTask = obj.data;
+        let do_task_Item_obj = $("#do_task_Item");
+        if (currentTask.sstatusid === 'tesReady') {
+            do_task_Item_obj.removeAttr("disabled");
+            do_task_Item_obj.removeClass("layui-btn-disabled");
+        } else {
+            do_task_Item_obj.attr("disabled", "disabled");
+            do_task_Item_obj.addClass("layui-btn-disabled");
+        }
+        let SpecFlowoutItemObj = $("#SpecFlowoutItem");
+        if (currentTask.sstatusid === 'tesReady') {
+            SpecFlowoutItemObj.removeAttr("disabled");
+            SpecFlowoutItemObj.removeClass("layui-btn-disabled");
+        } else {
+            SpecFlowoutItemObj.attr("disabled", "disabled");
+            SpecFlowoutItemObj.addClass("layui-btn-disabled");
+        }
+        let changeExcutor_Item_obj = $("#changeExcutor_Item");
+        if (currentTask.sstatusid === 'tesReady') {
+            changeExcutor_Item_obj.removeAttr("disabled");
+            changeExcutor_Item_obj.removeClass("layui-btn-disabled");
+        } else {
+            changeExcutor_Item_obj.attr("disabled", "disabled");
+            changeExcutor_Item_obj.addClass("layui-btn-disabled");
+        }
+        let puse_Item_obj = $("#puse_Item");
+        if (currentTask.sstatusid === 'tesReady') {
+            puse_Item_obj.removeAttr("disabled");
+            puse_Item_obj.removeClass("layui-btn-disabled");
+        } else {
+            puse_Item_obj.attr("disabled", "disabled");
+            puse_Item_obj.addClass("layui-btn-disabled");
+        }
+        let start_Item_obj = $("#start_Item");
+        if (currentTask.sstatusid === 'tesCanceled') {
+            start_Item_obj.removeAttr("disabled");
+            start_Item_obj.removeClass("layui-btn-disabled");
+        } else {
+            start_Item_obj.attr("disabled", "disabled");
+            start_Item_obj.addClass("layui-btn-disabled");
+        }
+    });
+
+    //处理任务
+    function doTask() {
+        tlv8.task.openTask(currentTask.sid);
+    }
+
+    //特送
+    function SpecFlowOut() {
+        tlv8.task.specFlowOut(currentTask.sid, function (r) {
+            loadTaskList(r);
+        });
+    }
+
+    //修改执行人
+    function changeExecutor() {
+        if (currentTask.sid) {
+            tlv8.portal.dailog.openDailog("选择执行人",
+                "/system/dialog/singleSelectPsn", 600, 600, function (
+                    re) {
+                    let param = new tlv8.RequestParam();
+                    param.set("taskID", currentTask.sid);
+                    param.set("epersonid", re.spersonid);
+                    tlv8.XMLHttpRequest("/flowControl/ChangeFlowExecutorAction", param,
+                        "POST", true, function (r) {
+                            if (r.state === false) {
+                                layui.layer.alert(r.msg);
+                            } else {
+                                layui.layer.msg("修改成功~");
+                                loadTaskList();
+                            }
+                        });
+                });
+        }
+    }
+
+    //取消任务
+    function cancelTask() {
+        layui.layer.confirm("确定取消任务吗？", function () {
+            tlv8.task.cancelTask(currentTask.sid, function (r) {
+                loadTaskList(r);
+            });
+        });
+    }
+
+    //激活取消的任务
+    function restartTask() {
+        layui.layer.confirm("确定激活已取消任务吗？", function () {
+            tlv8.task.flowRestart(currentTask.sid, function (r) {
+                loadTaskList(r);
+            });
+        });
+    }
+
+
+    // 流程轨迹
+    function tab_flowChart() {
+        let frame_flowChart = document.getElementById("frame_flowChart");
+        if (currentRow.sid) {
+            let url = cpath + "/system/flow/viewiocusbot/";
+            url += "?flowID=" + currentRow.sflowid + "&taskID=" + currentRow.sid;
+            frame_flowChart.src = url;
+        } else {
+            frame_flowChart.src = "";
+            frame_flowChart.contentWindow.document.write("<p>没有指定流程实例~</p>");
+        }
+    }
+
+    //流程数据
+    function tab_flowData() {
+        let frame_flowData = document.getElementById("frame_flowData");
+        if (currentTask.sid) {
+            let url = currentTask.seurl;
+            url += "?flowID=" + currentTask.sflowid + "&taskID=" + currentTask.sid + "&sData1=" + currentTask.sdata1
+                + "&task=" + currentTask.sid + "&activity-pattern=detail";
+            frame_flowData.src = url;
+        } else {
+            frame_flowData.src = "";
+            frame_flowData.contentWindow.document.write("<p>没有指定任务~</p>");
+        }
+    }
+
+
 </script>
 </html>

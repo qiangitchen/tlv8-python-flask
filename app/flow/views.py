@@ -4,11 +4,13 @@ from . import flow
 from datetime import datetime
 from flask import request
 from app.common.decorated import user_login
-from app.common.persons import *
 from app.common.pubstatic import url_decode, create_icon
+from app.common.persons import *
 from app.flow.expprocess import *
+from app.flow.exporgexecutor import *
+from app.flow.expbusiness import *
 from app.flow.flowcontroller import start_flow, out_flow, flow_back, flow_forward
-from app.flow.flowentity import FlowActivity
+from app.flow.flowentity import FlowActivity, FlowProcess
 import json
 
 
@@ -184,8 +186,7 @@ def flow_out_action():
                 exeGroup = exeGroup.replace("getProcesssData1()", sdata1)
                 excutorGroup = eval(exeGroup)
             else:  # 如果没有配置规则则自动获取有权限的人员
-                exeGroup = "get_org_unit_has_activity('" + processID + "','" + aftAList[
-                    0].getActivity() + "',False,False)"
+                exeGroup = "get_org_unit_has_activity('" + processID + "','" + afactivity.getActivity() + "',False,False)"
                 excutorGroup = eval(exeGroup)
             nactivity['excutorGroup'] = excutorGroup
             activitylabel = afactivity.getsActivityLabel()
@@ -362,7 +363,7 @@ def flow_transmit_action():
     return json.dumps(rdata, ensure_ascii=False)
 
 
-# 取消流程
+# 取消流程(默认只需求指定的待办)
 @flow.route("/flowcancelAction", methods=["GET", "POST"])
 @user_login
 def flow_cancel_action():
@@ -376,10 +377,48 @@ def flow_cancel_action():
         cur_task.version = cur_task.version + 1
         db.session.add(cur_task)
         db.session.commit()
+        ch_task = SATask.query.filter_by(sflowid=cur_task.sflowid, sstatusid='tesReady').first()
+        if not ch_task:  # 如果当前流程已经没有待办，则将流程状态更新为“已取消”
+            p_task = SATask.query.filter_by(sid=cur_task.sflowid).first()
+            if p_task:
+                p_task.sstatusid = 'tesCanceled'
+                p_task.sstatusname = '已取消'
+                p_task.sexecutetime = datetime.now()
+                p_task.version = p_task.version + 1
+                db.session.add(p_task)
+                db.session.commit()
         rdata['state'] = True
     else:
         rdata['state'] = False
         rdata['msg'] = "任务id无效,或任务已经处理完成不能取消！"
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 激活流程(针对已取消)
+@flow.route("/flowrestartAction", methods=["GET", "POST"])
+@user_login
+def flow_restart_action():
+    rdata = dict()
+    taskID = url_decode(request.form.get('taskID', ''))
+    cur_task = SATask.query.filter_by(sid=taskID, sstatusid='tesCanceled').first()
+    if cur_task:
+        cur_task.sstatusid = 'tesReady'
+        cur_task.sstatusname = '尚未处理'
+        cur_task.sexecutetime = None
+        cur_task.version = cur_task.version + 1
+        db.session.add(cur_task)
+        main_task = SATask.query.filter_by(sid=cur_task.sflowid).first()
+        if main_task:
+            main_task.sstatusid = 'tesExecuting'
+            main_task.sstatusname = '正在处理'
+            main_task.sexecutetime = datetime.now()
+            main_task.version = main_task.version + 1
+            db.session.add(main_task)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "任务id无效！"
     return json.dumps(rdata, ensure_ascii=False)
 
 
@@ -412,32 +451,32 @@ def flow_pause_action():
     return json.dumps(rdata, ensure_ascii=False)
 
 
-# 激活流程
-@flow.route("/flowrestartAction", methods=["GET", "POST"])
+# 唤醒流程（针对已暂停或已终止）
+@flow.route("/flowAwakenAction", methods=["GET", "POST"])
 @user_login
-def flow_restart_action():
+def flow_awaken_action():
     rdata = dict()
     flowID = url_decode(request.form.get('flowID', ''))
-    taskID = url_decode(request.form.get('taskID', ''))
-    cur_task = SATask.query.filter_by(sid=taskID).first()
+    status = url_decode(request.form.get('status', ''))  # tesPause或tesAborted
+    cur_task = SATask.query.filter_by(sid=flowID, sstatusid=status).first()
     if cur_task:
-        cur_task.sstatusid = 'tesReady'
-        cur_task.sstatusname = '尚未处理'
+        cur_task.sstatusid = 'tesExecuting'
+        cur_task.sstatusname = '正在处理'
         cur_task.sexecutetime = None
         cur_task.version = cur_task.version + 1
         db.session.add(cur_task)
-        main_task = SATask.query.filter_by(sid=flowID).first()
+        main_task = SATask.query.filter_by(sflowid=flowID, sstatusid=status).first()
         if main_task:
-            main_task.sstatusid = 'tesExecuting'
-            main_task.sstatusname = '正在处理'
-            main_task.sexecutetime = datetime.now()
+            main_task.sstatusid = 'tesReady'
+            main_task.sstatusname = '尚未处理'
+            main_task.sexecutetime = None
             main_task.version = main_task.version + 1
             db.session.add(main_task)
         db.session.commit()
         rdata['state'] = True
     else:
         rdata['state'] = False
-        rdata['msg'] = "任务id无效！"
+        rdata['msg'] = "流程id无效！"
     return json.dumps(rdata, ensure_ascii=False)
 
 
@@ -601,4 +640,90 @@ def recycle_task_action():
     else:
         rdata['state'] = False
         rdata['msg'] = '没有找到id对应的流程信息！'
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 特送（获取环节信息）
+@flow.route("/GetSpecFlowoutInfoAction", methods=["GET", "POST"])
+@user_login
+def get_spec_flow_out_info_action():
+    rdata = dict()
+    taskID = url_decode(request.form.get('taskID', ''))
+    task = SATask.query.filter_by(sid=taskID, sstatusid='tesReady').first()
+    if task:
+        flowID = task.sflowid
+        sdata1 = task.sdata1
+        processID = task.sprocess
+        aftAList = FlowProcess(processID).getProcessActivitys()
+        afterActList = list()
+        for afactivity in aftAList:
+            nactivity = dict()
+            nactivity['id'] = afactivity.getId()
+            nactivity['name'] = afactivity.getActivityname()
+            nactivity['type'] = afactivity.getType()
+            nactivity['excutorIDs'] = afactivity.getExcutorIDs()
+            nactivity['excutorNames'] = afactivity.getExcutorNames()
+            exeGroup = afactivity.getExcutorGroup()
+            if exeGroup and exeGroup != "":
+                exeGroup = exeGroup.replace("getProcessID()", processID)
+                exeGroup = exeGroup.replace("getFlowID()", flowID)
+                exeGroup = exeGroup.replace("getTaskID()", taskID)
+                exeGroup = exeGroup.replace("getProcesssData1()", sdata1)
+                excutorGroup = eval(exeGroup)
+            else:  # 如果没有配置规则则自动获取有权限的人员
+                exeGroup = ("get_org_unit_has_activity_inter_agency('"
+                            + processID + "','"
+                            + afactivity.getActivity()
+                            + "',False)")
+                excutorGroup = eval(exeGroup)
+            nactivity['excutorGroup'] = excutorGroup
+            activitylabel = afactivity.getsActivityLabel()
+            if not activitylabel or activitylabel == "":
+                activitylabel = afactivity.getActivityname() + ":" + afactivity.getProcessName()
+            else:
+                activitylabel = activitylabel.replace("getProcessID()", processID)
+                activitylabel = activitylabel.replace("getFlowID()", flowID)
+                activitylabel = activitylabel.replace("getTaskID()", taskID)
+                activitylabel = activitylabel.replace("getProcesssData1()", sdata1)
+                activitylabel = eval(activitylabel)
+            nactivity['label'] = activitylabel
+            afterActList.append(nactivity)
+        data = {
+            'activityList': afterActList,
+            'flowID': flowID,
+            'taskID': taskID,
+            'sData1': sdata1
+        }
+        rdata['data'] = data
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = '指定的任务id错误或者任务状态不正确，不能特送！'
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 修改执行人
+@flow.route("/ChangeFlowExecutorAction", methods=["GET", "POST"])
+@user_login
+def change_flow_executor_action():
+    rdata = dict()
+    taskID = url_decode(request.form.get('taskID', ''))
+    epersonid = url_decode(request.form.get('epersonid', ''))
+    task = SATask.query.filter_by(sid=taskID, sstatusid='tesReady').first()
+    if task:
+        person = get_person_info(epersonid)
+        task.sepersonid = person['personid']
+        task.sepersonname = person['personName']
+        task.sedeptid = person['deptid']
+        task.sedeptname = person['deptname']
+        task.seognid = person['ognid']
+        task.seognname = person['ognname']
+        task.sefid = person['personfid']
+        task.sefname = person['personfname']
+        db.session.add(task)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = '指定的任务id错误！'
     return json.dumps(rdata, ensure_ascii=False)

@@ -122,8 +122,6 @@
         table.on('tool(datalist)', function (obj) {
             let data = obj.data;
             if (obj.event === 'viewData') {
-                console.log(data);
-                let option = "{{ option }}";
                 let url = data.seurl;
                 url += "?flowID=" + data.sflowid + "&taskID=" + data.sid + "&sData1=" + data.sdata1
                     + "&task=" + data.sid + "&activity-pattern=detail";

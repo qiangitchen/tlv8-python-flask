@@ -1427,6 +1427,49 @@ tlv8.task = {
         }
     },
     /**
+     * 特送
+     * @param taskID
+     * @param callback
+     */
+    specFlowOut: function (taskID, callback) {
+        let param = new tlv8.RequestParam();
+        param.set("taskID", taskID);
+        tlv8.XMLHttpRequest("/flowControl/GetSpecFlowoutInfoAction", param, "post", true, function (r) {
+            try {
+                let reActData = r.data;
+                let activityListStr = reActData.activityList;
+                let exe_selct_url = "/system/flow/flowDialog/Select_executor";
+                exe_selct_url += "?flowID="
+                    + reActData.flowID;
+                exe_selct_url += "&taskID="
+                    + reActData.taskID;
+                tlv8.portal.dailog.openDailog('流程信息',
+                    exe_selct_url, 800, 600,
+                    function (backData) {
+                        param.set("flowID", backData.flowID);
+                        param.set("taskID", backData.taskID);
+                        param.set("afterActivity", backData.activity);
+                        param.set("epersonids", backData.epersonids);
+                        tlv8.XMLHttpRequest("/flowControl/flowOutAction", param, "post", true,
+                            function (r) {
+                                if (r.state === false) {
+                                    layui.layer.alert(r.msg);
+                                    return false;
+                                } else {
+                                    layui.layer.msg("特送成功~");
+                                    if (callback && typeof callback == "function") {
+                                        callback(r);
+                                    }
+                                }
+                            });
+                    }, null, null,
+                    activityListStr);
+            } catch (e) {
+                layui.layer.alert("流转失败!m:" + e.message);
+            }
+        });
+    },
+    /**
      * 取消流程
      * @param taskID {string} -任务id
      * @param callback {function} -回调函数

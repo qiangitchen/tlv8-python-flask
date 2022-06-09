@@ -7,6 +7,8 @@ from app.flow.codeutils import decodeSpechars
 流程相关实体
 """
 
+null = ""  # null的特殊处理
+
 
 # 流程环节
 class FlowActivity:
@@ -43,7 +45,7 @@ class FlowActivity:
             self.__processID = ProcessID
             self.__processName = dwr.sprocessname
             self.__processActy = dwr.sprocessacty
-            jsonObj = eval(dwr.sprocessacty.replace("null", "''"))
+            jsonObj = eval(dwr.sprocessacty)
             sprocessacty = jsonObj['nodes']
             self.__sActivityList = sprocessacty
             for Acjson in sprocessacty:
@@ -233,3 +235,37 @@ class FlowActivity:
 
     def getOutquery(self):
         return self.__outquery
+
+
+# 流程图实例
+class FlowProcess:
+    __processID = ""
+    __processName = ""
+    __processActy = ""
+
+    def __init__(self, ProcessID):  # 构造函数
+        dwr = SAFlowDraw.query.filter_by(sprocessid=ProcessID).first()
+        if dwr:
+            self.__processID = ProcessID
+            self.__processName = dwr.sprocessname
+            self.__processActy = dwr.sprocessacty
+
+    def getProcessActivitys(self):
+        ActList = list()
+        jsonObj = eval(self.__processActy)
+        ActivityArray = jsonObj['nodes']
+        for Acjson in ActivityArray:
+            if Acjson['type'] != 'condition' and Acjson['type'] != 'start' and Acjson['type'] != 'end':
+                actID = Acjson['id']
+                act = FlowActivity(self.__processID, actID)
+                ActList.append(act)
+        return ActList
+
+    def getProcessID(self):
+        return self.__processID
+
+    def getProcessName(self):
+        return self.__processName
+
+    def getProcessActy(self):
+        return self.__processActy

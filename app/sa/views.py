@@ -448,6 +448,13 @@ def select_ch_psm():
     return render_template("system/dialog/SelectChPsm.html")
 
 
+# 选择人员（单选）
+@system.route("/dialog/singleSelectPsn")
+@user_login
+def single_select_psm():
+    return render_template("system/dialog/singleSelectPsn.html")
+
+
 # 分配人员
 @system.route("/OPM/organization/appendPersonMembers", methods=["POST"])
 @user_login
@@ -1414,3 +1421,104 @@ def task_center():
 @user_login
 def flow_monitor():
     return render_template("system/task/monitor/mainActivity.html")
+
+
+# 流程监控-流程数据列表
+@system.route("/flow/monitor/processDataList", methods=["GET", "POST"])
+@user_login
+def process_data_list():
+    rdata = dict()
+    rdata['code'] = 0
+    person = get_curr_person_info()
+    data_query = SATask.query.filter(SATask.sid == SATask.sflowid)
+    search_text = url_decode(request.args.get('search_text', ''))
+    status = url_decode(request.args.get('status', ''))
+    orgs = url_decode(request.args.get('orgs', 'myself'))
+    if orgs == 'myself':
+        data_query = data_query.filter(SATask.scpersonid == person['personid'])
+    elif orgs != 'all':
+        for ofid in orgs.split(","):
+            data_query = data_query.filter(SATask.scfid.ilike(ofid + '%'))
+
+    if search_text and search_text != '':
+        data_query = data_query.filter(or_(SATask.sname.ilike('%' + search_text + '%'),
+                                           SATask.sepersonname.ilike('%' + search_text + '%')))
+    if status:
+        if status != "all":
+            data_query = data_query.filter_by(sstatusid=status)
+    count = data_query.count()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    rdata['count'] = count
+    page_data = data_query.order_by(SATask.screatetime.desc()).paginate(page, limit)
+    no = 1
+    data = list()
+    for d in page_data.items:
+        row_data = dict()
+        row_data['no'] = no + (page - 1) * limit
+        row_data['sid'] = d.sid
+        row_data['sflowid'] = d.sflowid
+        row_data['sname'] = d.sname
+        row_data['sflowname'] = d.sname
+        ff = SATask.query.filter_by(sparentid=d.sid).first()
+        if ff:
+            row_data['sflowname'] = ff.sname
+        row_data['screatetime'] = datetime.strftime(d.screatetime, '%Y-%m-%d %H:%M:%S')
+        row_data['sepersonname'] = d.sepersonname
+        row_data['sefname'] = d.sefname
+        row_data['sstatusid'] = d.sstatusid
+        row_data['sstatusname'] = d.sstatusname
+        data.append(row_data)
+        no += 1
+    rdata['data'] = data
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 流程监控-任务数据列表
+@system.route("/flow/monitor/taskDataList", methods=["GET", "POST"])
+@user_login
+def task_data_list():
+    rdata = dict()
+    rdata['code'] = 0
+    flowid = url_decode(request.args.get('flowid', ''))
+    data_query = SATask.query.filter(SATask.sflowid == flowid, SATask.sid != flowid)
+    search_text = url_decode(request.args.get('search_text', ''))
+    status = url_decode(request.args.get('status', ''))
+    if search_text and search_text != '':
+        data_query = data_query.filter(or_(SATask.sname.ilike('%' + search_text + '%'),
+                                           SATask.sepersonname.ilike('%' + search_text + '%')))
+    if status:
+        if status != "all":
+            data_query = data_query.filter_by(sstatusid=status)
+    count = data_query.count()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    rdata['count'] = count
+    page_data = data_query.order_by(SATask.screatetime.desc()).paginate(page, limit)
+    no = 1
+    data = list()
+    for d in page_data.items:
+        row_data = dict()
+        row_data['no'] = no + (page - 1) * limit
+        row_data['sid'] = d.sid
+        row_data['sflowid'] = d.sflowid
+        row_data['sname'] = d.sname
+        row_data['sflowname'] = d.sname
+        ff = SATask.query.filter_by(sparentid=d.sid).first()
+        if ff:
+            row_data['sflowname'] = ff.sname
+        row_data['screatetime'] = datetime.strftime(d.screatetime, '%Y-%m-%d %H:%M:%S')
+        row_data['scpersonname'] = d.scpersonname
+        if d.sexecutetime:
+            row_data['sexecutetime'] = datetime.strftime(d.sexecutetime, '%Y-%m-%d %H:%M:%S')
+        row_data['sepersonname'] = d.sepersonname
+        row_data['scfname'] = d.scfname
+        row_data['sefname'] = d.sefname
+        row_data['sstatusid'] = d.sstatusid
+        row_data['sstatusname'] = d.sstatusname
+        row_data['seurl'] = d.seurl
+        row_data['sdata1'] = d.sdata1
+        data.append(row_data)
+        no += 1
+    rdata['data'] = data
+    return json.dumps(rdata, ensure_ascii=False)
