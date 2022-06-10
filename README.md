@@ -99,3 +99,21 @@ http://127.0.0.1:5000/
 默认用户：system/1
 
 
+#### 效果展示
+
+-系统首页
+![系统首页](show/home.png)
+
+
+-组织权限
+![组织权限](show/org.png)
+
+
+-流程设计
+![流程设计](show/flow_design.png)
+
+
+-功能页面
+![功能页面](show/oa.png)
+
+
