@@ -42,7 +42,7 @@ var setting = {
     }
 };
 
-function afterRefresh(event) {
+function afterRefresh() {
     currentNode = null;
     currenttreeID = "";
     currenttreeName = "";
@@ -56,10 +56,10 @@ function beforeClick(treeId, treeNode) {
     currenttreeID = treeNode.id;
     currenttreeName = treeNode.name;
     sorgkindid = treeNode.sorgkindid;
-    if ("org" == sorgkindid || sorgkindid == "ogn") {
+    if ("org" === sorgkindid || sorgkindid === "ogn") {
         $(".buttnew").removeAttr("disabled");
     }
-    if ("dpt" == sorgkindid) {
+    if ("dpt" === sorgkindid) {
         $("#org").attr({
             disabled: "disabled"
         });
@@ -74,7 +74,7 @@ function beforeClick(treeId, treeNode) {
         $("#psm").removeAttr("disabled");
         $("#assignPerson").removeAttr("disabled");
     }
-    if ("pos" == sorgkindid) {
+    if ("pos" === sorgkindid) {
         $("#org").attr({
             disabled: "disabled"
         });
@@ -90,7 +90,7 @@ function beforeClick(treeId, treeNode) {
         $("#psm").removeAttr("disabled");
         $("#assignPerson").removeAttr("disabled");
     }
-    if ("psm" == sorgkindid) {
+    if ("psm" === sorgkindid) {
         $(".buttnew").attr({
             disabled: "disabled"
         });
@@ -125,7 +125,7 @@ function pageLoad() {
         , page: true
     });
     $("#query_text").keyup(function (event) {
-        if (event.keyCode == 13) {
+        if (event.keyCode === 13) {
             loadList();
         }
     });
@@ -148,7 +148,7 @@ function hideMenu() {
 }
 
 function onBodyDown(event) {
-    if (!(event.target.id == "addOrgItem" || event.target.id == "showdivt" || $(
+    if (!(event.target.id === "addOrgItem" || event.target.id === "showdivt" || $(
         event.target).parents("#showdivt").length > 0)) {
         hideMenu();
     }
@@ -160,7 +160,7 @@ function loadList() {
         url += "&parent=" + currenttreeID;
     }
     var searchText = $("#query_text").val();
-    if (searchText && searchText != "") {
+    if (searchText && searchText !== "") {
         url += "&search_text=" + J_u_encode(searchText);
     }
     layui.table.reload('orglist', {
@@ -170,7 +170,7 @@ function loadList() {
 
 function creat_dailogcallback(data) {
     MainJtree.refreshJtree("JtreeView");
-    if (data && data != "") {
+    if (data && data !== "") {
         MainJtree.quickPosition(data);
     } else {
         loadList();
@@ -181,7 +181,7 @@ function editOrgData(data) {
     var rowid = data.sid;
     var SORGKINDID = data.sorgkindid;
     var SPERSONID = data.spersonid;
-    if (SORGKINDID == "psm") {
+    if (SORGKINDID === "psm") {
         tlv8.portal.dailog
             .openDailog('人员信息',
                 "/system/OPM/organization/psm_edit?gridrowid="
@@ -204,7 +204,7 @@ function newognData(type) {
 }
 
 // 新增、编辑人员信息回调
-function creatPsm_dailogcallback(data) {
+function creatPsm_dailogcallback() {
     MainJtree.quickPosition(currenttreeID);
 }
 
@@ -221,7 +221,7 @@ function newPsmData() {
 // 排序
 function sortOrgAction() {
     var rowid = currenttreeID;
-    if (!rowid || rowid == "") {
+    if (!rowid || rowid === "") {
         layui.layer.alert("未选中数据!");
         return;
     }
@@ -231,7 +231,7 @@ function sortOrgAction() {
 
 // 重置密码
 function resetPassword(data) {
-    if (data.sorgkindid != 'psm') {
+    if (data.sorgkindid !== 'psm') {
         layui.layer.alert("当前行的数据不是人员，不能重置密码！");
         return;
     }
@@ -240,7 +240,7 @@ function resetPassword(data) {
         param.set("personid", data.spersonid);
         var r = tlv8.XMLHttpRequest("/system/OPM/organization/ResetPassword", param,
             "post", false, null);
-        if (r.state == true) {
+        if (r.state === true) {
             layui.layer.msg("密码重置成功！");
         } else {
             layui.layer.alert(r.msg);
@@ -262,7 +262,7 @@ function assign_dailogcallback(data) {
     param.set("personIds", data.id);
     tlv8.XMLHttpRequest("/system/OPM/organization/appendPersonMembers", param, "post", true, function (
         r) {
-        if (r.state == true) {
+        if (r.state === true) {
             layui.layer.msg("操作成功!");
             creat_dailogcallback(currenttreeID);// 分配完成刷新数据
         } else {
@@ -273,11 +273,11 @@ function assign_dailogcallback(data) {
 
 // 取消人员分配
 function disassignPsmFn(data) {
-    if (data.sorgkindid != 'psm') {
+    if (data.sorgkindid !== 'psm') {
         layui.layer.alert("当前行的数据不是人员，不能取消分配！");
         return;
     }
-    if (data.snodekind != 'nkLimb') {
+    if (data.snodekind !== 'nkLimb') {
         layui.layer.alert("当前人员并非分配的人员，不能取消分配！");
         return;
     }
@@ -286,7 +286,7 @@ function disassignPsmFn(data) {
             param.set("rowid", data.sid);
             var r = tlv8.XMLHttpRequest("/system/OPM/organization/disassignPsmAction", param, "post", false,
                 null);
-            if (r.state == true) {
+            if (r.state === true) {
                 layui.layer.msg("取消分配成功！");
                 creat_dailogcallback(currenttreeID);// 操作完成刷新数据
             } else {
@@ -303,7 +303,7 @@ function setMemberOrg(data) {
         param1.set("rowid", data.sid);
         tlv8.XMLHttpRequest("/system/OPM/organization/setMemberOrgAction", param1, "post", true,
             function (r) {
-                if (r.state == true) {
+                if (r.state === true) {
                     layui.layer.msg("设置成功！");
                     loadList();
                 } else {
@@ -319,7 +319,7 @@ function dailogcallback(data, rowid) {
     param1.set("rowid", rowid);
     param1.set("orgID", data);
     var r = tlv8.XMLHttpRequest("/system/OPM/organization/moveOrg", param1, "post", false, null);
-    if (r.state != true) {
+    if (r.state !== true) {
         layui.layer.alert(r.msg);
         return;
     }
@@ -337,7 +337,7 @@ function moveOrg(data) {
 
 //改变“启用和禁用”状态
 function changeOrgAble(data) {
-    if (data.svalidstate == "1") {
+    if (data.svalidstate === "1") {
         layui.layer.confirm("禁用该组织，组织下的所有用户将不能使用系统，确定禁用吗?", function () {
             changeOrgAbleAction(data.sid, "0");
         });
@@ -354,7 +354,7 @@ function changeOrgAbleAction(rowid, state) {
     pam.set("state", state);
     tlv8.XMLHttpRequest("/system/OPM/organization/changeOrgAble", pam, "post", true,
         function (r) {
-            if (r.state == false) {
+            if (r.state === false) {
                 layui.layer.alert(r.msg);
             } else {
                 layui.layer.msg("操作成功!");
@@ -370,7 +370,7 @@ function deleteorgitem(data) {
         pam.set("rowid", data.sid);
         tlv8.XMLHttpRequest("/system/OPM/organization/deleteOrgLogic", pam, "post", false,
             function (r) {
-                if (r.state == false) {
+                if (r.state === false) {
                     layui.layer.alert(r.msg);
                 } else {
                     layui.layer.msg("操作成功!");

@@ -1,5 +1,5 @@
 /* 创建树 */
-var param = {
+const param = {
     cell: {
         id: "sid",// 设置构建树的id
         name: "sname",// 树显示的名称
@@ -8,7 +8,7 @@ var param = {
     }
 };
 // 设置树的属性
-var setting = {
+const setting = {
     view: {
         addHoverDom: addHoverDom,
         removeHoverDom: removeHoverDom,
@@ -47,9 +47,9 @@ var setting = {
     }
 };
 
-var currentNode;
+let currentNode;
 
-function onClick(event, treeId, treeNode, clickFlag) {
+function onClick(event, treeId, treeNode) {
     // alert("单击：" + treeNode.id);
     currentNode = treeNode;
     loadList();
@@ -59,31 +59,31 @@ function beforeDrag(treeId, treeNodes) {
     return false;
 }
 
-var newCount = 0;
+let newCount = 0;
 
 function addHoverDom(treeId, treeNode) {
-    var sObj = $("#" + treeNode.tId + "_span");
+    let sObj = $("#" + treeNode.tId + "_span");
     if (treeNode.editNameFlag || $("#addBtn_" + treeNode.id).length > 0)
         return;
-    var addStr = "<button type='button' class='add' id='addBtn_" + treeNode.id
+    let addStr = "<button type='button' class='add' id='addBtn_" + treeNode.id
         + "' title='新增子节点' onfocus='this.blur();'></button>";
     sObj.append(addStr);
-    var btn = $("#addBtn_" + treeNode.id);
+    let btn = $("#addBtn_" + treeNode.id);
     if (btn)
         btn.bind("click", function () {
             newCount++;
-            var zTree = $.fn.zTree.getZTreeObj("tree_folder");
-            var newid = new UUID().toString();
-            var newCode = treeNode.scode + (newCount);
-            var newName = "新增节点" + (newCount);
-            var newSIDPATH = treeNode.sidpath + "/" + newid;
-            var param = new tlv8.RequestParam();
+            let zTree = $.fn.zTree.getZTreeObj("tree_folder");
+            let newid = new UUID().toString();
+            let newCode = treeNode.scode + (newCount);
+            let newName = "新增节点" + (newCount);
+            let newSIDPATH = treeNode.sidpath + "/" + newid;
+            let param = new tlv8.RequestParam();
             param.set("id", newid);
             param.set("pid", treeNode.id);
             param.set("scode", newCode);
             param.set("name", newName);
             param.set("sidpath", newSIDPATH);
-            var r = tlv8.XMLHttpRequest("/system/flow/dwr/dialog/insertflwFolderAction", param,
+            tlv8.XMLHttpRequest("/system/flow/dwr/dialog/insertflwFolderAction", param,
                 "post", true, null);
             zTree.addNodes(treeNode, {
                 id: newid,
@@ -101,9 +101,9 @@ function removeHoverDom(treeId, treeNode) {
 };
 
 function beforeRename(treeId, treeNode, newName) {
-    if (newName.length == 0) {
+    if (newName.length === 0) {
         layui.layer.alert("节点名称不能为空.");
-        var zTree = $.fn.zTree.getZTreeObj("tree_folder");
+        let zTree = $.fn.zTree.getZTreeObj("tree_folder");
         setTimeout(function () {
             zTree.editName(treeNode);
         }, 10);
@@ -117,43 +117,50 @@ function beforeRename(treeId, treeNode, newName) {
  */
 function afterEditName(event, treeId, treeNode) {
     // alert(treeNode.name);
-    var param = new tlv8.RequestParam();
+    let param = new tlv8.RequestParam();
     param.set("id", treeNode.id);
     param.set("name", treeNode.name);
-    var r = tlv8.XMLHttpRequest("/system/flow/dwr/dialog/editflwFolderAction", param, "post",
+    tlv8.XMLHttpRequest("/system/flow/dwr/dialog/editflwFolderAction", param, "post",
         true, null);
 }
 
 function beforeRemove(treeId, treeNode) {
-    if (treeNode.id == "root") {
-        alert("跟目录不能删除!");
+    if (treeNode.id === "root") {
+        layui.layer.alert("根目录不能删除!");
         return false;
     }
-    var zTree = $.fn.zTree.getZTreeObj("tree_folder");
+    let zTree = $.fn.zTree.getZTreeObj("tree_folder");
     zTree.selectNode(treeNode);
-    return confirm("确认删除 节点 -- " + treeNode.name + " 吗？");
+    if (confirm("确认删除 节点 -- " + treeNode.name + " 吗？")) {
+        let param = new tlv8.RequestParam();
+        param.set("id", treeNode.id);
+        param.set("name", treeNode.name);
+        param.set("sidpath", treeNode.sidpath);
+        let r = tlv8.XMLHttpRequest("/system/flow/dwr/dialog/deleteflwFolderAction", param, "post", false);
+        if (r.state === false) {
+            layui.layer.alert(r.msg);
+            return false;
+        } else {
+            layui.layer.msg("删除成功~");
+            return true;
+        }
+    }
+    return false;
 }
 
 function onRemove(e, treeId, treeNode) {
-    var param = new tlv8.RequestParam();
-    param.set("id", treeNode.id);
-    param.set("name", treeNode.name);
-    param.set("sidpath", treeNode.sidpath);
-    var r = tlv8.XMLHttpRequest("/system/flow/dwr/dialog/deleteflwFolderAction", param, "post",
-        true, function () {
-            //clear_draw_board();
-        });
+    //删除之后做
 }
 
-var Jtree_Folder = new Jtree();
+const Jtree_Folder = new Jtree();
 
 function pageLoad() {
     Jtree_Folder.init("tree_folder", setting, param);
 }
 
 function loadList(isAdd) {
-    var search_text = $("#search_text").val();
-    var surl = '/system/flow/dwr/dialog/dataList?search_text=' + J_u_encode(search_text);
+    let search_text = $("#search_text").val();
+    let surl = '/system/flow/dwr/dialog/dataList?search_text=' + J_u_encode(search_text);
     if (currentNode) {
         surl += "&sparent=" + currentNode.id;
     }
@@ -172,7 +179,7 @@ function addData() {
     loadList(true);
 }
 
-var currentRow;
+let currentRow;
 
 function deleteData() {
     if (!currentRow || !currentRow.sid) {
@@ -180,11 +187,11 @@ function deleteData() {
         return;
     }
     layui.layer.confirm("数据删除后不可恢复，确定删除吗?", function () {
-        var param = new tlv8.RequestParam();
+        let param = new tlv8.RequestParam();
         param.set("id", currentRow.sid);
         tlv8.XMLHttpRequest("/system/flow/dwr/dialog/deleteFlowDWR", param, "post",
             true, function (r) {
-                if (r.state == true) {
+                if (r.state === true) {
                     layui.layer.msg("删除成功！");
                     loadList();
                 } else {
@@ -195,13 +202,13 @@ function deleteData() {
 }
 
 function editData(value, field, data) {
-    var param = new tlv8.RequestParam();
+    let param = new tlv8.RequestParam();
     param.set("id", data.sid);
     param.set("value", value);
     param.set("field", field);
     tlv8.XMLHttpRequest("/system/flow/dwr/dialog/editFlowDWR", param, "post",
         true, function (r) {
-            if (r.state == true) {
+            if (r.state === true) {
                 layui.layer.msg("编辑成功！");
                 loadList();
             } else {

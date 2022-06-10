@@ -6,7 +6,7 @@ var currentRole = {};
 function addRoleData() {
     tlv8.portal.dailog.openDailog("添加角色",
         "/system/OPM/role/editRole?operator=new", "500", "400",
-        function (r) {
+        function () {
             reloadList();
         });
 }
@@ -18,7 +18,7 @@ function reloadList() {
     var search_role = $("#search_role").val();
     layui.table.reload('role_list', {
         url: '/system/OPM/role/roleList?search_role=' + J_u_encode(search_role),
-        done: function (res, curr, count) {
+        done: function () {
             $("#search_role").val(search_role);
             loadPermission({});
         }
@@ -34,19 +34,19 @@ function sortAction() {
 
 /**
  * 编辑'角色'
- * @param dtaa
+ * @param data
  */
 function editRoleData(data) {
     tlv8.portal.dailog.openDailog("编辑角色",
         "/system/OPM/role/editRole?operator=edit&rowid=" + data.sid, "500", "400",
-        function (r) {
+        function () {
             reloadList();
         });
 }
 
 /**
  * 删除‘角色’
- * @param dtaa
+ * @param data
  */
 function delRoleData(data) {
     layui.layer.confirm('角色删除后不可恢复，确认删除吗？', function () {
@@ -54,7 +54,7 @@ function delRoleData(data) {
         param.set("rowid", data.sid);
         tlv8.XMLHttpRequest("/system/OPM/role/deleteRole", param, "post", true,
             function (r) {
-                if (r.state == true) {
+                if (r.state === true) {
                     layui.layer.msg("删除成功！");
                     reloadList();
                 } else {
@@ -72,7 +72,7 @@ function loadPermission(roleData) {
     var search_perm = $("#search_perm").val();
     layui.table.reload('perm_list', {
         url: '/system/OPM/role/PermissionList?permission_kind=0&role_id=' + roleData.sid + '&search_perm=' + J_u_encode(search_perm),
-        done: function (res, curr, count) {
+        done: function () {
             $("#search_perm").val(search_perm);
         }
     });
@@ -104,7 +104,7 @@ function cocationCallback(data) {
     param.set("values", JSON.stringify(values));
     tlv8.XMLHttpRequest("/system/OPM/role/AssignPermissions", param, "post", true,
         function (r) {
-            if (r.state == true) {
+            if (r.state === true) {
                 layui.layer.msg("添加权限成功！");
                 loadPermission(currentRole);
             } else {
@@ -132,7 +132,7 @@ function deletePermission() {
     param.set("values", values.join(","));
     tlv8.XMLHttpRequest("/system/OPM/role/CancelPermissions", param, "post", true,
         function (r) {
-            if (r.state == true) {
+            if (r.state === true) {
                 layui.layer.msg("删除成功！");
                 loadPermission(currentRole);
             } else {

@@ -299,3 +299,45 @@ class RoleForm(FlaskForm):
             "lay-filter": "mainform"
         }
     )
+
+
+# 修改密码表单
+class ChangePassForm(FlaskForm):
+    old_pass = PasswordField(
+        render_kw={
+            "class": "layui-input",
+            "lay-verify": "required",
+            "type": "password",
+            "autocomplete": "off",
+            "placeholder": "请输入原密码！",
+        }
+    )
+
+    new_pass = PasswordField(
+        render_kw={
+            "class": "layui-input",
+            "lay-verify": "required",
+            "type": "password",
+            "autocomplete": "off",
+            "placeholder": "请输入新密码！",
+        }
+    )
+
+    new_pass_ord = PasswordField(
+        render_kw={
+            "class": "layui-input",
+            "lay-verify": "required",
+            "type": "password",
+            "autocomplete": "off",
+            "placeholder": "请再次输入新密码！",
+        }
+    )
+
+    submit = SubmitField(
+        '确认修改',
+        render_kw={
+            "class": "layui-btn",
+            "lay-submit": "",
+            "lay-filter": "dataform"
+        }
+    )

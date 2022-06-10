@@ -40,7 +40,7 @@ var setting = {
     }
 };
 
-function afterRefresh(event) {
+function afterRefresh() {
     currentNode = null;
     currenttreeID = "";
     loadList();
@@ -63,7 +63,7 @@ function loadList() {
     layui.table.reload('rolelist',
         {
             url: "/system/OPM/authorization/dataList?org_id=" + currenttreeID + "&query_text=" + J_u_encode(query_text),
-            done: function (res, curr, count) {
+            done: function () {
                 $("#query_text").val(query_text);
             }
         }
@@ -71,7 +71,7 @@ function loadList() {
 }
 
 function addData() {
-    if (!currenttreeID || currenttreeID == "") {
+    if (!currenttreeID || currenttreeID === "") {
         layui.layer.alert("请先在左边【机构数】选择需要分配角色的组织！");
         return;
     }
@@ -86,7 +86,7 @@ function addDataCallBack(roles) {
     param.set("roles", roles);
     tlv8.XMLHttpRequest("/system/OPM/authorization/addRole", param, "post", true,
         function (r) {
-            if (r.state == true) {
+            if (r.state === true) {
                 layui.layer.msg("添加成功！");
                 loadList();
             } else {
@@ -111,7 +111,7 @@ function deleteData() {
         param.set("values", values.join(","));
         tlv8.XMLHttpRequest("/system/OPM/authorization/deleteRole", param, "post", true,
             function (r) {
-                if (r.state == true) {
+                if (r.state === true) {
                     layui.layer.msg("删除成功！");
                     loadList();
                 } else {

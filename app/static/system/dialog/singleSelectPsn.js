@@ -64,7 +64,7 @@ $(document).ready(function () {
  * 树单击 @param {Object} treeId @param {Object} treeNode
  */
 function beforeClick(treeId, treeNode) {
-    if (treeNode.sorgkindid == "psm") {
+    if (treeNode.sorgkindid === "psm") {
         staticGrid.clearData();
         var json = {};
         json.rowid = treeNode.id;
@@ -80,7 +80,7 @@ function beforeClick(treeId, treeNode) {
 /*
  * 列表双击 @param {Object} obj @param {Object} stGrid
  */
-function staticGridDbclick(obj, stGrid) {
+function staticGridDbclick(obj) {
     staticGrid.removeData(obj.id);
 }
 

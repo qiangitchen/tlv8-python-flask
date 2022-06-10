@@ -40,7 +40,7 @@ var setting = {
 };
 
 
-function afterRefresh(event) {
+function afterRefresh() {
     currentNode = null;
     currenttreeID = null;
     loadList();
@@ -72,13 +72,13 @@ function gridChecked(data, checked) {
     } else {
         checkData.remove(data.sid);
     }
-    var kset = checkData.keySet();
-    var html = "";
-    for (var i in kset) {
+    const kset = checkData.keySet();
+    let html = "";
+    for (let i in kset) {
         var value = checkData.get(kset[i]);
         html += "<span id='" + kset[i] + "'><input id='" + kset[i] + "' name='"
             + kset[i] + "' type='checkbox' value='" + value
-            + "'  onclick='checkItem(event)' class='selectedItem'>" + value + "</input></span>";
+            + "'  onclick='checkItem()' class='selectedItem'>" + value + "</span>";
     }
     $("#Chtext").html(html);
 }
@@ -87,7 +87,7 @@ function gridCheckedAll(checked) {
     if (checked) {
         var checkStatus = layui.table.checkStatus('psmlist');
         var data = checkStatus.data;
-        for (var i in data) {
+        for (let i in data) {
             checkData.put(data[i].sid, data[i].sname);
         }
     } else {
@@ -99,7 +99,7 @@ function gridCheckedAll(checked) {
         var value = checkData.get(kset[i]);
         html += "<span id='" + kset[i] + "'><input id='" + kset[i] + "' name='"
             + kset[i] + "' type='checkbox' value='" + value
-            + "'  onclick='checkItem(event)' class='selectedItem'>" + value + "</input></span>";
+            + "'  onclick='checkItem()' class='selectedItem'>" + value + "</span>";
     }
     $("#Chtext").html(html);
 }
@@ -112,7 +112,7 @@ function deleteBills() {
     checkData.remove(chid);
 }
 
-function checkItem(event) {
+function checkItem() {
     $("input").bind("click", function () {
         chid = $(this).attr("id");
     });
@@ -132,9 +132,8 @@ function dailogEngin() {
         tid.push($(this).attr("name"));
         txt.push($(this).attr("value"));
     });
-    var prams = {
+    return {
         "id": tid.join(","),
         "name": txt.join(",")
     };
-    return prams;
 }

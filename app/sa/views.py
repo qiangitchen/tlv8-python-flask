@@ -5,7 +5,7 @@ from flask import session, render_template, request
 from sqlalchemy import or_
 from datetime import datetime
 from app import db
-from app.sa.forms import LoginForm, OrgForm, PersonForm, RoleForm
+from app.sa.forms import LoginForm, ChangePassForm, OrgForm, PersonForm, RoleForm
 from app.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize, SAOnlineInfo
 from app.models import SAFlowDraw, SAFlowFolder, SATask
 from app.menus.menuutils import get_process_name, get_process_full, get_function_tree
@@ -82,6 +82,29 @@ def init_portal_info():
     rdata['status'] = True
     rdata['data'] = person_info
     return json.dumps(rdata, ensure_ascii=False)
+
+
+@system.route("/User/change_password", methods=["GET", "POST"])
+@user_login
+def change_password():
+    form = ChangePassForm()
+    if form.is_submitted():
+        rdata = dict()
+        person_id = session['user_id']
+        old_pass = form.data['old_pass']
+        new_pass = form.data['new_pass']
+        user = SAPerson.query.filter_by(sid=person_id, svalidstate=1).first()
+        if user:
+            if user.spassword != old_pass:
+                rdata['state'] = False
+                rdata['msg'] = "原密码验证失败~"
+            else:
+                user.spassword = new_pass
+                db.session.add(user)
+                db.session.commit()
+                rdata['state'] = True
+        return json.dumps(rdata, ensure_ascii=False)
+    return render_template("home/dialog/changePassword.html", form=form)
 
 
 # 写系统日志
@@ -671,6 +694,8 @@ def recycled():
     if search_text and search_text != '':
         org_query = org_query.filter(or_(SAOrganization.scode.ilike('%' + search_text + '%'),
                                          SAOrganization.sname.ilike('%' + search_text + '%')))
+    else:
+        search_text = ""
     count = org_query.count()
     page = request.args.get('page', 1, type=int)
     limit = request.args.get('limit', 20, type=int)
@@ -1126,13 +1151,25 @@ def flow_folder_tree_del():
     id = url_decode(data.get('id', ''))
     sidpath = url_decode(data.get('sidpath'))
     folder = SAFlowFolder.query.filter_by(sid=id).first()
+    p_folder = SAFlowFolder.query.filter_by(sparent=id).first()
+    if p_folder:
+        rdata['state'] = False
+        rdata['msg'] = '指定的目录下有子目录不能删除，如确认要删除，请先删除子目录~'
+        return json.dumps(rdata, ensure_ascii=False)
+    draw = SAFlowDraw.query.filter_by(sfolderid=id).first()
+    if draw:
+        rdata['state'] = False
+        rdata['msg'] = '指定的目录下有流程图，不能删除此目录，如确认要删除，请先删除目录下的流程图~'
+        return json.dumps(rdata, ensure_ascii=False)
     if folder:
         db.session.delete(folder)
+        # 删除目录时同步删除子目录（或者判断有子目录时不让删除，以免出现垃圾数据）
         db.session.execute("delete from sa_flowfolder where sidpath like :sidpath_", {'sidpath_': str(sidpath) + '%'})
         db.session.commit()
         rdata['state'] = True
     else:
         rdata['state'] = False
+        rdata['msg'] = '指定的目录id无效~'
     return json.dumps(rdata, ensure_ascii=False)
 
 
