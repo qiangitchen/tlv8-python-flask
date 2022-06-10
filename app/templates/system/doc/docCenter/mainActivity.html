@@ -1,0 +1,74 @@
+<html lang="zh_CN">
+{% include "common/tree_page_head.html" %}
+<script type="text/javascript" src="{{ url_for('static',filename='system/doc/docCenter/mainActivity.js') }}"></script>
+<body style="width:100%; height:100%; overflow: hidden;">
+<div class="layui-fluid" style="background: #dddddd; padding: 20px;">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md3">
+            <div class="layui-card">
+                <div class="layui-card-header">文档目录</div>
+                <div class="layui-card-body" style="height: 90%; padding: 1px;">
+                    <form id="main_org_trr" style="display: none;"></form>
+                    <div class="easyui-layout" fit="true" border="false">
+                        <div data-options="region:'north',border:false"
+                             style="height: 40px;padding: 2px; overflow: hidden;">
+                            <table>
+                                <tr>
+                                    <td><a href="javascript:void(0);" class="toobar_item" title="新建目录">
+                                        <img src="{{ url_for('static',filename='common/image/doc/newfolder_g.gif') }}" id="new_folder_item">
+                                    </a>
+                                    </td>
+                                    <td><a href="javascript:void(0);" class="toobar_item" title="目录属性">
+                                        <img src="{{ url_for('static',filename='common/image/doc/folder_pro_g.gif') }}" id="folder_pro_item">
+                                    </a>
+                                    </td>
+                                    <td><a href="javascript:void(0);" class="toobar_item" title="目录权限">
+                                        <img src="{{ url_for('static',filename='common/image/doc/folder_perm_g.gif') }}" id="folder_perm_item">
+                                    </a>
+                                    </td>
+                                    <td><a href="javascript:void(0);" class="toobar_item" title="删除目录">
+                                        <img src="{{ url_for('static',filename='common/image/doc/deletefile_g.gif') }}" id="deletefile_item">
+                                    </a>
+                                    </td>
+                                    <td><a href="javascript:Jtree.refreshJtree('maintree');" class="toobar_item"
+                                           title="刷新目录">
+                                        <img src="{{ url_for('static',filename='common/image/doc/refresh.gif') }}" id="refresh_folder_item">
+                                    </a>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div data-options="region:'center',border:false" style="padding: 0px; overflow: hidden;">
+                            <div id="docfoldertree"
+                                 style="border-top:1px solid #eee; width:100%;height:100%; overflow:auto;">
+                                <ul id="maintree" class="ztree"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md9">
+            <div class="layui-card">
+                <div class="layui-card-header">文件列表</div>
+                <div class="layui-card-body" style="height: 90%; padding: 1px;">
+                    <div id="main-grid-view" component="dataGrid" afterRefresh="afGridrefresh" onselected="select_file"
+                         style="width: 100%; height: 100%; align: left;" ondbclick="griddbclickFN">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="dialogsView"></div>
+<div id="transportDiv"></div>
+<div id="docExtDiv"></div>
+<script type="text/javascript">
+    var Jtree = new Jtree();
+    var treebody = "maintree";
+    //Jtree.init(treebody, setting, param);
+    //$("#docfoldertree").height($("#docfoldertree").parent().height());
+</script>
+</body>
+</html>

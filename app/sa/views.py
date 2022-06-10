@@ -107,6 +107,11 @@ def change_password():
     return render_template("home/dialog/changePassword.html", form=form)
 
 
+"""
+下面是系统管理基础模块
+"""
+
+
 # 写系统日志
 @system.route("/WriteSystemLogAction", methods=["GET", "POST"])
 @user_login
@@ -1032,6 +1037,11 @@ def sys_log():
                            page_data=page_data, search_text=search_text)
 
 
+"""
+下面是流程引擎相关功能
+"""
+
+
 # 流程设计
 @system.route("/flow/flow_design", methods=["GET", "POST"])
 @user_login
@@ -1558,4 +1568,63 @@ def task_data_list():
         data.append(row_data)
         no += 1
     rdata['data'] = data
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+"""
+下面是文档中心功能
+"""
+
+
+# 文档中心
+@system.route("/doc/docCenter", methods=["GET", "POST"])
+@user_login
+def doc_center():
+    return render_template("system/doc/docCenter/mainActivity.html")
+
+
+# 文档搜索
+@system.route("/doc/docSearch", methods=["GET", "POST"])
+@user_login
+def doc_search():
+    return render_template("system/doc/docSearch/docSearch.html")
+
+
+# 加载机构树
+@system.route("/doc/TreeSelectAction", methods=["GET", "POST"])
+@user_login
+def doc_tree_select():
+    rdata = dict()
+    data = request.form
+    params = url_decode(data.get('params', ''))  # 接收的参数需要解码
+    param_dict = eval(params)  # 字符串转字典
+    others = param_dict.get('other', '').split(',')
+    org_query = SAOrganization.query.filter(SAOrganization.svalidstate > -1)
+    show_system = request.args.get('show_system')
+    if not show_system:
+        org_query = org_query.filter(SAOrganization.scode != 'SYSTEM')
+    hide_psm = request.args.get('hide_psm')
+    if hide_psm:
+        org_query = org_query.filter(SAOrganization.sorgkindid != 'psm')
+    currenid = data.get('currenid')
+    if currenid:
+        org_query = org_query.filter(SAOrganization.sparent == currenid)
+    else:
+        org_query = org_query.filter(or_(SAOrganization.sparent.is_(None), SAOrganization.sparent == ''))
+    orgs = org_query.order_by(SAOrganization.ssequence).all()
+    json_result = list()
+    for org in orgs:
+        item = dict()
+        item['id'] = getattr(org, param_dict['id'])
+        item['name'] = getattr(org, param_dict['name'])
+        item['parent'] = getattr(org, param_dict['parent'])
+        if org.sorgkindid == 'psm':
+            item['isParent'] = False
+        else:
+            item['isParent'] = True
+        item['icon'] = create_icon(org.sorgkindid)
+        for o in others:
+            item[o] = getattr(org, o)
+        json_result.append(item)
+    rdata['jsonResult'] = json_result
     return json.dumps(rdata, ensure_ascii=False)
