@@ -1,0 +1,131 @@
+<html lang="zh_CN">
+{% include "common/tree_page_head.html" %}
+<script type="text/javascript">
+    const togofullScreen = function (othis) {
+        let SCREEN_FULL = 'layui-icon-screen-full', SCREEN_REST = 'layui-icon-screen-restore', iconElem = $(
+            othis).children("i");
+
+        if (iconElem.hasClass(SCREEN_FULL)) {
+            fullScreen();
+            iconElem.addClass(SCREEN_REST).removeClass(SCREEN_FULL);
+        } else {
+            exitScreen();
+            iconElem.addClass(SCREEN_FULL).removeClass(SCREEN_REST);
+        }
+    };
+
+    function fullScreen() {
+        let ele = document.documentElement, reqFullScreen = ele.requestFullScreen
+            || ele.webkitRequestFullScreen || ele.mozRequestFullScreen
+            || ele.msRequestFullscreen;
+        if (typeof reqFullScreen !== 'undefined' && reqFullScreen) {
+            reqFullScreen.call(ele);
+        }
+    }
+
+    function exitScreen() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitCancelFullScreen) {
+            document.webkitCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    }
+</script>
+{% if extName==".xls" or extName==".xlsx" or extName==".et" %}
+    <script type="text/javascript"
+            src="{{ url_for('static',filename='system/doc/docOcx/wps/etfileediter.js') }}"></script>
+{% elif extName==".ppt" or extName==".pptx" or extName==".dps" %}
+    <script type="text/javascript"
+            src="{{ url_for('static',filename='system/doc/docOcx/wps/dpsfileediter.js') }}"></script>
+{% else %}
+    <script type="text/javascript"
+            src="{{ url_for('static',filename='system/doc/docOcx/wps/fileediter.js') }}"></script>
+{% endif %}
+<body onLoad="InitFrame();" style="width:100%; height:100%; overflow: hidden;">
+<div class="easyui-layout" fit="true">
+    <div data-options="region:'north',split:false" style="height: 35px; overflow: hidden; padding: 5px;">
+        <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-xs" onclick="showRevision0()"><i
+                    class="layui-icon layui-icon-search"></i>显示痕迹
+            </button>
+            <button type="button" class="layui-btn layui-btn-xs" onclick="showRevision2()"><i
+                    class="layui-icon layui-icon-menu-fill"></i>隐藏痕迹
+            </button>
+            <button type="button" class="layui-btn layui-btn-xs layui-btn-normal" onclick="saveAs()"><i
+                    class="layui-icon layui-icon-export"></i>另存为
+            </button>
+            <button type="button" class="layui-btn layui-btn-xs layui-btn-warm" onclick="printwps()"><i
+                    class="layui-icon layui-icon-print"></i>打印
+            </button>
+            {% if option != "view" %}
+                <button type="button" class="layui-btn layui-btn-xs layui-btn-disabled"><i
+                        class="layui-icon layui-icon-list"></i>套红
+                </button>
+                <button type="button" class="layui-btn layui-btn-xs layui-btn-normal" onclick="saveToServer()"><i
+                        class="layui-icon layui-icon-ok"></i>保存到服务器
+                </button>
+            {% endif %}
+            <button type="button" class="layui-btn layui-btn-xs layui-btn-danger" onclick="colseWindow()"><i
+                    class="layui-icon layui-icon-close"></i>关闭
+            </button>
+            <button type="button" class="layui-btn layui-btn-xs layui-btn-primary layui-border-black"
+                    style="float: right;" onclick="togofullScreen(this)"><i
+                    class="layui-icon layui-icon-screen-full"></i></button>
+        </div>
+    </div>
+    <div data-options="region:'center'" style="overflow: hidden;">
+        <div id="wps"></div>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    const option = '{{ option }}';
+    const fileName = '{{ fileName }}';
+
+    document.title = "在线" + (option == "view" ? "（查看）" : "（编辑）") + "：" + fileName;
+
+    function colseWindow() {
+        try {
+            app.close();
+            obj.Application.Quit();
+        } catch (e) {
+        }
+        if (option !== "view") {
+            try {
+                def_callBackFun("");
+                tlv8.portal.closeWindow();
+            } catch (e) {
+            }
+        }
+        if (option === "view") {
+            try {
+                tlv8.portal.closeWindow();
+            } catch (e) {
+                window.opener = null;
+                window.open('', '_self');
+                window.close();
+            }
+        }
+    }
+
+    function saveToServer() {
+        try {
+            let aa = app.saveURL_s("<%=comiturl%>", "{{ fileName }}");
+            if (aa == true) {
+                layui.layer.msg("保存成功.");
+            } else {
+                layui.layer.alert("保存失败！");
+            }
+        } catch (e) {
+            layui.layer.alert(e.message);
+        }
+    }
+
+    const template = "{{ file_url }}";
+    const username = tlv8.Context.getCurrentPersonName();
+</script>
+</html>

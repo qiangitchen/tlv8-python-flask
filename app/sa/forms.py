@@ -1,7 +1,7 @@
 # _*_ coding: utf-8 _*_
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, RadioField, TextAreaField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, RadioField, TextAreaField, SelectField, FileField
 from wtforms.validators import DataRequired, Email, Regexp, EqualTo, ValidationError
 
 
@@ -391,4 +391,12 @@ class DocNodeForm(FlaskForm):
             "lay-submit": "",
             "lay-filter": "mainform"
         }
+    )
+
+
+# 文件上传表单
+class UpLoadForm(FlaskForm):
+    file = FileField(
+        label="文件",
+        description="文件",
     )

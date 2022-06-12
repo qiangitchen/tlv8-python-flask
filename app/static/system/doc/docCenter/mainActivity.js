@@ -43,6 +43,8 @@ let currenttreeName = null;
 let currenttreeSDOCPATH = null;
 let currenttreeSDOCPATHName = null;
 
+let uploadInst;
+
 
 // 选中树
 function treeselected(event, treeId, node) {
@@ -57,7 +59,7 @@ function treeselected(event, treeId, node) {
     J$("new_folder_item").onclick = newFolderData;
 
     if (treeID !== 'root') {
-        if (node.screatorid == tlv8.Context.getCurrentPersonID()) {
+        if (node.screatorid === tlv8.Context.getCurrentPersonID()) {
             $("#folder_pro_item").attr("src", "/static/common/image/doc/folder_pro.gif");
             J$("folder_pro_item").onclick = editFolderData;
 
@@ -65,6 +67,30 @@ function treeselected(event, treeId, node) {
             J$("deletefile_item").onclick = deleteFolderData;
         }
     }
+
+    $("#upbtn").removeClass("layui-btn-disabled");
+    if (!uploadInst) {
+        uploadInst = layui.upload.render({
+            elem: '#upbtn'
+            , url: '/system/doc/docCenter/uploadFile'
+            , data: {folder: currenttreeID}
+            , accept: 'file'
+            , multiple: true
+            , size: 1024 * 1024 * 100 //限定大小100M
+            , done: function (res) {
+                if (res.code === 0) {
+                    layui.layer.msg("上传成功~");
+                    doQuery();
+                } else {
+                    layui.layer.alert("上传失败！");
+                }
+            }
+        });
+    } else {
+        uploadInst.reload({data: {folder: currenttreeID}});
+    }
+
+    doQuery();
 }
 
 function dailogcallback(data) {

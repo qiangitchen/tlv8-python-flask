@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+    <title>PDF文件查看：{{ fileName }}</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='jquery-easyui/themes/default/easyui.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='layui/css/layui.css') }}">
+    <script type="text/javascript" src="{{ url_for('static',filename='common/js/jquery/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='layui/layui.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui/jquery.easyui.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui/locale/easyui-lang-zh_CN.js') }}"></script>
+</head>
+<body style="overflow: hidden;">
+<div class="easyui-layout" fit="true">
+    <div id="result-DocList" data-options="region:'center',border:false" style="overflow: hidden;">
+        <iframe id="pdfform" border="0" src="{{ file_url }}" style="width: 100%; height: 100%; border: 0px;"></iframe>
+    </div>
+</div>
+</body>
+<body>

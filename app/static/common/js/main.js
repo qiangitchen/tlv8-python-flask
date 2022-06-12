@@ -2187,7 +2187,7 @@ tlv8.Context = {
         if (typeof result == "string") {
             result = window.eval("(" + result + ")");
         }
-        this.userInfo = window["eval"]("(" + result[0].data + ")");
+        this.userInfo = result.data;
     },
     checklogin: function () {
         if (!this.userInfo.personid || this.userInfo.personid === ""
@@ -3029,11 +3029,6 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
         createStyleSheet($rp + "layui/css/layui.css");
         createJSSheet($rp + "layui/layui.js");
     }
-    let $commonpath = $dpjspath.replace("/js/", "/");
-    if (!checkPathisHave(cpath + "/common/doc_ocx/docUtil.js")
-        && !checkPathisHave($commonpath + "doc_ocx/docUtil.js")) {
-        createJSSheet($commonpath + "doc_ocx/docUtil.js");
-    }
     $(div).css("padding", "10px 0");
     this.uploadcount = 0;
     div.uploader = null;
@@ -3279,22 +3274,34 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
 };
 
 // office、wps文件在线编辑
-tlv8.trangereditfile = function (fileID, fileName, docPath, dbkey,
-                                 tablename, billid, cellname, comentid) {
-    editFilecoment = comentid;
+tlv8.trangereditfile = function (fileID, fileName) {
     if ('.doc.docx.xls.xlsx.ppt.pptx.mpp.vsd.dps.wps.et.'
         .indexOf(String(/\.[^.]+$/.exec(fileName)) + '.') < 0) {
-        alert("不支持非Office文件编辑");
+        alert("不支持非Office文件在线编辑");
         return;
     }
-    let edurl = "/comon/doc_ocx/tangerOffice/officeediter?fileID="
-        + fileID + "&fileName=" + J_u_encode(fileName) + "&dbkey="
-        + dbkey + "&tablename=" + tablename + "&billid=" + billid
-        + "&cellname=" + cellname + "&callerName="
-        + tlv8.portal.currentTabId() + "&option=edit";
-    //tlv8.portal.openWindow("文件" + fileName + "编辑",edurl);
-    window.open(cpath + edurl);
+    let url = "/system/doc/wps/fileEditor?option=edit&fileID=" + fileID;
+    window.open(url);
 };
+
+tlv8.viewFile = function (fileID, fileName) {
+    if ('.pdf.PDF.'.indexOf(String(/\.[^.]+$/.exec(fileName)) + '.') > -1) {
+        let url = "/system/doc/pdf/fileBrowser?fileID=" + fileID;
+        window.open(url);
+        return;
+    } else if ('.doc.docx.xls.xlsx.ppt.pptx.mpp.vsd.dps.wps.et.'
+        .indexOf(String(/\.[^.]+$/.exec(fileName)) + '.') < 0) {
+        layui.layer.alert("不支持非Office文件在线编辑");
+        return;
+    }
+    let url = "/system/doc/wps/fileEditor?option=view&fileID=" + fileID;
+    window.open(url);
+};
+
+tlv8.downloadFile = function (fileID) {
+    let url = "/system/doc/file/" + fileID + "/download";
+    window.open(url);
+}
 
 
 function Confirm(msg, okcallFn, cancelcallFn, img) {

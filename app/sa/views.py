@@ -1,11 +1,14 @@
 # _*_ coding: utf-8 _*_
 
+import os
+import uuid
+
 from . import system
-from flask import session, render_template, request
+from flask import session, render_template, request, current_app, send_file, send_from_directory, abort
 from sqlalchemy import or_
 from datetime import datetime
 from app import db
-from app.sa.forms import LoginForm, ChangePassForm, OrgForm, PersonForm, RoleForm, DocNodeForm
+from app.sa.forms import LoginForm, ChangePassForm, OrgForm, PersonForm, RoleForm, DocNodeForm, UpLoadForm
 from app.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize, SAOnlineInfo
 from app.models import SAFlowDraw, SAFlowFolder, SATask
 from app.models import SADocNode, SADocPath
@@ -18,6 +21,7 @@ from app.sa.onlineutils import set_online, clear_online
 from app.sa.orgutils import can_move_to, up_child_org_path
 from app.flow.expressions import get_expression_tree
 from app.flow.flowcontroller import seach_process_id
+from mimetypes import MimeTypes
 import json
 
 
@@ -1671,6 +1675,202 @@ def create_folder():
         rdata['state'] = True
         return json.dumps(rdata, ensure_ascii=False)
     return render_template("system/doc/docCenter/dialog/createFolder.html", form=form, model=model)
+
+
+# 文档中心-加载文件列表
+@system.route("/doc/docCenter/docDataList", methods=["GET", "POST"])
+@user_login
+def doc_data_list():
+    rdata = dict()
+    rdata['code'] = 0
+    folder = url_decode(request.args.get('folder', 'root'))
+    data_query = SADocNode.query.filter(SADocNode.sparentid == folder, SADocNode.skind != 'dir')
+    search_text = url_decode(request.args.get('search_text', ''))
+    if search_text and search_text != '':
+        data_query = data_query.filter(or_(SADocNode.sdocname.ilike('%' + search_text + '%'),
+                                           SADocNode.skeywords.ilike('%' + search_text + '%')))
+    count = data_query.count()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    rdata['count'] = count
+    page_data = data_query.order_by(SADocNode.screatetime.desc()).paginate(page, limit)
+    no = 1
+    data = list()
+    for d in page_data.items:
+        row_data = dict()
+        row_data['no'] = no + (page - 1) * limit
+        row_data['sid'] = d.sid
+        row_data['sfileid'] = d.sfileid
+        row_data['sdocname'] = d.sdocname
+        row_data['ssize'] = d.ssize
+        row_data['sdocdisplaypath'] = d.sdocdisplaypath
+        row_data['screatorid'] = d.screatorid
+        row_data['screatorname'] = d.screatorname
+        row_data['seditorname'] = d.seditorname
+        row_data['screatetime'] = datetime.strftime(d.screatetime, '%Y-%m-%d %H:%M:%S')
+        if d.slastwritetime:
+            row_data['slastwritetime'] = datetime.strftime(d.slastwritetime, '%Y-%m-%d %H:%M:%S')
+        data.append(row_data)
+        no += 1
+    rdata['data'] = data
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 上传文件
+@system.route("/doc/docCenter/uploadFile", methods=["POST"])
+@user_login
+def upload_file():
+    rdata = dict()
+    folder = request.form.get('folder')
+    form = UpLoadForm()
+    fileName = form.file.data.filename
+    base_folder = current_app.config["UP_DIR"]
+    filepath = datetime.strftime(datetime.now(), '%Y/%m/%d/%H/%M/%S')
+    doc_folder = base_folder + "/" + filepath
+    if not os.path.exists(doc_folder):
+        # 创建一个多级目录
+        os.makedirs(doc_folder)  # 创建文件夹
+        os.chmod(doc_folder, 777)  # 设置权限
+    extname = os.path.splitext(fileName)[1]
+    file_mime = MimeTypes()
+    mime_type = file_mime.guess_type(fileName)
+    file_data = SADocPath(filename=fileName,
+                          extname=extname,
+                          filetype=mime_type[0],
+                          filepath=filepath)
+    db.session.add(file_data)
+    db.session.commit()  # 保存文件数据
+    file_id = md5_code(str(file_data.id) + '-root')
+    file_path = doc_folder + "/" + file_id
+    form.file.data.save(file_path)  # 保存文件
+    size = os.stat(file_path).st_size
+    file_data.filesize = size
+    db.session.add(file_data)
+    db.session.commit()  # 保存文件数据
+    person = get_curr_person_info()
+    docnode = SADocNode(sdocname=fileName,
+                        sparentid=folder,
+                        ssize=size,
+                        skind=mime_type[0],
+                        sfileid=file_data.id,
+                        screatorid=person['personid'],
+                        screatorname=person['personName']
+                        )
+    db.session.add(docnode)
+    db.session.commit()
+    parent_node = SADocNode.query.filter_by(sid=folder).first()
+    if parent_node:
+        docnode.sdocpath = parent_node.sdocpath + '/' + docnode.sid
+        docnode.sdocdisplaypath = parent_node.sdocdisplaypath + '/' + docnode.sdocname
+    else:
+        docnode.sdocpath = '/root/' + docnode.sid,
+        docnode.sdocdisplaypath = '/文档中心/' + docnode.sdocname
+    db.session.add(docnode)
+    db.session.commit()
+    rdata['code'] = 0
+    rdata['msg'] = ''
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 查看文件（在线编辑）
+@system.route("/doc/wps/fileEditor", methods=["GET", "POST"])
+@user_login
+def wps_file_editor():
+    option = request.args.get('option', 'view')
+    fileID = request.args.get('fileID', 0, type=int)
+    fileName = ""
+    extName = ""
+    file_url = ""
+    if fileID:
+        doc = SADocPath.query.filter_by(id=fileID).first()
+        if doc:
+            fileName = doc.filename
+            extName = doc.extname
+            file_url = "/system/doc/file/" + str(doc.id) + "/download/?t=" + uuid.uuid4().hex
+    return render_template("system/doc/docOcx/wps/fileEditor.html", option=option, fileName=fileName,
+                           extName=extName.lower(), file_url=file_url)
+
+
+# 查看文件（PDF）
+@system.route("/doc/pdf/fileBrowser", methods=["GET", "POST"])
+@user_login
+def pdf_file_view():
+    fileID = request.args.get('fileID', 0, type=int)
+    fileName = ""
+    file_url = "/system/doc/file/0/view"
+    if fileID:
+        doc = SADocPath.query.filter_by(id=fileID).first()
+        if doc:
+            fileName = doc.filename
+            file_url = "/system/doc/file/" + str(doc.id) + "/view/?t=" + uuid.uuid4().hex
+    return render_template("system/doc/docOcx/pdf/vform.html", fileName=fileName, file_url=file_url)
+
+
+# 文件下载
+@system.route("/doc/file/<int:fileid>/download/", methods=["GET", "POST"])
+@user_login
+def file_download(fileid=0):
+    doc = SADocPath.query.filter_by(id=fileid).first()
+    if doc:
+        base_folder = current_app.config["UP_DIR"]
+        filepath = doc.filepath
+        doc_folder = base_folder + "/" + filepath
+        file_name = md5_code(str(doc.id) + "-root")
+        response_file = send_from_directory(doc_folder, filename=file_name,
+                                            as_attachment=True, attachment_filename=doc.filename)
+        response_file.headers["Content-Disposition"] = "attachment; filename=%s" % doc.filename.encode().decode(
+            'latin-1')
+        response_file.headers['content-length'] = os.stat(doc_folder + "/" + file_name).st_size
+        return response_file
+    else:
+        abort(404)
+
+
+# 文件预览
+@system.route("/doc/file/<int:fileid>/view/", methods=["GET", "POST"])
+@user_login
+def file_browse(fileid=0):
+    doc = SADocPath.query.filter_by(id=fileid).first()
+    if doc:
+        base_folder = current_app.config["UP_DIR"]
+        filepath = doc.filepath
+        doc_folder = base_folder + "/" + filepath
+        file_name = md5_code(str(doc.id) + "-root")
+        file_path = doc_folder + "/" + file_name
+        response_file = send_file(file_path, doc.filetype,
+                                  as_attachment=True, attachment_filename=doc.filename)
+        response_file.headers["Content-Disposition"] = "inline; filename=%s" % doc.filename.encode().decode(
+            'latin-1')
+        response_file.headers['content-length'] = os.stat(file_path).st_size
+        return response_file
+    else:
+        abort(404)
+
+
+# 文件删除
+@system.route("/doc/file/<int:fileid>/delete/", methods=["GET", "POST"])
+@user_login
+def file_delete(fileid=0):
+    rdata = dict()
+    doc = SADocPath.query.filter_by(id=fileid).first()
+    if doc:
+        base_folder = current_app.config["UP_DIR"]
+        filepath = doc.filepath
+        doc_folder = base_folder + "/" + filepath
+        file_name = md5_code(str(doc.id) + "-root")
+        file_path = doc_folder + "/" + file_name
+        if os.path.isfile(file_path):
+            os.remove(file_path)  # 删除文件
+        doc_node = SADocNode.query.filter_by(sfileid=fileid).first()
+        if doc_node:
+            db.session.delete(doc_node)
+        db.session.delete(doc)
+        db.session.commit()  # 删除数据
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "指定的文件id错误~"
+    return json.dumps(rdata, ensure_ascii=False)
 
 
 # 文档搜索

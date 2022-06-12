@@ -5,7 +5,8 @@ import os
 class Config:
     SECRET_KEY = 'tlv8-flask'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-    UP_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "uploads/")  # 文件上传路径
+    UP_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "uploads")  # 文件上传路径
+    MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 上传文件限制为最大 100 MB
 
     @staticmethod
     def init_app(app):
