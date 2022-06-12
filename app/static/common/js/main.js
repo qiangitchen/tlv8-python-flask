@@ -820,6 +820,7 @@ tlv8.Data = function () {
     /**
      * @name saveData
      * @description 保存数据
+     * @param formfield
      * @returns {string}
      * @example let rowid = data.saveData();
      */
@@ -1012,14 +1013,14 @@ tlv8.Data = function () {
                 }
             }
         }
-        layui.layer.alert("删除成功！",function(){
+        layui.layer.alert("删除成功！", function () {
             tlv8.portal.closeWindow();
         });
     };
     /**
      * @name refreshData
-     * @param isconfirm {boolean} -是否提示确认
-     * @param isrefreshSub {boolean} -是否刷新关联的子表数据
+     * @param isconfirm -是否提示确认
+     * @param isrefreshSub -是否刷新关联的子表数据
      * @description 刷新数据
      * @description 只是重加载表单的数据，不刷新页面
      * @example data.refreshData();
@@ -1049,6 +1050,9 @@ tlv8.Data = function () {
         tlv8.XMLHttpRequest(self.queryAction, param, "post", true, function (rd) {
             self.setData(rd, self.formid);
         });
+        if (isrefreshSub !== false) {
+            //刷新子表数据实现
+        }
         return true;
     };
     this.setData = function (data, nowformid) {
@@ -1781,7 +1785,7 @@ tlv8.portal.dailog = {
     /**
      * @name tlv8.portal.dailog.dailogEngin
      * @description 自定义对话框确定
-     * @param data {object}
+     * @param data
      * @param b_g
      */
     dailogEngin: function (data, b_g) {

@@ -1,0 +1,86 @@
+<html lang="zh_CN">
+{% include "common/table_page_head.html" %}
+<body onload="initDialog()" style="padding-top: 10px; padding-right: 40px;">
+<form id="org_create_mng" class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-block">
+            {{ form.sdocname(value=model.sdocname) }}
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">描述</label>
+        <div class="layui-input-block">
+            {{ form.sdescription(value=model.sdescription) }}
+        </div>
+    </div>
+    <div style="display: none;">
+        {{ form.sparentid(value=model.sparentid) }}
+        {{ form.skind(value=model.skind) }}
+        {{ form.screatorid(value=model.screatorid) }}
+        {{ form.screatorname(value=model.screatorname) }}
+    </div>
+    <div style="display: none;">
+        {{ form.csrf_token }}
+        {{ form.submit }}
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</form>
+</body>
+<script type="text/javascript">
+    let isnewdata = false;
+    let maindata = new tlv8.Data();
+
+    function saveDatafn(formfield) {
+        let rowid = tlv8.RequestURLParam.getParam("rowid");
+        $.ajax({
+            url: "/system/doc/docCenter/dialog/createFolder?rowid=" + rowid || "",
+            type: "post",
+            async: false,
+            data: formfield,
+            dataType: "json",
+            success: function (re, textStatus) {
+                if (re.state === true) {
+                    rowid = re.data;
+                    layui.layer.alert("保存成功！", function () {
+                        tlv8.portal.dailog.dailogEngin(rowid);
+                    })
+                } else {
+                    layui.layer.alert("保存失败：" + re.msg);
+                }
+            }
+        });
+        return rowid;
+    }
+
+    function dailogEngin() {
+        $("#submit").click();
+        return false;
+    }
+
+    function initDialog() {
+        maindata.setSaveAction("saveFolderAction");//设置保存动作
+        maindata.setFormId("org_create_mng");//设置提交的表单
+
+        let rowid = tlv8.RequestURLParam.getParam("rowid");
+        if (rowid && rowid !== "") {
+            isnewdata = false;
+            maindata.refreshData();
+        } else {
+            isnewdata = true;
+            let sparent = tlv8.RequestURLParam.getParam("sparent");
+            sparent = (sparent && sparent !== "null") ? sparent : "root";
+            document.getElementById("sparentid").value = sparent;
+            document.getElementById("skind").value = "dir";
+            document.getElementById("screatorid").value = tlv8.Context.getCurrentPersonID();
+            document.getElementById("screatorname").value = tlv8.Context.getCurrentPersonName();
+        }
+
+        layui.form.on('submit(mainform)', function (data) {
+            //console.log(JSON.stringify(data.field));
+            saveDatafn(data.field);
+            return false;
+        });
+    }
+</script>
+</html>

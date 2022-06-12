@@ -5,7 +5,7 @@ import os
 class Config:
     SECRET_KEY = 'tlv8-flask'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-    UP_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "app/static/uploads/")  # 文件上传路径
+    UP_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "uploads/")  # 文件上传路径
 
     @staticmethod
     def init_app(app):

@@ -5,9 +5,10 @@ from flask import session, render_template, request
 from sqlalchemy import or_
 from datetime import datetime
 from app import db
-from app.sa.forms import LoginForm, ChangePassForm, OrgForm, PersonForm, RoleForm
+from app.sa.forms import LoginForm, ChangePassForm, OrgForm, PersonForm, RoleForm, DocNodeForm
 from app.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize, SAOnlineInfo
 from app.models import SAFlowDraw, SAFlowFolder, SATask
+from app.models import SADocNode, SADocPath
 from app.menus.menuutils import get_process_name, get_process_full, get_function_tree
 from app.menus.menuutils import get_function_ztree
 from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, guid, get_org_type
@@ -1583,14 +1584,7 @@ def doc_center():
     return render_template("system/doc/docCenter/mainActivity.html")
 
 
-# 文档搜索
-@system.route("/doc/docSearch", methods=["GET", "POST"])
-@user_login
-def doc_search():
-    return render_template("system/doc/docSearch/docSearch.html")
-
-
-# 加载机构树
+# 加载文档目录
 @system.route("/doc/TreeSelectAction", methods=["GET", "POST"])
 @user_login
 def doc_tree_select():
@@ -1599,32 +1593,88 @@ def doc_tree_select():
     params = url_decode(data.get('params', ''))  # 接收的参数需要解码
     param_dict = eval(params)  # 字符串转字典
     others = param_dict.get('other', '').split(',')
-    org_query = SAOrganization.query.filter(SAOrganization.svalidstate > -1)
-    show_system = request.args.get('show_system')
-    if not show_system:
-        org_query = org_query.filter(SAOrganization.scode != 'SYSTEM')
-    hide_psm = request.args.get('hide_psm')
-    if hide_psm:
-        org_query = org_query.filter(SAOrganization.sorgkindid != 'psm')
+    org_query = SADocNode.query.filter_by(skind='dir')
     currenid = data.get('currenid')
     if currenid:
-        org_query = org_query.filter(SAOrganization.sparent == currenid)
+        org_query = org_query.filter(SADocNode.sparentid == currenid)
     else:
-        org_query = org_query.filter(or_(SAOrganization.sparent.is_(None), SAOrganization.sparent == ''))
-    orgs = org_query.order_by(SAOrganization.ssequence).all()
+        org_query = org_query.filter(or_(SADocNode.sparentid.is_(None), SADocNode.sparentid == ''))
+    docs = org_query.order_by(SADocNode.screatetime.desc()).all()
     json_result = list()
-    for org in orgs:
+    if not currenid:
+        root_item = dict()
+        root_item['id'] = 'root'
+        root_item['name'] = '文档中心'
+        root_item['skind'] = 'dir'
+        root_item['sdocpath'] = '/root'
+        root_item['sdocdisplaypath'] = '/文档中心'
+        root_item['isParent'] = True
+        json_result.append(root_item)
+    for doc in docs:
         item = dict()
-        item['id'] = getattr(org, param_dict['id'])
-        item['name'] = getattr(org, param_dict['name'])
-        item['parent'] = getattr(org, param_dict['parent'])
-        if org.sorgkindid == 'psm':
-            item['isParent'] = False
-        else:
-            item['isParent'] = True
-        item['icon'] = create_icon(org.sorgkindid)
+        item['id'] = getattr(doc, param_dict['id'])
+        item['name'] = getattr(doc, param_dict['name'])
+        item['parent'] = getattr(doc, param_dict['parent'])
+        item['isParent'] = True
         for o in others:
-            item[o] = getattr(org, o)
+            item[o] = getattr(doc, o)
         json_result.append(item)
     rdata['jsonResult'] = json_result
     return json.dumps(rdata, ensure_ascii=False)
+
+
+# 创建/编辑目录页面
+@system.route("/doc/docCenter/dialog/createFolder", methods=["GET", "POST"])
+@user_login
+def create_folder():
+    form = DocNodeForm()
+    rowid = request.args.get('rowid')
+    sid = guid()
+    model = None
+    if rowid:
+        model = SADocNode.query.filter_by(sid=rowid).first()
+        if model:
+            sid = rowid
+    option = request.args.get('option')
+    if option and option == 'del':
+        rdata = dict()
+        if model:
+            db.session.delete(model)
+            db.session.commit()
+            rdata['state'] = True
+        else:
+            rdata['state'] = False
+            rdata['msg'] = '指定的id无效~'
+        return json.dumps(rdata, ensure_ascii=False)
+    if not model:
+        model = SADocNode(sdocname='', skind='dir', sdescription='')
+    if form.is_submitted():
+        rdata = dict()
+        model.sid = sid
+        model.sdocname = form.data['sdocname']
+        model.sdescription = form.data['sdescription']
+        model.sparentid = form.data['sparentid']
+        model.skind = form.data['skind']
+        model.screatorid = form.data['screatorid']
+        model.screatorname = form.data['screatorname']
+        parentid = request.form.get('sparentid', 'root')
+        if parentid == 'root':
+            model.sdocpath = '/root/' + model.sid
+            model.sdocdisplaypath = '/文档中心/' + model.sdocname
+        else:
+            parent = SADocNode.query.filter_by(sid=parentid).first()
+            if parent:
+                model.sdocpath = parent.sdocpath + '/' + model.sid
+                model.sdocdisplaypath = parent.sdocdisplaypath + '/' + model.sdocname
+        db.session.add(model)
+        db.session.commit()
+        rdata['state'] = True
+        return json.dumps(rdata, ensure_ascii=False)
+    return render_template("system/doc/docCenter/dialog/createFolder.html", form=form, model=model)
+
+
+# 文档搜索
+@system.route("/doc/docSearch", methods=["GET", "POST"])
+@user_login
+def doc_search():
+    return render_template("system/doc/docSearch/docSearch.html")

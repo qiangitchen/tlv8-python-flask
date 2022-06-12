@@ -212,6 +212,43 @@ class SATask(db.Model):
     version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
 
 
+# 文档中心
+class SADocNode(db.Model):
+    __tablename__ = "sa_docnode"
+    __table_args__ = {"useexisting": True}
+    sid = db.Column(db.String(32), primary_key=True, default=guid, doc='主键')
+    sdocname = db.Column(db.String(255), doc='名称')
+    sparentid = db.Column(db.String(32), index=True, doc='父id')
+    ssize = db.Column(db.Float, doc='文件大小B')
+    skind = db.Column(db.String(128), index=True, doc='类型：dir（文件夹）,其他：文件的MimeType')
+    sdocpath = db.Column(db.String(2048), doc='文件路径')
+    sdocdisplaypath = db.Column(db.String(2048), doc='显示文件路径名')
+    screatorid = db.Column(db.String(32), doc='创建人id')
+    screatorname = db.Column(db.String(128), doc='创建人姓名')
+    screatetime = db.Column(db.DateTime, default=datetime.now, doc='创建时间')
+    seditorid = db.Column(db.String(32), doc='编辑人id')
+    seditorname = db.Column(db.String(128), doc='编辑人姓名')
+    slastwritetime = db.Column(db.DateTime, default=datetime.now, doc='最后修改时间')
+    sfileid = db.Column(db.String(128), index=True, doc='文件id')
+    sdescription = db.Column(db.Text, doc='描述')
+    skeywords = db.Column(db.String(1024), doc='搜索关键字')
+    version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
+
+
+# 文件存储位置
+class SADocPath(db.Model):
+    __tablename__ = "sa_docpath"
+    __table_args__ = {"useexisting": True}
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, doc='主键')
+    filename = db.Column(db.String(255), doc='文件名')
+    extname = db.Column(db.String(10), doc='文件扩展名')
+    filesize = db.Column(db.Float, doc='文件大小B')
+    filetype = db.Column(db.String(128), doc='文件类型')
+    filepath = db.Column(db.String(2048), doc='文件路径')
+    addtime = db.Column(db.DateTime, default=datetime.now, doc='上传时间')
+    updatetime = db.Column(db.DateTime, default=datetime.now, doc='更新时间')
+
+
 # OA-请假
 class OALeave(db.Model):
     __tablename__ = "oa_leave"

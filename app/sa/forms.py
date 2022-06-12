@@ -341,3 +341,54 @@ class ChangePassForm(FlaskForm):
             "lay-filter": "dataform"
         }
     )
+
+
+# 文档目录表单
+class DocNodeForm(FlaskForm):
+    sdocname = StringField(
+        render_kw={
+            "class": "layui-input",
+            "lay-verify": "required",
+            "placeholder": "请输入名称",
+        }
+    )
+
+    sdescription = TextAreaField(
+        description="描述",
+        render_kw={
+            "class": "layui-textarea"
+        }
+    )
+
+    sparentid = StringField(
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    skind = StringField(
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    screatorid = StringField(
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    screatorname = StringField(
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    submit = SubmitField(
+        '提交保存',
+        render_kw={
+            "class": "layui-btn",
+            "lay-submit": "",
+            "lay-filter": "mainform"
+        }
+    )
