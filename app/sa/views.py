@@ -90,6 +90,7 @@ def init_portal_info():
     return json.dumps(rdata, ensure_ascii=False)
 
 
+# 修改密码
 @system.route("/User/change_password", methods=["GET", "POST"])
 @user_login
 def change_password():
@@ -111,6 +112,41 @@ def change_password():
                 rdata['state'] = True
         return json.dumps(rdata, ensure_ascii=False)
     return render_template("home/dialog/changePassword.html", form=form)
+
+
+# 个人信息
+@system.route("/personal/cnttSrc/", methods=["GET", "POST"])
+@user_login
+def personal_entry():
+    form = PersonForm()
+    person = SAPerson.query.filter_by(sid=session['user_id']).first()
+    if form.is_submitted():
+        data = form.data
+        rdata = dict()
+        try:
+            person.sname = data['sname']
+            person.ssex = data['ssex']
+            person.smobilephone = data['smobilephone']
+            person.sbirthday = data['sbirthday']
+            person.smail = data['smail']
+            person.sdescription = data['sdescription']
+            db.session.add(person)
+            db.session.commit()
+            org = SAOrganization.query.filter_by(spersonid=person.sid).first()
+            parent_org = SAOrganization.query.filter_by(sid=person.smainorgid).first()
+            if org:
+                org.sname = person.sname
+                if parent_org:
+                    org.sfname = parent_org.sfname + '/' + person.sname
+                db.session.add(org)
+                db.session.commit()
+            rdata['state'] = True
+        except Exception as e:
+            print(e)
+            rdata['state'] = False
+            rdata['msg'] = '保存到数据库时异常!'
+        return json.dumps(rdata, ensure_ascii=False)
+    return render_template("system/personal/cnttSrc/PersonData.html", form=form, person=person, nul2em=nul2em)
 
 
 """

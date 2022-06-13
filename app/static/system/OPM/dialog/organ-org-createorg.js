@@ -10,7 +10,7 @@ function dailogEngin() {
 function initDialog() {
     type = J_u_decode(tlv8.RequestURLParam.getParam("type"));
     operator = J_u_decode(tlv8.RequestURLParam.getParam("operator"));
-    if (operator != "edit") {
+    if (operator !== "edit") {
         $("#sorgkindid").val(type);
         $("#sorgkindid").attr("disabled", "disabled");
         layui.form.render("select");
@@ -26,7 +26,7 @@ function initDialog() {
             data: data.field,
             dataType: "json",
             success: function (re, textStatus) {
-                if (re.state == true) {
+                if (re.state === true) {
                     layui.layer.alert("保存成功！", function () {
                         tlv8.portal.dailog.dailogEngin(nCode);
                     })
