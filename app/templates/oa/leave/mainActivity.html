@@ -91,6 +91,11 @@
                             <textarea id="freason" name="freason" class="layui-textarea"></textarea>
                         </div>
                     </div>
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label" style="width: 110px;">附件</label>
+                        <div class="layui-input-block" id="enclosure">
+                        </div>
+                    </div>
                     <div style="display: none">
                         <input type="text" id="fid" name="fid" class="layui-input" style="display: none;">
                         <button id="mainfsub" class="layui-btn" lay-submit lay-filter="mainform">立即提交</button>
@@ -111,6 +116,7 @@
         }
 
         const MainData = new tlv8.Data();
+        MainData.setTable("oa_leave");
         MainData.setFormId("MAIN_DATA_FORM");
         MainData.setQueryAction("/oa/leave/queryData");//定义数据查询动作
         MainData.setDeleteAction("/oa/leave/deleteData");//定义数据删除动作
@@ -144,6 +150,8 @@
             } else {
                 initPsData();
             }
+
+            new tlv8.fileComponent(J$("enclosure"), MainData, "fenclosure", "/root/请假申请/附件", true, true, true);
         });
 
         //保存表单数据
@@ -174,7 +182,7 @@
             if (r.state === true) {
                 layui.layer.msg("保存成功~");
                 let rowid = r.rowid;
-                if (!flwComponent.taskID || flwComponent.taskID == "") {
+                if (!flwComponent.taskID || flwComponent.taskID === "") {
                     flwComponent.flowStart(rowid);
                 }
             } else {

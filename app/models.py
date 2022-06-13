@@ -265,4 +265,5 @@ class OALeave(db.Model):
     fleavetype = db.Column(db.String(255), doc='请假类型')
     fstate = db.Column(db.String(50), doc='申请状态')
     freason = db.Column(db.String(512), doc='请假原因')
+    fenclosure = db.Column(db.String(1024), doc='附件')
     version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')

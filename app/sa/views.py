@@ -21,6 +21,7 @@ from app.sa.onlineutils import set_online, clear_online
 from app.sa.orgutils import can_move_to, up_child_org_path
 from app.flow.expressions import get_expression_tree
 from app.flow.flowcontroller import seach_process_id
+from app.sa.docutils import get_doc_folder_by_path
 from mimetypes import MimeTypes
 import json
 
@@ -1722,7 +1723,11 @@ def doc_data_list():
 @user_login
 def upload_file():
     rdata = dict()
+    person = get_curr_person_info()
     folder = request.form.get('folder')
+    docPath = request.form.get('docPath')
+    if not folder and docPath:
+        folder = get_doc_folder_by_path(docPath, person)
     form = UpLoadForm()
     fileName = form.file.data.filename
     base_folder = current_app.config["UP_DIR"]
@@ -1748,7 +1753,6 @@ def upload_file():
     file_data.filesize = size
     db.session.add(file_data)
     db.session.commit()  # 保存文件数据
-    person = get_curr_person_info()
     docnode = SADocNode(sdocname=fileName,
                         sparentid=folder,
                         ssize=size,
@@ -1770,6 +1774,29 @@ def upload_file():
     db.session.commit()
     rdata['code'] = 0
     rdata['msg'] = ''
+    data = {
+        'fileID': file_data.id,
+        'fileName': docnode.sdocname,
+        'fileSize': docnode.ssize
+    }
+    tablename = request.form.get('tablename')
+    cellname = request.form.get('cellname')
+    rowid = request.form.get('rowid')
+    if tablename and cellname and rowid:
+        base = db.session.execute("select " + cellname + " from " + tablename + " where fid=:fid_",
+                                  {"fid_": rowid}).first()
+        ff = []
+        if base:
+            ata = base[cellname]
+            try:
+                ff = eval(ata)
+            except:
+                ff = []
+            ff.append(data)
+        db.session.execute("update " + tablename + " set " + cellname + "=:ff_ where fid=:fid_",
+                           {"ff_": json.dumps(ff, ensure_ascii=False), "fid_": rowid})
+        db.session.commit()
+    rdata['data'] = data
     return json.dumps(rdata, ensure_ascii=False)
 
 
@@ -1846,6 +1873,56 @@ def file_browse(fileid=0):
         return response_file
     else:
         abort(404)
+
+
+# 获取指定字段的信息
+@system.route("/doc/file/cell/view/", methods=["GET", "POST"])
+@user_login
+def file_cell_view():
+    rdata = dict()
+    tablename = request.form.get('tablename')
+    cellname = request.form.get('cellname')
+    rowid = request.form.get('rowid')
+    try:
+        sql = ("select " + cellname + " from " + tablename + " where fid=:fid_")
+        rs = db.session.execute(sql, {"fid_": rowid}).first()
+        if rs:
+            rdata['data'] = rs[cellname]
+        else:
+            rdata['data'] = ""
+    except Exception as e:
+        # print(e)
+        rdata['data'] = ""
+    rdata['state'] = True
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 删除文件（附件）
+@system.route("/doc/file/cell/delete/", methods=["GET", "POST"])
+@user_login
+def file_cell_del():
+    rdata = dict()
+    tablename = request.form.get('tablename')
+    cellname = request.form.get('cellname')
+    rowid = request.form.get('rowid')
+    fileID = request.form.get('fileID', 0, type=int)
+    try:
+        sql = ("select " + cellname + " from " + tablename + " where fid=:fid_")
+        rs = db.session.execute(sql, {"fid_": rowid}).first()
+        if rs:
+            file_list = eval(rs[cellname])
+            for file in file_list:
+                if file['fileID'] == fileID:
+                    file_list.remove(file)
+            db.session.execute("update " + tablename + " set " + cellname + "=:ff_ where fid=:fid_",
+                               {"ff_": json.dumps(file_list, ensure_ascii=False), "fid_": rowid})
+            db.session.commit()  # 更新附件信息
+            file_delete(fileID)  # 删除文件
+        rdata['state'] = True
+    except Exception as e:
+        # print(e)
+        pass
+    return json.dumps(rdata, ensure_ascii=False)
 
 
 # 文件删除

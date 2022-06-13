@@ -15,7 +15,7 @@ def getRelationValueString(concept, individual, condition, orderRelation, return
             sql += " order by " + orderRelation
         rs = db.session.execute(sql).first()
         if rs:
-            return getattr(rs, returnRelation, "")
+            return rs[returnRelation]
     except Exception as e:
         print(e)
     return ""

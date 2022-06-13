@@ -58,6 +58,12 @@ function treeselected(event, treeId, node) {
     $("#new_folder_item").attr("src", "/static/common/image/doc/newfolder.gif");
     J$("new_folder_item").onclick = newFolderData;
 
+    $("#folder_pro_item").attr("src", "/static/common/image/doc/folder_pro_g.gif");
+    J$("folder_pro_item").onclick = null;
+
+    $("#deletefile_item").attr("src", "/static/common/image/doc/deletefile_g.gif");
+    J$("deletefile_item").onclick = null;
+
     if (treeID !== 'root') {
         if (node.screatorid === tlv8.Context.getCurrentPersonID()) {
             $("#folder_pro_item").attr("src", "/static/common/image/doc/folder_pro.gif");
@@ -77,11 +83,11 @@ function treeselected(event, treeId, node) {
             , accept: 'file'
             , multiple: true
             , size: 1024 * 1024 * 100 //限定大小100M
-            ,before: function(obj){
-				window.top.layui.layer.load();
-			}
+            , before: function (obj) {
+                layui.layer.load();
+            }
             , done: function (res) {
-                window.top.layui.layer.closeAll('loading');
+                layui.layer.closeAll('loading');
                 if (res.code === 0) {
                     layui.layer.msg("上传成功~");
                     doQuery();

@@ -398,7 +398,7 @@ tlv8.Queryaction = function (actionName, post, callBack, data, where, ays) {
  * @param rowid
  * @param data
  * @param ays
- * @returns {JSON}
+ * @returns
  */
 tlv8.DeleteAction = function (actionName, post, callBack, rowid, data, ays) {
     if (!rowid || rowid === "") {
@@ -431,16 +431,15 @@ tlv8.DeleteAction = function (actionName, post, callBack, rowid, data, ays) {
  * @name tlv8.saveAction
  * @function
  * @description 公用函数：java调用动作{针对带参数操作 保存}
- * @param actionName
- * @param post
- * @param callBack
+ * @param actionName {string}
+ * @param post {string}
+ * @param callBack {function}
  * @param data
  * @param allreturn
  * @param ays
- * @returns {JSON}
+ * @returns
  */
-tlv8.saveAction = function (actionName, post, callBack, data, allreturn,
-                            ays) {
+tlv8.saveAction = function (actionName, post, callBack, data, allreturn, ays) {
     if (!data || data === "") {
         return;
     }
@@ -1845,14 +1844,13 @@ tlv8.portal.dailog = {
     }
 };
 
-function setTab(n) {
-    let tli = document.getElementById("menu").getElementsByTagName("li");
-    let mli = document.getElementById("tab_view").getElementsByTagName("ul");
-    for (let i = 0; i < tli.length; i++) {
-        tli[i].className = i === n ? "hover" : "";
-        mli[i].style.display = i === n ? "block" : "none";
-    }
-}
+//纠正拼写错误
+tlv8.portal.dialog = {
+    openDialog: tlv8.portal.dailog.openDailog,
+    dialogEngin: tlv8.portal.dailog.dailogEngin,
+    dialogReload: tlv8.portal.dailog.dailogReload,
+    dialogCancel: tlv8.portal.dailog.dailogCancel
+};
 
 /**
  * @name tlv8.Context
@@ -2242,12 +2240,12 @@ String.prototype.rtrim = function () {
 String.prototype.startWith = function (str) {
     return this.indexOf(str) === 0;
 };
-let reMoveStr = function (str1, str2) {
+const reMoveStr = function (str1, str2) {
     if (str1.indexOf(str2) > -1)
         str1 = str1.replace(str2, "");
     return str1;
 };
-let replaceFirst = function (str, p, m) {
+const replaceFirst = function (str, p, m) {
     if (str.indexOf(p) === 0)
         str = str.replace(p, m);
     return str;
@@ -2486,7 +2484,7 @@ tlv8.numberFormat = function (number, format) {
             }
             n++;
         }
-        for (k in numList) {
+        for (let k in numList) {
             if (result !== "") {
                 result = numList[k] + "," + result;
             } else
@@ -2776,18 +2774,18 @@ tlv8.System.Date = {
 };
 let $dpjspath = null;
 let scripts = document.getElementsByTagName("script");
-for (i = 0; i < scripts.length; i++) {
+for (let i = 0; i < scripts.length; i++) {
     if (scripts[i].src.substring(scripts[i].src.length - 7).toLowerCase() === 'main.js') {
         $dpjspath = scripts[i].src.substring(0, scripts[i].src.length - 7);
         break;
     }
 }
-let $dpcsspath = $dpjspath ? $dpjspath.replace("/js/", "/css/") : null;
-let $dpimgpath = $dpjspath ? $dpjspath.replace("/js/", "/image/") : null;
+const $dpcsspath = $dpjspath ? $dpjspath.replace("/js/", "/css/") : null;
+const $dpimgpath = $dpjspath ? $dpjspath.replace("/js/", "/image/") : null;
 /*
  * 添加JS引用
  */
-let createJSSheet = function (jsPath) {
+const createJSSheet = function (jsPath) {
     let head = document.getElementsByTagName('HEAD')[0];
     let script = document.createElement('script');
     script.src = jsPath;
@@ -2798,7 +2796,7 @@ let createJSSheet = function (jsPath) {
 /*
  * 添加CSS引用
  */
-let createStyleSheet = function (cssPath) {
+const createStyleSheet = function (cssPath) {
     let head = document.getElementsByTagName('HEAD')[0];
     let style = document.createElement('link');
     style.href = cssPath;
@@ -2809,7 +2807,7 @@ let createStyleSheet = function (cssPath) {
 /*
  * 检查引用文件是否已存在
  */
-let checkPathisHave = function (path) {
+const checkPathisHave = function (path) {
     let Hhead = document.getElementsByTagName('HEAD')[0];
     let Hscript = Hhead.getElementsByTagName("SCRIPT");
     for (let i = 0; i < Hscript.length; i++) {
@@ -2822,73 +2820,6 @@ let checkPathisHave = function (path) {
             return true;
     }
     return false;
-};
-
-
-tlv8.fileupload = function (dbkey, docPath, tablename, cellname, rowid,
-                            callback) {
-    let url = "/comon/fileupload/upload";
-    url += "?dbkey=" + dbkey;
-    url += "&docPath=" + docPath;
-    url += "&tablename=" + (tablename ? tablename : "undefined");
-    url += "&cellname=" + (cellname ? cellname : "undefined");
-    url += "&rowid=" + (rowid ? rowid : "undefined");
-    url += "&personID=" + tlv8.Context.getCurrentPersonID();
-    tlv8.portal.dailog.openDailog('文件上传', url, 350, 200, callback, false);
-};
-
-tlv8.dowloadfile = function (fileID, filename) {
-    let xmlHttp = tlv8.xmlHttp();
-    xmlHttp.onreadystatechange = function () {
-        if (xmlHttp.readyState === 4) {
-            if (xmlHttp.status === 200) {
-                let r = eval('(' + xmlHttp.responseText + ')');
-            }
-        }
-    };
-    xmlHttp.open("post", cpath + "/GetDownloadURLAction?fileID=" + J_u_encode(fileID)
-        + "&filename=" + J_u_encode(filename), false);
-    xmlHttp.send(null);
-    try {
-        let r = eval('(' + xmlHttp.responseText + ')');
-    } catch (e) {
-    }
-    if (!r) {
-        alert("获取文件信息失败!可能文档服务配置错误，请联系管理员");
-        return;
-    }
-    if (r.url && r.url !== "err")
-        window.open(r.url, "文件下载", "height=" + (screen.availHeight - 60)
-            + ",width=" + (screen.availWidth)
-            + ",toolbar=no,menubar=no,status=no,location=no,top=0,left=0");
-    else
-        alert("下载失败!");
-};
-
-tlv8.deletefile = function (fileID, filename, dbkey, tablename, cellname,
-                            rowid, callback) {
-    if (!fileID || fileID === "" || !filename)
-        return;
-    if (confirm("确定删除文件'" + filename + "'吗？")) {
-        let url = cpath + "/deleteFileAction?fileID=" + fileID;
-        url += "&filename=" + J_u_encode(filename);
-        url += "&dbkey=" + dbkey;
-        url += "&tablename=" + tablename;
-        url += "&cellname=" + cellname;
-        url += "&rowid=" + rowid;
-        let xmlHttp = tlv8.xmlHttp();
-        xmlHttp.onreadystatechange = function () {
-            if (xmlHttp.readyState === 4) {
-                if (xmlHttp.status === 200) {
-                    let r = eval('(' + xmlHttp.responseText + ')');
-                    if (callback)
-                        callback(r);
-                }
-            }
-        };
-        xmlHttp.open("post", url, true);
-        xmlHttp.send(null);
-    }
 };
 
 /**
@@ -3019,233 +2950,116 @@ tlv8.decodeURIComponent = function (str) {
  *上传文件完成回调事件： onuploaded  定义为div的属性即可
  */
 tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
-                               candelete, canedit, viewhistory, limit, download) {
+                               candelete, canedit, viewhistory, limit, download, accept) {
     if (!div || !data || !cellname)
         return;
-    $(div).css("padding", "10px 0");
-    this.uploadcount = 0;
-    div.uploader = null;
-    div.writedata = [];
-    this.div = div;
-    this.comitDataFn = function () {
-        let paramlog = JSON.stringify(this.div.writedata);
-        let pas = new tlv8.RequestParam();
-        pas.set("writelog", paramlog);
-        let self = this;
-        tlv8.XMLHttpRequest("writeUploadDataAction", pas, "POST", true,
-            function (r) {
-                self.uploadcallback(r, self);
-            });
-        this.uploadcount = 0;
-    };
-    this.uploadcallback = function (r, compment) {
-        compment.$refreshFileComp();
-        compment.div.writedata = [];
-    };
-    let taptt = tlv8.RequestURLParam.getParam("activity-pattern");
-    let isTasksub = (taptt === "detail");
-    let fiTablehead = "<table style='width:100%;' border='0'>";
-    if (false !== canupload && !isTasksub) {
-        fiTablehead += "<tr id=\""
-            + div.id
-            + "_uploadTR\"><td colspan='6' align='left' style='width:100%;height:20px;border:0px none;'><div style='position:relative;'>"
-            + "<a href='javascript:void(0)' id='"
-            + div.id
-            + "_uploadItem'  title='上传文件' style='font-size:12px;color:#0033FF;text-decoration: none;'>上传文件</a><hr/></div></td></tr>";
+    if (typeof div == "string") {
+        div = J$(div);
     }
-    let filetableBody = "<tr><td valign='top' style='border:0 none;'><div id='"
-        + div.id + "_fileList'></div></td></tr>";
-    let filetableFooter = "<tr><td style='border:0 none;'></td></tr></table>";
-    this.div.innerHTML = fiTablehead + filetableBody + filetableFooter;
-    this.createUploader = function () {
-        layui.upload.render({
-            elem: '#' + div.id + '_uploadItem',
-            url: cpath + '/utils/layuiFileUploadAction',
-            accept: 'file',
-            multiple: (!limit || limit > 1),
-            dataType: 'json',
-            data: {dbkey: data.dbkay, rowid: data.rowid, tablename: data.table, cellname: cellname, docPath: docPath},
-            before: function (obj) {
-                layui.layer.load();
-            },
-            done: function (res, index, upload) {
-                layui.layer.closeAll('loading');
-                if (res.code !== '-1') {
-                    layui.layer.msg('上传成功.', {icon: 1, time: 1000});
-                    div.refreshFileComp();
+    $(div).html("");//每次创建重新初始化
+    let transJson = function (str) {
+        str = str.toString().replaceAll(":", ":\"");
+        str = str.toString().replaceAll(",", "\",");
+        str = str.toString().replaceAll("}", "\"}");
+        str = str.toString().replaceAll("}{", "},{");
+        str = str.toString().replaceAll(";", "\",");
+        return eval("([" + str + "])");
+    };
+    let loadFiles = function () {
+        let file_list = [];
+        $.ajax({
+            url: "/system/doc/file/cell/view/",
+            method: "post",
+            data: {tablename: data.table, cellname: cellname, rowid: data.rowid},
+            dataType: "json",
+            async: false,
+            success: function (r) {
+                try {
+                    file_list = JSON.parse(r.data);
+                } catch (e) {
                     try {
-                        let puploadcallback = $(div).attr("onuploaded");
-                        if (typeof puploadcallback == "string") {
-                            puploadcallback = window.eval(puploadcallback);
-                        }
-                        puploadcallback(div.dilelist);
-                    } catch (e) {
+                        file_list = JSON.parse(transJson(r.data));
+                    } catch (er) {
+                        file_list = [];
                     }
-                } else {
-                    this.error(index, upload);
                 }
-            },
-            error: function () {
+            }
+        });
+        return file_list;
+    };
+    let file_list = loadFiles();
+    let upload_btn = new UUID().toString();
+    this.buildUploader = function () {
+        layui.upload.render({
+            elem: '#' + upload_btn
+            , url: '/system/doc/docCenter/uploadFile'
+            , data: {docPath: docPath || "/root", tablename: data.table, cellname: cellname, rowid: data.rowid}
+            , accept: accept || 'file'
+            , multiple: (limit && limit > 1)
+            , size: 1024 * 1024 * 100 //限定大小100M
+            , before: function (obj) {
+                if (!data.rowid || data.rowid === "") {
+                    layui.layer.alert("请先保存数据~");
+                    return false;
+                }
+                layui.layer.load();
+            }
+            , done: function (res) {
                 layui.layer.closeAll('loading');
-                layui.layer.msg('上传失败!', {icon: 2});
-            },
-            progress: function (n, elem, e) {
-                //layui.element.progress('正在上传:', n + '%'); //可配合 layui 进度条元素使用
+                if (res.code === 0) {
+                    layui.layer.msg("上传成功~");
+                    loadFileList();
+                } else {
+                    layui.layer.alert("上传失败！");
+                }
             }
         });
     };
-    div.createUploader = this.createUploader;
-    if (false !== canupload && !isTasksub) {
-        setTimeout(function () {
-            if (data.rowid && data.rowid !== "") {
-                div.createUploader();
-            } else {
-                $('#' + div.id + '_uploadItem').click(function () {
-                    let rowid = data.saveData();
-                    if (!rowid || rowid === "") {
-                        layui.layer.msg("数据保存失败,请先保存数据!");
-                    } else {
-                        $('#' + div.id + '_uploadItem').unbind("click");
-                        div.createUploader();
-                    }
-                });
-            }
-        }, 500);
+    if (canupload && ((limit && limit > file_list.length) || !limit)) {
+        $(div).append('<button type="button" class="layui-btn" id="' + upload_btn + '">' +
+            '  <i class="layui-icon">&#xe67c;</i>上传' +
+            '</button>');
+        if (!data.rowid || data.rowid === "") {
+            $("#" + upload_btn).click(function () {
+                layui.layer.alert("请先保存数据~");
+            });
+        } else {
+            this.buildUploader();
+        }
     }
-    this.$refreshFileComp = function () {
-        let dbkey = data.dbkay;
-        let tablename = data.table;
-        let rowid = data.rowid;
-        let sID = (dbkey === "system" || !dbkey) ? "SID" : "fID";
-        let random = Math.random();
-        let sql = "select " + cellname + " FILECOMPE from " + tablename
-            + " where " + sID + " = '" + rowid + "' and " + random + "="
-            + random;
-        let r = tlv8.sqlQueryActionforJson(dbkey, sql);
-        let duelist = [];
-        let transJson = function (str) {
-            str = str.toString().replaceAll(":", ":\"");
-            str = str.toString().replaceAll(",", "\",");
-            str = str.toString().replaceAll("}", "\"}");
-            str = str.toString().replaceAll("}{", "},{");
-            str = str.toString().replaceAll(";", "\",");
-            return eval("([" + str + "])");
-        };
-        try {
-            if (r.data !== "") {
-                let datas = r.data[0];
-                datas = datas.FILECOMPE;
-                if ("null" === datas) {
-                    datas = "";
-                }
-                if (datas && datas !== "") {
-                    try {
-                        duelist = eval("(" + datas + ")");
-                    } catch (e) {
-                        duelist = transJson(datas);
-                    }
-                }
+    let listID = div.id + "_fileList";
+    $(div).append('<div id="' + listID + '"></div>');
+    let loadFileList = function (file_list) {
+        if (!file_list) {
+            file_list = loadFiles();
+        }
+        let tt = [];
+        tt.push('<table class="layui-table">');
+        for (let i = 0; i < file_list.length; i++) {
+            tt.push('<tr>');
+            tt.push('<td><a style="color: green;" href="javascript:tlv8.viewFile(\'' + file_list[i].fileID + '\',\'' + file_list[i].fileName + '\');">' + file_list[i].fileName + '</a></td>');
+            if (canedit) {
+                tt.push('<td width="100px"><a style="color: blue;" href="javascript:tlv8.trangereditfile(\'' + file_list[i].fileID + '\',\'' + file_list[i].fileName + '\');">编辑</a></td>');
             }
-        } catch (e) {
-            alert(e.message);
-        }
-        div.dilelist = duelist;
-        let fileIDs = [];
-        let filenames = [];
-        for (let i = 0; i < duelist.length; i++) {
-            fileIDs.push(duelist[i].fileID);
-            filenames.push(duelist[i].filename);
-        }
-        filetableBody = "<table>";
-        docPath = docPath || "/";
-        try {
-            if (limit && limit !== -1 && limit <= filenames.length) {
-                document.getElementById(div.id + "_uploadItem").style.display = "none";
-                $("#" + div.id + "_uploadDocItemDiv").remove();
-                div.uploader = null;
-            } else {
-                document.getElementById(div.id + "_uploadItem").style.display = "";
+            if (candelete) {
+                tt.push('<td width="100px"><a style="color: red;" class="file_list_del" href="javascript:void();" fileID="' + file_list[i].fileID + '" fileName="' + file_list[i].fileName + '">删除</a></td>');
             }
-        } catch (e) {
-        }
-        if (filenames && filenames.length > 0) {
-            for (i in filenames) {
-                let fileID = fileIDs[i];
-                filetableBody += "<tr style='width:100%;height:20px;padding:5px;'><td style='border:0 none;'>"
-                    + "<a style='font-size:12px;color:#0033FF;text-decoration: none;' href='javascript:void(0)' id=\""
-                    + div.id
-                    + "_titleItem\" title='"
-                    + filenames[i]
-                    + "' onclick='justep.Doc.browseDocByID(\""
-                    + fileID
-                    + "\",\""
-                    + filenames[i]
-                    + "\")'>"
-                    + filenames[i]
-                    + "</a>&nbsp;&nbsp;</td>";
-                filetableBody += "<td width='40px;' style='border:0 none;'>"
-                    + "<a href='javascript:void(0)' style='font-size:12px;color:#0033FF;text-decoration: none;' title='文件属性' onclick='justep.Doc.openDocInfoDialog(\""
-                    + fileID + "\")'>属性</a></td>";
-                if (canedit === true && !isTasksub) {
-                    filetableBody += "<td width='40px;' style='border:0 none;'><a href='javascript:void(0)' "
-                        + "style='font-size:12px;color:#0033FF;text-decoration: none;' title='编辑文件' "
-                        + "onclick='tlv8.trangereditfile(\""
-                        + fileID
-                        + "\",\""
-                        + filenames[i]
-                        + "\",\""
-                        + docPath
-                        + "\",\""
-                        + data.dbkay
-                        + "\",\""
-                        + data.table
-                        + "\",\""
-                        + data.rowid
-                        + "\",\""
-                        + cellname
-                        + "\",\"" + div.id + "\")'>编辑</a></td>";
-                } else {
-                    filetableBody += "<td style='border:0 none;'></td>";
-                }
-                if (viewhistory === true) {
-                    filetableBody += "<td width='40px;' style='border:0 none;'><a href='javascript:void(0)' style='font-size:12px;color:#0033FF;text-decoration: none;' title='历史版本' onclick='justep.Doc.openDocHistoryDialog(null,\""
-                        + fileID + "\")'>历史</a></td>";
-                } else {
-                    filetableBody += "<td style='border:0 none;'></td>";
-                }
-                if (candelete !== false && !isTasksub) {
-                    filetableBody += "<td width='40px;' style='border:0 none;'><a href='javascript:void(0)' style='font-size:12px;color:#0033FF;text-decoration: none;' title='删除附件' onclick='tlv8.deletefile(\""
-                        + fileID
-                        + "\",\""
-                        + filenames[i]
-                        + "\",\""
-                        + dbkey
-                        + "\",\""
-                        + tablename
-                        + "\",\""
-                        + cellname
-                        + "\",\""
-                        + rowid
-                        + "\",function(){document.getElementById(\""
-                        + div.id + "\").refreshFileComp()})'>删除</a></td>";
-                } else {
-                    filetableBody += "<td></td>";
-                }
-                if (download !== false) {
-                    filetableBody += "<td width='40px;' style='border:0 none;'><a href='javascript:void(0)' style='font-size:12px;color:#0033FF;text-decoration: none;' title='下载附件' onclick='justep.Doc.downloadDocByFileID(\""
-                        + docPath + "\",\"" + fileID + "\")'>下载</a></td>";
-                } else {
-                    filetableBody += "<td style='border:0 none;'></td>";
-                }
-                filetableBody += "</tr>";
+            if (viewhistory) {
+                tt.push('<td width="100px"><a style="color: #555555;" href="javascript:tlv8.viewFileHistory(\'' + file_list[i].fileID + '\',\'' + file_list[i].fileName + '\');">历史</a></td>');
             }
+            tt.push('</tr>');
         }
-        filetableBody += "</table>";
-        document.getElementById(div.id + "_fileList").innerHTML = filetableBody;
-    };
-    this.div.refreshFileComp = this.$refreshFileComp;
-    div.compment = this;
-    this.$refreshFileComp();
+        tt.push('</table>');
+        $('#' + listID).html(tt.join(" "));
+        $(".file_list_del").click(function () {
+            tlv8.deleteFile($(this).attr("fileID"), $(this).attr("fileName"), data.table, cellname, data.rowid, function (r) {
+                loadFileList();//重新加载文件列表
+            });
+        });
+    }
+    loadFileList(file_list);
+    this.loadFiles = loadFiles;
+    this.loadFileList = loadFileList;
 };
 
 /**
@@ -3329,9 +3143,41 @@ tlv8.viewFile = function (fileID, fileName) {
  * @param fileID
  */
 tlv8.downloadFile = function (fileID) {
-    let url = "/system/doc/file/" + fileID + "/download";
+    let url = "/system/doc/file/" + fileID + "/download?t=" + new Date().getTime();
     window.open(url, "_download");
-}
+};
+
+/**
+ * 删除文件
+ * @param fileID
+ * @param fileName
+ */
+tlv8.deleteFile = function (fileID, fileName, tableName, cellName, rowid, callback) {
+    layui.layer.confirm("确定删除文件[" + fileName + "]吗？", function () {
+        layui.layer.closeAll();
+        $.ajax({
+            url: "/system/doc/file/cell/delete/",
+            method: "post",
+            data: {tablename: tableName, cellname: cellName, rowid: rowid, fileID: fileID},
+            dataType: "json",
+            async: false,
+            success: function (r) {
+                if (callback) {
+                    callback(r);
+                }
+            }
+        });
+    });
+};
+
+/**
+ * 查看文件编辑历史
+ * @param fileID
+ * @param fileName
+ */
+tlv8.viewFileHistory = function (fileID, fileName) {
+
+};
 
 
 function Confirm(msg, okcallFn, cancelcallFn) {
