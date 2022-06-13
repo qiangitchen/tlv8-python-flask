@@ -1992,3 +1992,10 @@ def file_delete(fileid=0):
 @user_login
 def doc_search():
     return render_template("system/doc/docSearch/docSearch.html")
+
+
+# 日程安排
+@system.route("/personal/schedule/", methods=["GET", "POST"])
+@user_login
+def personal_schedule():
+    return render_template("system/personal/schedule/mainActivity.html")
