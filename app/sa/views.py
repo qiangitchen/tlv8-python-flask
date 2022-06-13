@@ -1684,7 +1684,8 @@ def doc_data_list():
     rdata = dict()
     rdata['code'] = 0
     folder = url_decode(request.args.get('folder', 'root'))
-    data_query = SADocNode.query.filter(SADocNode.sparentid == folder, SADocNode.skind != 'dir')
+    data_query = SADocNode.query.filter(SADocNode.sparentid == folder,
+                                        or_(SADocNode.skind != 'dir', SADocNode.skind.is_(None)))
     search_text = url_decode(request.args.get('search_text', ''))
     if search_text and search_text != '':
         data_query = data_query.filter(or_(SADocNode.sdocname.ilike('%' + search_text + '%'),

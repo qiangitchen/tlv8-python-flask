@@ -86,7 +86,7 @@
     const option = '{{ option }}';
     const fileName = '{{ fileName }}';
 
-    document.title = "在线" + (option == "view" ? "（查看）" : "（编辑）") + "：" + fileName;
+    document.title = "在线" + (option === "view" ? "（查看）" : "（编辑）") + "：" + fileName;
 
     function colseWindow() {
         try {
@@ -115,7 +115,7 @@
     function saveToServer() {
         try {
             let aa = app.saveURL_s("<%=comiturl%>", "{{ fileName }}");
-            if (aa == true) {
+            if (aa === true) {
                 layui.layer.msg("保存成功.");
             } else {
                 layui.layer.alert("保存失败！");

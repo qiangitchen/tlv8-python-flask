@@ -3022,36 +3022,11 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
                                candelete, canedit, viewhistory, limit, download) {
     if (!div || !data || !cellname)
         return;
-    try {
-        upload = layui.upload;
-    } catch (e) {
-        let $rp = $dpjspath.replace("/common/js/", "/");
-        createStyleSheet($rp + "layui/css/layui.css");
-        createJSSheet($rp + "layui/layui.js");
-    }
     $(div).css("padding", "10px 0");
     this.uploadcount = 0;
     div.uploader = null;
-    div.writedata = new Array();
+    div.writedata = [];
     this.div = div;
-    this.CimitDataParam = function (docName, kind, size, cacheName,
-                                    revisionCacheName, commentFileContent, filecount, compment) {
-        let pa_log = {};
-        pa_log.dbkey = data.dbkay;
-        pa_log.docPath = docPath || "/root";
-        pa_log.tablename = data.table;
-        pa_log.cellname = cellname;
-        pa_log.rowid = data.rowid;
-        pa_log.docName = docName;
-        pa_log.kind = kind;
-        pa_log.size = size;
-        pa_log.cacheName = cacheName;
-        compment.div.writedata.push(pa_log);
-        compment.uploadcount++;
-        if (compment.uploadcount === filecount) {
-            compment.comitDataFn();
-        }
-    };
     this.comitDataFn = function () {
         let paramlog = JSON.stringify(this.div.writedata);
         let pas = new tlv8.RequestParam();
@@ -3273,7 +3248,11 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
     this.$refreshFileComp();
 };
 
-// office、wps文件在线编辑
+/**
+ * office、wps文件在线编辑
+ * @param fileID
+ * @param fileName
+ */
 tlv8.trangereditfile = function (fileID, fileName) {
     if ('.doc.docx.xls.xlsx.ppt.pptx.mpp.vsd.dps.wps.et.'
         .indexOf(String(/\.[^.]+$/.exec(fileName)) + '.') < 0) {
@@ -3284,27 +3263,78 @@ tlv8.trangereditfile = function (fileID, fileName) {
     window.open(url);
 };
 
+/**
+ * 查看文件
+ * @param fileID
+ * @param fileName
+ */
 tlv8.viewFile = function (fileID, fileName) {
-    if ('.pdf.PDF.'.indexOf(String(/\.[^.]+$/.exec(fileName)) + '.') > -1) {
+    if ('.mp3.ogg.wav.'.indexOf(String(/\.[^.]+$/.exec(fileName.toLowerCase())) + '.') > -1) {
+        let audioData = "/system/doc/file/" + fileID + "/view/";
+        layui.layer.close(tlv8.audioIndex);
+        tlv8.audioIndex = layui.layer.open({
+            type: 1,
+            title: '播放音频:' + fileName,
+            area: ['400px', '100px'],
+            maxmin: false,
+            content: '<div style="height: 100%; overflow: hidden;"><audio style="width:100%;height:100%;" autoplay="autoplay" controls><source src="' + audioData + '">你的浏览器不支持音频播放，请下载播放~</audio></div>'
+        });
+        return;
+    } else if ('.mp4.mp5.avi.rm.rmvb.wmv.'.indexOf(String(/\.[^.]+$/.exec(fileName.toLowerCase())) + '.') > -1) {
+        let videoData = "/system/doc/file/" + fileID + "/view/";
+        layui.layer.close(tlv8.videoIndex);
+        tlv8.videoIndex = layui.layer.open({
+            type: 1,
+            title: '播放视频:' + fileName,
+            area: ['600px', '400px'],
+            maxmin: true,
+            content: '<div style="background-color: #000; height: 100%;"><video style="position: absolute; width: 100%; height: 100%;" src="' + videoData + '" loop="loop" autoplay="autoplay" controls="controls">你的浏览器不支持视频查看，请下载查看~</video></div>'
+        });
+        return;
+    } else if ('.jpg.jpeg.png.git.bmp.'.indexOf(String(/\.[^.]+$/.exec(fileName.toLowerCase())) + '.') > -1) {
+        layui.layer.close(tlv8.photosIndex);
+        layui.layer.photos({
+            photos: {
+                data: [{
+                    "alt": fileName,
+                    "src": "/system/doc/file/" + fileID + "/view/"
+                }]
+            }
+            , shade: 0.01
+            , closeBtn: 2
+            , anim: 0
+            , resize: false
+            , success: function (layero, index) {
+                tlv8.photosIndex = index;
+            }
+        });
+        return;
+    } else if ('.pdf.'.indexOf(String(/\.[^.]+$/.exec(fileName.toLowerCase())) + '.') > -1) {
         let url = "/system/doc/pdf/fileBrowser?fileID=" + fileID;
         window.open(url);
         return;
     } else if ('.doc.docx.xls.xlsx.ppt.pptx.mpp.vsd.dps.wps.et.'
         .indexOf(String(/\.[^.]+$/.exec(fileName)) + '.') < 0) {
-        layui.layer.alert("不支持非Office文件在线编辑");
+        layui.layer.confirm("文件不支持在线查看，请下载查看~", function () {
+            tlv8.downloadFile(fileID);
+        });
         return;
     }
     let url = "/system/doc/wps/fileEditor?option=view&fileID=" + fileID;
     window.open(url);
 };
 
+/**
+ * 文件下载
+ * @param fileID
+ */
 tlv8.downloadFile = function (fileID) {
     let url = "/system/doc/file/" + fileID + "/download";
-    window.open(url);
+    window.open(url, "_download");
 }
 
 
-function Confirm(msg, okcallFn, cancelcallFn, img) {
+function Confirm(msg, okcallFn, cancelcallFn) {
     layui.layer.confirm(msg, okcallFn, cancelcallFn);
 }
 

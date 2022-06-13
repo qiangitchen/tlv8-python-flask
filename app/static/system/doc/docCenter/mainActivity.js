@@ -77,7 +77,11 @@ function treeselected(event, treeId, node) {
             , accept: 'file'
             , multiple: true
             , size: 1024 * 1024 * 100 //限定大小100M
+            ,before: function(obj){
+				window.top.layui.layer.load();
+			}
             , done: function (res) {
+                window.top.layui.layer.closeAll('loading');
                 if (res.code === 0) {
                     layui.layer.msg("上传成功~");
                     doQuery();
