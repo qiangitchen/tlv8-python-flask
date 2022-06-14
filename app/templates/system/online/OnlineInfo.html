@@ -70,13 +70,13 @@
                     window.location.reload();
                     break;
                 case 'quickQuery':
-                    window.location.href = "/system/logs?search_text=" + J_u_encode($("#query_text").val());
+                    window.location.href = "/system/online?search_text=" + J_u_encode($("#query_text").val());
                     break;
             }
         });
         $("#query_text").keyup(function (event) {
             if (event.keyCode == 13) {
-                window.location.href = "/system/logs?search_text=" + J_u_encode($("#query_text").val());
+                window.location.href = "/system/online?search_text=" + J_u_encode($("#query_text").val());
             }
         });
         //执行一个laypage实例
@@ -92,7 +92,7 @@
                 //console.log(obj.limit); //得到每页显示的条数
                 //首次不执行
                 if (!first) {
-                    window.location.href = "/system/logs?page=" + obj.curr + "&limit=" + obj.limit + "&search_text=" + J_u_encode($("#query_text").val());
+                    window.location.href = "/system/online?page=" + obj.curr + "&limit=" + obj.limit + "&search_text=" + J_u_encode($("#query_text").val());
                 }
             }
         });
