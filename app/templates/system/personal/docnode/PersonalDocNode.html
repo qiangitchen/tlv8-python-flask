@@ -1,0 +1,106 @@
+<html lang="zh_CN">
+{% include "common/tree_page_head.html" %}
+<body>
+<div class="layui-fluid" style="background: #dddddd; padding: 10px;">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md3">
+            <div class="layui-card">
+                <div class="layui-card-header">文件夹</div>
+                <div class="layui-card-body" style="height: 90%; padding: 5px;">
+                    <table style="width: 100%; height: 100%; table-layout: fixed;">
+                        <tr height="35px">
+                            <td width="90px">
+                                <a href="javascript:void(0);" class="toobar_item" onclick="openview()" title="新建文件夹">
+                                    <img src="{{ url_for('static',filename='common/image/doc/newfolder.gif') }}"
+                                         style="float: left; margin-top: -2px;"/>
+                                    <span style="font-size: 11pt; float: left;">新建</span>
+                                </a>
+                            </td>
+                            <td width="70px">
+                                <a href="javascript:void(0);" class="toobar_item" style="line-height: 20px;"
+                                   onclick="editview()" title="文件夹属性">
+                                    <img src="{{ url_for('static',filename='common/image/doc/folder_pro.gif') }}"
+                                         style="float: left; margin-top: -2px;"/>
+                                    <span style="font-size: 11pt; float: left;">修改</span>
+                                </a>
+                            </td>
+                            <td width="70px">
+                                <a href="javascript:void(0);" class="toobar_item disabled" style="line-height: 20px;"
+                                   onclick="deleteview()" title="删除">
+                                    <img src="{{ url_for('static',filename='common/image/doc/deletefile.gif') }}"
+                                         style="float: left; margin-top: -2px;"/>
+                                    <span style="font-size: 11pt; float: left;">删除</span>
+                                </a>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <form id="docnodeframe" style="display: none;"></form>
+                                <div style="border-top:1px solid #eee; width:100%;height:100%; overflow:auto;">
+                                    <ul id="maintree" class="ztree"></ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md9">
+            <div class="layui-card">
+                <div class="layui-card-header">文件列表</div>
+                <div class="layui-card-body" style="height: 90%; padding: 1px;">
+                    <div style="padding: 5px; width: 100%; position: relative; height: 35px;">
+                        <div style='float:left; height: 30px; margin-right: 5px;'>
+                            <button class="layui-btn layui-btn-sm layui-btn-normal layui-btn-disabled" id="upbtn">
+                                <i class="layui-icon">&#xe681;</i>&nbsp;上传
+                            </button>
+                        </div>
+                        <div style='float:left; height: 30px; margin-right: 5px;'>
+                            <button class="layui-btn layui-btn-sm layui-btn-disabled" id="viewbtn">
+                                <i class="layui-icon">&#xe705;</i>&nbsp;查看
+                            </button>
+                            <button class="layui-btn layui-btn-sm layui-btn-disabled" id="downbtn">
+                                <i class="layui-icon">&#xe601;</i>&nbsp;下载
+                            </button>
+                            <button class="layui-btn layui-btn-sm layui-btn-primary layui-btn-disabled" id="sharebtn">
+                                <i class="layui-icon">&#xe641;</i>&nbsp;分享
+                            </button>
+                            <button class="layui-btn layui-btn-sm" onclick="doQuery()">
+                                <span class='glyphicon glyphicon-repeat'></span>&nbsp;刷新
+                            </button>
+                            <button class="layui-btn layui-btn-sm layui-btn-danger layui-btn-disabled" id="deletebtn">
+                                <span class='layui-icon layui-icon-delete'></span>&nbsp;删除
+                            </button>
+                        </div>
+                        <div class='input-group input-group-sm'
+                             style='float:left; width:280px; height: 30px; margin-left: 5px;'>
+                            <input type="text" id="query_text" placeholder="快速查询..."
+                                   class='form-control'>
+                            <span class='input-group-btn'>
+                                <button class='btn btn-default' onclick="doQuery()">
+                                    <span class='glyphicon glyphicon-search'></span>查询
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <table lay-filter="datalist" class="layui-table"
+                           lay-data="{height:'full-120', page:true,even:true, id:'datalist'}" id="datalist">
+                        <thead>
+                        <tr>
+                            <th lay-data="{field:'sid',hide:true}"></th>
+                            <th lay-data="{field:'sfileid',hide:true}"></th>
+                            <th lay-data="{field:'no',width:60}">序号</th>
+                            <th lay-data="{field:'sdocname'}">名称</th>
+                            <th lay-data="{field:'ssize',width:150}">大小</th>
+                            <th lay-data="{field:'screatetime', width:160}">上传时间</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

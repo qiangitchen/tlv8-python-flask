@@ -1,0 +1,39 @@
+<html lang="zh_CN">
+{% include "common/table_page_head.html" %}
+<body>
+<div style="padding: 5px; width: 100%; position: relative; height: 35px;">
+    <div style='float:left; height: 30px; margin-right: 5px;'>
+        <button class="layui-btn layui-btn-sm layui-btn-disabled" id="downbtn">
+            <i class="layui-icon">&#xe601;</i>&nbsp;下载
+        </button>
+        <button class="layui-btn layui-btn-sm" onclick="doQuery()">
+            <span class='glyphicon glyphicon-repeat'></span>&nbsp;刷新
+        </button>
+    </div>
+    <div class='input-group input-group-sm'
+         style='float:left; width:280px; height: 30px; margin-left: 5px;'>
+        <input type="text" id="query_text" placeholder="快速查询..."
+               class='form-control'>
+        <span class='input-group-btn'>
+                                <button class='btn btn-default' onclick="doQuery()">
+                                    <span class='glyphicon glyphicon-search'></span>查询
+                                </button>
+                            </span>
+    </div>
+</div>
+<table lay-filter="datalist" class="layui-table"
+       lay-data="{height:'full-60', page:true,even:true, id:'datalist'}" id="datalist">
+    <thead>
+    <tr>
+        <th lay-data="{field:'sid',hide:true}"></th>
+        <th lay-data="{field:'sfileid',hide:true}"></th>
+        <th lay-data="{field:'no',width:60}">序号</th>
+        <th lay-data="{field:'sdocname'}">名称</th>
+        <th lay-data="{field:'ssize',width:150}">大小</th>
+        <th lay-data="{field:'screatorname',width:100}">上传人员</th>
+        <th lay-data="{field:'screatetime', width:160}">上传时间</th>
+    </tr>
+    </thead>
+</table>
+</body>
+</html>

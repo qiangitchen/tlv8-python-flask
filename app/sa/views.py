@@ -2165,3 +2165,17 @@ def personal_schedule_del_data():
         rdata['state'] = False
         rdata['msg'] = "指定的id无效~"
     return json.dumps(rdata, ensure_ascii=False)
+
+
+# 个人文件柜
+@system.route("/personal/docnode/PersonalDocNode", methods=["GET", "POST"])
+@user_login
+def personal_doc_node():
+    return render_template("system/personal/docnode/PersonalDocNode.html")
+
+
+# 分享文件列表
+@system.route("/personal/docnode/PersonaList", methods=["GET", "POST"])
+@user_login
+def personal_doc_node_list():
+    return render_template("system/personal/docnode/PersonaList.html")
