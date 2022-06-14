@@ -3083,7 +3083,20 @@ tlv8.trangereditfile = function (fileID, fileName) {
  * @param fileName
  */
 tlv8.viewFile = function (fileID, fileName) {
-    if ('.mp3.ogg.wav.'.indexOf(String(/\.[^.]+$/.exec(fileName.toLowerCase())) + '.') > -1) {
+    if ('.wma.wmv.'.indexOf(String(/\.[^.]+$/.exec(fileName.toLowerCase())) + '.') > -1) {
+        let audioData = "/system/doc/file/" + fileID + "/view/";
+        layui.layer.close(tlv8.audioIndex);
+        tlv8.audioIndex = layui.layer.open({
+            type: 1,
+            title: '在线播放:' + fileName,
+            area: ['400px', '300px'],
+            maxmin: false,
+            content: '<div style="height: 100%; overflow: hidden;"><object id="mplayer" align="baseline" border="0" width="100%" height="100%" classid="CLSID:22d6f312-b0f6-11d0-94ab-0080c74c7e95" codebase="http://activex.microsoft.com/activex/controls/mplayer/en/nsmp2inf.cab#Version=6,4,5,715" type="application/x-oleobject">\n' +
+                '<param name="FileName" value="' + audioData + '"><param name="ShowControls" value="1"><param name="ShowPositionControls" value="0"><param name="ShowAudioControls" value="1"><param name="ShowTracker" value="1"><param name="ShowDisplay" value="0"><param name="ShowStatusBar" value="1"><param name="AutoSize" value="0"><param name="ShowGotoBar" value="0"><param name="ShowCaptioning" value="0"><param name="EnableContextMenu" value="1"><param name="InvokeURLs" value="1"><param name="DefaultFrame" value="datawindow">' +
+                '<embed src="' + audioData + '" align="baseline" border="0" width="100%" height="100%" type="application/x-mplayer2" pluginspage="http://www.microsoft.com/isapi/redir.dll?prd=windows& sbp=mediaplayer&ar=media&sba=plugin&" name="MediaPlayer" showcontrols="1" showpositioncontrols="0" showaudiocontrols="1" showtracker="1" showdisplay="0" showstatusbar="1" showgotobar="0" showcaptioning="0" animationatstart="0" transparentatstart="0" allowscan="1" enablecontextmenu="1" clicktoplay="0" invokeurls="1" defaultframe="datawindow">你的浏览器不支持在线播放，请下载播放~</embed></object></div>'
+        });
+        return;
+    } else if ('.mp3.ogg.wav.'.indexOf(String(/\.[^.]+$/.exec(fileName.toLowerCase())) + '.') > -1) {
         let audioData = "/system/doc/file/" + fileID + "/view/";
         layui.layer.close(tlv8.audioIndex);
         tlv8.audioIndex = layui.layer.open({
@@ -3094,7 +3107,7 @@ tlv8.viewFile = function (fileID, fileName) {
             content: '<div style="height: 100%; overflow: hidden;"><audio style="width:100%;height:100%;" autoplay="autoplay" controls><source src="' + audioData + '">你的浏览器不支持音频播放，请下载播放~</audio></div>'
         });
         return;
-    } else if ('.mp4.mp5.avi.rm.rmvb.wmv.'.indexOf(String(/\.[^.]+$/.exec(fileName.toLowerCase())) + '.') > -1) {
+    } else if ('.mp4.mp5.avi.rm.rmvb.mkv.'.indexOf(String(/\.[^.]+$/.exec(fileName.toLowerCase())) + '.') > -1) {
         let videoData = "/system/doc/file/" + fileID + "/view/";
         layui.layer.close(tlv8.videoIndex);
         tlv8.videoIndex = layui.layer.open({
