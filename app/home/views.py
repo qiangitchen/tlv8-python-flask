@@ -1,7 +1,8 @@
 # _*_ coding: utf-8 _*_
 
+import os
 from . import home
-from flask import render_template, url_for, redirect, session, send_file
+from flask import render_template, url_for, redirect, session, send_file, send_from_directory
 from app.common.captcha import generate_captcha
 from app.menus.menuutils import get_function_menu
 from app.common.persons import get_permission_list
@@ -19,6 +20,14 @@ def index():
     return redirect(url_for("home.index_page"))
 
 
+# 系统图标定义
+@home.route("/favicon.ico")
+def favicon():
+    file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../static/favicon/')
+    return send_from_directory(file_path, filename="tlv8.ico", as_attachment=True)
+
+
+# 图形验证码
 @home.route("/captchaimage")
 def captchaimage():
     text, img_io = generate_captcha()
