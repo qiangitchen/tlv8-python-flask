@@ -22,7 +22,7 @@ function onload_getdate() {
 
 // ↓得到div外左边距**********************************************************************************
 function getLeftmargin(daynum) {
-    var num;
+    let num;
     switch (daynum) {
         case 1:
             num = 0;
@@ -103,8 +103,8 @@ function LastNextweek(parameter) {
         $("#div19_23").show("fast");
     }
 
-    var neednum;
-    var myDate = new Date();
+    let neednum;
+    let myDate = new Date();
     if (parameter === "last") {
         loaddate = loaddate - 604800000;
         myDate.setTime(loaddate);
@@ -390,26 +390,25 @@ function LastNextweek(parameter) {
                 let eDate = new Date(enddateArray[0], enddateArray[1] - 1,
                     enddateArray[2]);
                 let sDay = sDate.getDay();
-                if (sDay == 0) {
+                if (sDay === 0) {
                     sDay = 7;
                 }
                 let eDay = eDate.getDay();
-                if (eDay == 0) {
+                if (eDay === 0) {
                     eDay = 7;
                 }
                 let xAxis = sDay;
                 let yAxis = Number(cycleAffairsData[i].SSTARTDATE.substring(11,
                     13));
-                for (var j = 0; j <= (eDay - sDay); j++) {
+                for (let j = 0; j <= (eDay - sDay); j++) {
                     let coordinate = "w" + xAxis + "t" + yAxis;
                     let affairstxt = document.getElementById(coordinate);
-                    if (affairstxt.innerText == ""
+                    if (affairstxt.innerText === ""
                         || affairstxt.innerText == null
-                        || affairstxt.innerText == "null") {
+                        || affairstxt.innerText === "null") {
                         affairstxt.innerHTML = cycletxt;
                     } else {
-                        let txt = cycletxt + affairstxt.innerHTML;
-                        affairstxt.innerHTML = txt;
+                        affairstxt.innerHTML = cycletxt + affairstxt.innerHTML;
                     }
                     xAxis += 1;
                 }
@@ -422,22 +421,21 @@ function LastNextweek(parameter) {
                     enddateArray[2]);
                 let sDay = 1;
                 let eDay = eDate.getDay();
-                if (eDay == 0) {
+                if (eDay === 0) {
                     eDay = 7;
                 }
                 let xAxis = sDay;
                 let yAxis = Number(cycleAffairsData[i].SSTARTDATE.substring(11,
                     13));
-                for (var j = 0; j <= (eDay - sDay); j++) {
-                    var coordinate = "w" + xAxis + "t" + yAxis;
-                    var affairstxt = document.getElementById(coordinate);
-                    if (affairstxt.innerText == ""
+                for (let j = 0; j <= (eDay - sDay); j++) {
+                    let coordinate = "w" + xAxis + "t" + yAxis;
+                    let affairstxt = document.getElementById(coordinate);
+                    if (affairstxt.innerText === ""
                         || affairstxt.innerText == null
-                        || affairstxt.innerText == "null") {
+                        || affairstxt.innerText === "null") {
                         affairstxt.innerHTML = cycletxt;
                     } else {
-                        var txt = cycletxt + affairstxt.innerHTML;
-                        affairstxt.innerHTML = txt;
+                        affairstxt.innerHTML = cycletxt + affairstxt.innerHTML;
                     }
                     xAxis += 1;
                 }
@@ -464,8 +462,7 @@ function LastNextweek(parameter) {
                         || affairstxt.innerText === "null") {
                         affairstxt.innerHTML = cycletxt;
                     } else {
-                        let txt = cycletxt + affairstxt.innerHTML;
-                        affairstxt.innerHTML = txt;
+                        affairstxt.innerHTML = cycletxt + affairstxt.innerHTML;
                     }
                     xAxis += 1;
                 }
@@ -485,8 +482,7 @@ function LastNextweek(parameter) {
                         || affairstxt.innerText === "null") {
                         affairstxt.innerHTML = cycletxt;
                     } else {
-                        let txt = cycletxt + affairstxt.innerHTML;
-                        affairstxt.innerHTML = txt;
+                        affairstxt.innerHTML = cycletxt + affairstxt.innerHTML;
                     }
                     xAxis += 1;
                 }
@@ -588,15 +584,15 @@ function LastNextweek(parameter) {
                 let coordinateDate = new Date(coordinateNumA[0],
                     coordinateNumA[1] - 1, coordinateNumA[2]);
                 let coordinateDay = coordinateDate.getDay();
-                if (coordinateDay == 0) {
+                if (coordinateDay === 0) {
                     coordinateDay = 7;
                 }
                 let coordinate = "w" + coordinateDay + "t"
                     + Number(affairsdata[i].SSTARTDATE.substring(11, 13));
                 // 为坐标单元格填入数据
                 let affairstxt = document.getElementById(coordinate);
-                if (affairstxt.innerText == "" || affairstxt.innerText == null
-                    || affairstxt.innerText == "null") {
+                if (affairstxt.innerText === "" || affairstxt.innerText == null
+                    || affairstxt.innerText === "null") {
                     affairstxt.innerHTML = txt;
                 } else {
                     txt = txt + affairstxt.innerHTML;
@@ -623,7 +619,7 @@ function message_add(coordinate_id) {
     tlv8.portal.dailog.openDailog('添加事务',
         '/system/personal/schedule/dialog/cycleAffairs?coordinate_id='
         + coordinate_id + '&loadMondaydate=' + loadMondaydate, 700,
-        400, addcallback, null);
+        450, addcallback);
 }
 
 function addcallback(datas) {// 对话框回调函数
@@ -632,76 +628,43 @@ function addcallback(datas) {// 对话框回调函数
 
 // 查看事务对话框
 function message_looks(obj) {
-    obj$ = $(obj);
-    var cid = encodeURIComponent(obj$.attr("sid"));
-    var cstartdate = encodeURIComponent(obj$.attr("sstartdate"));
-    var cenddate = encodeURIComponent(obj$.attr("senddate"));
-    var ccaption = encodeURIComponent(obj$.attr("scaption"));
-    var cstatus = encodeURIComponent(obj$.attr("sstatus"));
-    var ccontent = encodeURIComponent(obj$.attr("scontent"));
-    var cpriority = encodeURIComponent(obj$.attr("spriority"));
-    var itemSetInit = {
-        refreshItem: false,
-        enginItem: true,
-        CanclItem: true
-    };
-    tlv8.portal.dailog.openDailog("查看事务",
-        "/SA/personal/schedule/dialog/messgge_looks.html?sid=" + cid
-        + "&sstartdate=" + cstartdate + "&senddate=" + cenddate
-        + "&scaption=" + ccaption + "&sstatus=" + cstatus
-        + "&scontent=" + ccontent + "&spriority=" + cpriority, 600,
-        450, lookscallback, itemSetInit);
+    let cid = encodeURIComponent($(obj).attr("sid"));
+    tlv8.portal.dailog.openDailog("查看/编辑-事务",
+        "/system/personal/schedule/dialog/cycleAffairs?sid=" + cid + "&option=edit", 700,
+        450, lookscallback);
     event.cancelBubble = true;// 阻止触发事件
 }
 
 function lookscallback() {
     LastNextweek("add");
-    cycleAffairsgrid.refreshData();
 }
 
 // 新建周期性事务对话框
 function message_cycleAffairs() {
     tlv8.portal.dailog.openDailog('新建周期性事务',
-        '/system/personal/schedule/dialog/cycleAffairs', 700, 400,
-        cycleAffairscallback, null);
+        '/system/personal/schedule/dialog/cycleAffairs', 700, 450,
+        cycleAffairscallback);
 }
 
 function cycleAffairscallback() {// 回调函数
-    cycleAffairsgrid.refreshData();
     LastNextweek('cycle');
 }
 
 // 查看周期事务对话框
 function message_cycleAffairsLooks(obj) {
-    obj$ = $(obj);
-    var cid = encodeURIComponent(obj$.attr("sid"));
-    var cstartdate = encodeURIComponent(obj$.attr("sstartdate"));
-    var cenddate = encodeURIComponent(obj$.attr("senddate"));
-    var ccaption = encodeURIComponent(obj$.attr("scaption"));
-    var ccontent = encodeURIComponent(obj$.attr("scontent"));
-    var cpriority = encodeURIComponent(obj$.attr("spriority"));
-    var itemSetInit = {
-        refreshItem: true,
-        enginItem: true,
-        CanclItem: true
-    };
+    let cid = encodeURIComponent($(obj).attr("sid"));
     tlv8.portal.dailog.openDailog("查看周期事务",
-        "/SA/personal/schedule/dialog/message_cycleLooks.html?sid=" + cid
-        + "&sstartdate=" + cstartdate + "&senddate=" + cenddate
-        + "&scaption=" + ccaption + "&scontent=" + ccontent
-        + "&spriority=" + cpriority, 520, 290, cyclelookscallback,
-        itemSetInit);
+        "/system/personal/schedule/dialog/cycleAffairs?sid=" + cid, 700, 450, cyclelookscallback);
     event.cancelBubble = true;// 阻止触发事件
 }
 
 function cyclelookscallback() {// 回调函数
-    cycleAffairsgrid.refreshData();
     LastNextweek("add");
 }
 
 // 将星期几数字转为中文
 function conversionweek(day) {
-    var dayweek;
+    let dayweek;
     switch (day) {
         case 0:
             dayweek = "星期日";
@@ -735,69 +698,54 @@ function cycleAffairs() {
 
 }
 
-/*
- * `SCAPTION` varchar(100) default NULL COMMENT '标题', `SSTARTDATE` datetime
- * default NULL COMMENT '开始时间', `SENDDATE` datetime default NULL COMMENT '结束时间',
- * `SPRIORITY` int(11) default NULL COMMENT '优先级', `SCONTENT` text COMMENT '内容',
- * `SSTATUS` varchar(50) default NULL COMMENT '状态', `SAFFAIRSTYPE` int(11)
- * default NULL COMMENT '事务类型', `SCOMPLETERATE` int(11) unsigned default NULL
- * COMMENT '完成率', `SSTARTDATE_AXIS` int(11) default NULL COMMENT '开始时间轴',
- * `SSENDDATE_AXIS` int(11) default NULL COMMENT '结束时间轴', `SWHOUSER`
- * varchar(100) default NULL COMMENT '所属用户',
- */
-
 // *************我的任务*********************我的任务***********************我的任务**/
 function myTaskLoad() {
-    var myTaskLoadData = selectData(
-        "SID,SCAPTION,SSTARTDATE,SENDDATE,SPRIORITY,SCONTENT,SSTATUS,SAFFAIRSTYPE,"
-        + "SCOMPLETERATE,SSTARTDATE_AXIS,SSENDDATE_AXIS,SWHOUSER",
-        "sa_psnmytask", " where SWHOUSER='"
-        + tlv8.Context.getCurrentPersonID() + "'");
+    let myTaskLoadData = selectData();
 
-    var nowDate = new Date();
-    var nowYears = nowDate.getFullYear().toString();// 当前年份
-    var nowMonths = nowDate.getMonth() + 1;// 当前月份
+    let nowDate = new Date();
+    let nowYears = nowDate.getFullYear().toString();// 当前年份
+    let nowMonths = nowDate.getMonth() + 1;// 当前月份
     if (nowMonths < 10) {
         nowMonths = "0" + nowMonths.toString();
     }
-    var nowDates = nowDate.getDate();// 当前日
+    let nowDates = nowDate.getDate();// 当前日
     if (nowDates < 10) {
         nowDates = "0" + nowDates.toString();
     }
-    var nowTime = nowDate.toLocaleTimeString().split(":");// 获取当前时间,时分秒
-    var nowDatetimeNum = nowYears + nowMonths + nowDates
+    let nowTime = nowDate.toLocaleTimeString().split(":");// 获取当前时间,时分秒
+    let nowDatetimeNum = nowYears + nowMonths + nowDates
         + nowTime[0].toString() + nowTime[1].toString()
         + nowTime[2].toString();
-    var nowDateNum = nowYears + nowMonths + nowDates;
+    let nowDateNum = nowYears + nowMonths + nowDates;
 
-    var tomorrowDate = new Date(nowDate.getTime() + 86400000);
-    var tomorrowYears = tomorrowDate.getFullYear().toString();// 当前年份
-    var tomorrowMonths = tomorrowDate.getMonth() + 1;// 当前月份
+    let tomorrowDate = new Date(nowDate.getTime() + 86400000);
+    let tomorrowYears = tomorrowDate.getFullYear().toString();// 当前年份
+    let tomorrowMonths = tomorrowDate.getMonth() + 1;// 当前月份
     if (tomorrowMonths < 10) {
         tomorrowMonths = "0" + tomorrowMonths.toString();
     }
-    var tomorrowDates = tomorrowDate.getDate();// 当前日
+    let tomorrowDates = tomorrowDate.getDate();// 当前日
     if (tomorrowDates < 10) {
         tomorrowDates = "0" + tomorrowDates.toString();
     }
-    var tomorrowTime = tomorrowDate.toLocaleTimeString().split(":");// 获取当前时间,时分秒
-    var tomorrowDatetimeNum = tomorrowYears + tomorrowMonths + tomorrowDates
+    let tomorrowTime = tomorrowDate.toLocaleTimeString().split(":");// 获取当前时间,时分秒
+    let tomorrowDatetimeNum = tomorrowYears + tomorrowMonths + tomorrowDates
         + tomorrowTime[0].toString() + tomorrowTime[1].toString()
         + tomorrowTime[2].toString();
-    var tomorrowDateNum = tomorrowYears + tomorrowMonths + tomorrowDates;
+    let tomorrowDateNum = tomorrowYears + tomorrowMonths + tomorrowDates;
 
     /* 为标题框加入日期显示 */
     document.getElementById("tdTodayTask").innerHTML = "";// tdTodayTask
-    var tdTodayHtml = "&nbsp;&nbsp;今天的任务" + "（" + nowDate.toLocaleDateString()
+    let tdTodayHtml = "&nbsp;&nbsp;今天的任务" + "（" + nowDate.toLocaleDateString()
         + "）";
     document.getElementById("tdTodayTask").innerHTML = tdTodayHtml;
 
     document.getElementById("tdTomorrowTask").innerHTML = "";// tdTomorrowTask
-    var tdTomorrowHtml = "&nbsp;&nbsp;明天的任务" + "（"
+    let tdTomorrowHtml = "&nbsp;&nbsp;明天的任务" + "（"
         + tomorrowDate.toLocaleDateString() + "）";
     document.getElementById("tdTomorrowTask").innerHTML = tdTomorrowHtml;
     /* 构建显示表格的表头 */
-    var tableHeader = "<table width='100%' cellpadding='0' cellspacing='0' class='weekdatalistdata'>"
+    let tableHeader = "<table width='100%' cellpadding='0' cellspacing='0' class='weekdatalistdata'>"
         + "<tr align='center'  valign='middle' style=\"font-family: '宋体';font-size:12; color:'#0000CC'\">"
         + "<td width='65' >单天/跨天</td>"
         + "<td width='40' >类型</td>"
@@ -806,23 +754,24 @@ function myTaskLoad() {
         + "<td width='125' >结束时间</td>"
         + "<td width='84' >优先级别</td>"
         + "<td width='54' >状态</td>"
-        + "<td width='49' >完成率</td>"
+        //+ "<td width='49' >完成率</td>"
         + "<td width='450' >内容</td>"
-        + "<td width='30' >修改</td>"
-        + "<td width='30' >删除</td></tr>";
-    var todayTasktxt = "", tomorrowTasktxt = "", beforeTasktxt = "", afterTasktxt = "";
-    if (myTaskLoadData != null && myTaskLoadData != undefined) {
-        for (var i = 0; i < myTaskLoadData.length; i++) {
+        + "<td width='30' colspan='2'>操作</td>"
+        + "</tr>";
+    let todayTasktxt = "", tomorrowTasktxt = "", beforeTasktxt = "", afterTasktxt = "";
+    if (myTaskLoadData) {
+        for (let i = 0; i < myTaskLoadData.length; i++) {
             try {
-                var sid = myTaskLoadData[i].SID, caption = myTaskLoadData[i].SCAPTION,
+                let sid = myTaskLoadData[i].SID, caption = myTaskLoadData[i].SCAPTION,
                     startdate = myTaskLoadData[i].SSTARTDATE
                         .substring(0, 19), enddate = myTaskLoadData[i].SENDDATE
                         .substring(0, 19), priority = myTaskLoadData[i].SPRIORITY, content = myTaskLoadData[i].SCONTENT,
                     status = myTaskLoadData[i].SSTATUS, affairstype = myTaskLoadData[i].SAFFAIRSTYPE,
-                    completerate = myTaskLoadData[i].SCOMPLETERATE, startdate_axis = myTaskLoadData[i].SSTARTDATE_AXIS,
+                    //completerate = myTaskLoadData[i].SCOMPLETERATE,
+                    startdate_axis = myTaskLoadData[i].SSTARTDATE_AXIS,
                     senddate_axis = myTaskLoadData[i].SSENDDATE_AXIS, swhouser = myTaskLoadData[i].SWHOUSER;
 
-                var stime, stime_a, stime_b, stime_c, stime_d, etime, etime_a, etime_b, etime_c, etime_d;
+                let stime, stime_a, stime_b, stime_c, stime_d, etime, etime_a, etime_b, etime_c, etime_d;
                 stime_a = startdate.toString().substring(0, 10);
                 stime_b = startdate.toString().substring(11, 19);
                 stime_c = stime_a.split("-");
@@ -842,12 +791,12 @@ function myTaskLoad() {
                     + etime_d[2].toString();
                 stime = stime_a + stime_b;
                 etime = etime_a + etime_b;
-                var statusColor;
-                if (status == "已完成") {
+                let statusColor;
+                if (status === "已完成") {
                     statusColor = "#3CB371";
                     status = "已完成";
                 }
-                if (!status || status == null || status == "null") {
+                if (!status || status === "null") {
                     if (nowDatetimeNum > etime) {
                         status = "已过期";
                         statusColor = "red";
@@ -861,32 +810,32 @@ function myTaskLoad() {
                         statusColor = "#B5005A";
                     }
                 }
-                var Priority = convertPriority(priority);
-                var priorityColor;
-                if (priority == 0) {
+                let Priority = convertPriority(priority);
+                let priorityColor;
+                if (priority === 0) {
                     priorityColor = "#000000";
-                } else if (priority == 1) {
+                } else if (priority === 1) {
                     priorityColor = "#6F7274";
-                } else if (priority == 2) {
+                } else if (priority === 2) {
                     priorityColor = "#00AA00";
-                } else if (priority == 3) {
+                } else if (priority === 3) {
                     priorityColor = "#FF9933";
-                } else if (priority == 4) {
+                } else if (priority === 4) {
                     priorityColor = "#FF0000";
                 }
-                var nDays = "单天";
-                if (startdate_axis != senddate_axis) {
+                let nDays = "单天";
+                if (startdate_axis !== senddate_axis) {
                     nDays = "跨天";
                 }
-                var Affairstype;
-                if (affairstype == 4) {
+                let Affairstype;
+                if (affairstype === 4) {
                     Affairstype = "工作";
                 } else {
                     Affairstype = "个人";
                 }
-                var title = Priority + "(" + status + ")";
+                let title = Priority + "(" + status + ")";
                 /* 将数据构建为HTML格式 */
-                var tableHtml = "<tr align='center' style=\"font-family: '宋体';font-size:12\"><td>"
+                let tableHtml = "<tr align='center' style=\"font-family: '宋体';font-size:12px;\"><td>"
                     + nDays
                     + "</td>"
                     + "<td>"
@@ -908,8 +857,8 @@ function myTaskLoad() {
                     + priority
                     + "' sstatus='"
                     + status
-                    + "' scompleterate='"
-                    + completerate
+                    // + "' scompleterate='"
+                    // + completerate
                     + "' scontent='"
                     + content
                     + "'>"
@@ -931,9 +880,9 @@ function myTaskLoad() {
                     + ">"
                     + status
                     + "</font></td>"
-                    + "<td>"
-                    + completerate
-                    + "%</td>"
+                    // + "<td>"
+                    // + completerate
+                    // + "%</td>"
                     + "<td>"
                     + content
                     + "</td>"
@@ -951,13 +900,13 @@ function myTaskLoad() {
                     + priority
                     + "' sstatus='"
                     + status
-                    + "' scompleterate='"
-                    + completerate
+                    // + "' scompleterate='"
+                    // + completerate
                     + "' scontent='"
                     + content
-                    + "'><img src=img/up.png /></a></td>"
+                    + "'>修改</a></td>"
                     + "<td><a href='javascript:void(0);' onclick='myTaskDelete(this)' sid='"
-                    + sid + "'><img src=img/del.png /></a></td></tr>";
+                    + sid + "'>删除</a></td></tr>";
 
                 if (nowDateNum > etime_a && status != "已完成") {
                     todayTasktxt = todayTasktxt + tableHtml;
@@ -1014,7 +963,7 @@ function convertPriority(num) {
 // 新建我的任务对话框
 function message_addmyTask() {
     tlv8.portal.dailog.openDailog('新建我的任务',
-        '/SA/personal/schedule/dialog/message_addMyTask.html', 800, 400,
+        '/system/personal/schedule/dialog/cycleAffairs', 700, 450,
         addmyTask, null);
 }
 
@@ -1024,28 +973,9 @@ function addmyTask() {// 回调函数
 
 // 查看我的任务对话框
 function message_myTaskLooks(obj) {
-    obj$ = $(obj);
-    var cid = encodeURIComponent(obj$.attr("sid"));
-    var caffairstype = encodeURIComponent(obj$.attr("saffairstype"));
-    var cstartdate = encodeURIComponent(obj$.attr("sstartdate"));
-    var cenddate = encodeURIComponent(obj$.attr("senddate"));
-    var ccaption = encodeURIComponent(obj$.attr("scaption"));
-    var cstatus = encodeURIComponent(obj$.attr("sstatus"));
-    var ccontent = encodeURIComponent(obj$.attr("scontent"));
-    var cpriority = encodeURIComponent(obj$.attr("spriority"));
-    var ccompleterate = encodeURIComponent(obj$.attr("scompleterate"));
-    var itemSetInit = {
-        refreshItem: false,
-        enginItem: true,
-        CanclItem: true
-    };
-    tlv8.portal.dailog.openDailog("查看我的任务",
-        "/SA/personal/schedule/dialog/message_MyTaskLooks.html?sid=" + cid
-        + "&saffairstype=" + caffairstype + "&scaption=" + ccaption
-        + "&sstartdate=" + cstartdate + "&senddate=" + cenddate
-        + "&spriority=" + cpriority + "&sstatus=" + cstatus
-        + "&scompleterate=" + ccompleterate + "&scontent="
-        + ccontent, 520, 320, myTaskLooks, itemSetInit);
+    let cid = encodeURIComponent($(obj).attr("sid"));
+    tlv8.portal.dailog.openDailog("我的任务",
+        "/system/personal/schedule/dialog/cycleAffairs?sid=" + cid, 700, 450, myTaskLooks);
     event.cancelBubble = true;// 阻止触发事件
 }
 
@@ -1055,25 +985,23 @@ function myTaskLooks() {// 回调函数
 
 // 删除我的任务
 function myTaskDelete(obj) {
-    document.getElementById("textDelete").value = obj.sid;
-    var dataDelete = new tlv8.Data();
-    dataDelete.setDbkey("system");
-    dataDelete.setTable("sa_psnmytask");
-    dataDelete.setFormId("dataDelete");
-    dataDelete.rowid = obj.sid;
-    var result = dataDelete.deleteData();
-    document.getElementById("textDelete").value = "";
-    myTaskLoad();
+    let sid = $(obj).attr("sid");
+    document.getElementById("textDelete").value = sid;
+    layui.layer.confirm("确定删除数据吗?", function () {
+        let param = new tlv8.RequestParam();
+        param.set("sid", sid);
+        let r = tlv8.XMLHttpRequest("/system/personal/schedule/delData", param, "post", false);
+        if (r.state === true) {
+            layui.layer.msg("删除成功~");
+        } else {
+            layui.layer.alert("删除失败:" + r.msg);
+        }
+        layui.table.reload('divCycleAffairs');
+        myTaskLoad();
+    });
 }
 
-// ****************导入导出页面grid
-var currentgrid = null;
-
-function importExport() {
-
-}
-
-// 查询数据-需传入3个值，字段名（列名）、表名和where条件，无where条件为""
+// 查询数据
 function selectData(m, s, a, t) {
     let param = new tlv8.RequestParam();
     if (m) {
@@ -1087,17 +1015,9 @@ function selectData(m, s, a, t) {
         param.set("td", t);
     }
     let r = tlv8.XMLHttpRequest("/system/personal/schedule/loadData", param, "post", false);
-    console.log(r);
     return r.data;
 }
 
 function openHelp() {
 
-}
-
-// tab选择事件
-function tabselected(param) {
-    if (param === "周期性事务") {
-
-    }
 }

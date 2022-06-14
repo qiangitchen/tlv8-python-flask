@@ -419,6 +419,12 @@ class ScheduleForm(FlaskForm):
         default=0
     )
 
+    sstatus = SelectField(
+        description="状态",
+        choices=["未开始", "进行中", "已完成"],
+        default="未开始"
+    )
+
     sstartdate = StringField(
         label="开始时间",
         render_kw={
@@ -446,7 +452,7 @@ class ScheduleForm(FlaskForm):
         description="事务内容",
         render_kw={
             "class": "layui-textarea",
-            "style": "min-height:100px;"
+            "style": "min-height:90px;"
         }
     )
 

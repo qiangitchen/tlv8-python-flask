@@ -121,6 +121,7 @@ def change_password():
 def personal_entry():
     form = PersonForm()
     person = SAPerson.query.filter_by(sid=session['user_id']).first()
+    form.sdescription.data = person.sdescription
     if form.is_submitted():
         data = form.data
         rdata = dict()
@@ -1690,6 +1691,8 @@ def create_folder():
         return json.dumps(rdata, ensure_ascii=False)
     if not model:
         model = SADocNode(sdocname='', skind='dir', sdescription='')
+    else:
+        form.sdescription.data = model.sdescription
     if form.is_submitted():
         rdata = dict()
         model.sid = sid
@@ -2019,7 +2022,13 @@ def personal_schedule_cycle():
     sid = request.args.get('sid', '')
     model = SASchedule.query.filter_by(sid=sid).first()
     if not model:
-        model = SASchedule(spriority=0, saffairstype=0, sstartdate_axis=0, ssenddate_axis=0)
+        saffairstype = 0
+        coordinate_id = request.args.get('coordinate_id')
+        if not coordinate_id:
+            saffairstype = 3
+        model = SASchedule(spriority=0, saffairstype=saffairstype, sstartdate_axis=0, ssenddate_axis=0)
+    else:
+        form.scontent.data = model.scontent
     if form.is_submitted():
         data = form.data
         rdata = dict()
@@ -2033,13 +2042,14 @@ def personal_schedule_cycle():
                 model.senddate = None
             model.scontent = data['scontent']
             model.swhouser = data['swhouser']
-            model.saffairstype = request.form.get('saffairstype', default=0, type=int)
+            model.saffairstype = int(data['saffairstype'])
             model.sstartdate_axis = int(data['sstartdate_axis'])
             model.ssenddate_axis = int(data['ssenddate_axis'])
+            model.sstatus = data['sstatus']
             db.session.add(model)
             db.session.commit()
             rdata['state'] = True
-            rdata['stata'] = model.sid
+            rdata['data'] = model.sid
         except Exception as e:
             current_app.logger.error(e)
             rdata['state'] = False
@@ -2055,12 +2065,12 @@ def personal_schedule_cycle():
 def personal_schedule_load_data():
     rdata = dict()
     user_id = session['user_id']
-    m_num = request.args.get('m_num', 0, type=int)
-    s_num = request.args.get('s_num', 0, type=int)
-    af = request.args.get('af', 0, type=int)
-    td = request.args.get('td')
+    m_num = url_decode(request.form.get('m_num'))
+    s_num = url_decode(request.form.get('s_num'))
+    af = request.form.get('af', 0, type=int)
+    td = request.form.get('td')
     # schedule_list = list()
-    if m_num > 0 and s_num > 0:
+    if m_num and s_num:  # 指定时间范围的数据
         data_query = SASchedule.query.filter(SASchedule.ssenddate_axis >= m_num,
                                              SASchedule.sstartdate_axis <= s_num,
                                              SASchedule.swhouser == user_id)
@@ -2070,9 +2080,12 @@ def personal_schedule_load_data():
             data_query = data_query.filter(SASchedule.saffairstype != 3)
         if td:
             data_query = data_query.filter(SASchedule.sstartdate_axis == SASchedule.ssenddate_axis)
+        else:
+            data_query = data_query.filter(SASchedule.sstartdate_axis != SASchedule.ssenddate_axis)
         schedule_list = data_query.order_by(SASchedule.sstartdate_axis).all()
-    else:
-        schedule_list = SASchedule.query.filter(SASchedule.swhouser == user_id).order_by(SASchedule.sstartdate_axis).all()
+    else:  # 不指定时间范围的查当前用户的数据
+        schedule_list = SASchedule.query.filter(SASchedule.swhouser == user_id).order_by(
+            SASchedule.sstartdate_axis.desc()).paginate(1, 20).items  # 只展示最新的20条数据
     data_list = list()
     if len(schedule_list) > 0:
         for schedule in schedule_list:
@@ -2089,4 +2102,66 @@ def personal_schedule_load_data():
             }
             data_list.append(data)
     rdata['data'] = data_list
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 日程安排-加载周期性任务
+@system.route("/personal/schedule/loadPageData", methods=["GET", "POST"])
+@user_login
+def personal_schedule_load_page_data():
+    rdata = dict()
+    rdata['code'] = 0
+    user_id = session['user_id']
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    schedule_list = SASchedule.query.filter_by(swhouser=user_id, saffairstype=3).order_by(
+        SASchedule.sstartdate_axis.desc()).paginate(page, limit)
+    data_list = list()
+    no = 1
+    for d in schedule_list.items:
+        data = dict()
+        data['no'] = no
+        data['sid'] = d.sid
+        data['scaption'] = ('<a onclick="message_cycleAffairsLooks(this)" sid="'
+                            + d.sid +
+                            '" href="javascript:void(0);">'
+                            + d.scaption +
+                            '</a>')
+        data['sstartdate'] = datetime.strftime(d.sstartdate, '%Y-%m-%d %H:%M:%S')
+        data['senddate'] = datetime.strftime(d.senddate, '%Y-%m-%d %H:%M:%S')
+        data['spriority'] = d.spriority
+        data['scontent'] = d.scontent
+        data['action'] = ('<a href="javascript:void(0)" '
+                          ' onclick="message_cycleAffairsLooks(this)" '
+                          ' sid="'
+                          + d.sid +
+                          '">修改</a>'
+                          '&nbsp;&nbsp;'
+                          '<a style="color:red;" href="javascript:void();"'
+                          ' onclick="myTaskDelete(this)" sid="'
+                          + d.sid +
+                          '">删除</a>'
+                          )
+        data_list.append(data)
+        no += 1
+    rdata['data'] = data_list
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 日程安排-删除数据
+@system.route("/personal/schedule/delData", methods=["GET", "POST"])
+@user_login
+def personal_schedule_del_data():
+    rdata = dict()
+    user_id = session['user_id']
+    sid = url_decode(request.form.get('sid'))
+    print(sid)
+    schedule = SASchedule.query.filter_by(swhouser=user_id, sid=sid).first()
+    if schedule:
+        db.session.delete(schedule)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "指定的id无效~"
     return json.dumps(rdata, ensure_ascii=False)

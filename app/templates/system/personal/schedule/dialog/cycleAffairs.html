@@ -8,7 +8,7 @@
         <form id="affairsdata" class="layui-form">
             <div class="layui-form-item">
                 <div class="layui-inline">
-                    <label class="layui-form-label" style="width: 110px;">标题</label>
+                    <label class="layui-form-label" style="width: 110px;">任务标题</label>
                     <div class="layui-input-inline">
                         {{ form.scaption(value=nul2em(model.scaption)) }}
                     </div>
@@ -35,9 +35,15 @@
                 </div>
             </div>
             <div class="layui-form-item">
+                <label class="layui-form-label" style="width: 110px;">任务状态</label>
+                <div class="layui-input-block">
+                    {{ form.sstatus(value=model.sstatus) }}
+                </div>
+            </div>
+            <div class="layui-form-item">
                 <label class="layui-form-label" style="width: 110px;">事务内容</label>
                 <div class="layui-input-block">
-                    {{ form.scontent(value=nul2em(model.scontent)) }}
+                    {{ form.scontent(value=model.scontent) }}
                 </div>
             </div>
             <div style="display: none">
@@ -55,6 +61,15 @@
 </body>
 <script type="text/javascript">
     $("#spriority").val('{{ model.spriority }}');
+    $("#sstatus").val('{{ model.sstatus }}');
+
+    const mainData = new tlv8.Data();
+    mainData.setFormId("affairsdata");
+    let option = tlv8.RequestURLParam.getParam("option");
+    if (option === "view") {
+        mainData.setReadonly(true);
+    }
+
     layui.form.on('submit(mainform)', function (data) {
         $.ajax({
             url: "/system/personal/schedule/dialog/cycleAffairs?sid={{ sid }}",
@@ -64,7 +79,7 @@
             dataType: "json",
             success: function (re) {
                 if (re.state === true) {
-                    layui.layer.msg("保存成功！")
+                    layui.layer.msg("保存成功！");
                     tlv8.portal.dailog.dailogEngin(re.data);
                 } else {
                     layui.layer.alert("保存失败：" + re.msg);

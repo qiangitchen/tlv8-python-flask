@@ -1,8 +1,11 @@
+let saffairstype = 0;
+
 //页面载入执行
 function onloadset() {
+    document.getElementById("swhouser").value = tlv8.Context.getCurrentPersonID();
     let coordinate_id = tlv8.RequestURLParam.getParam("coordinate_id");//单元格ID
     if (!coordinate_id || coordinate_id === "") {
-        J$("saffairstype").value = "3";
+        saffairstype = 3;
         return;
     }
     let loadMondaydate = tlv8.RequestURLParam.getParam("loadMondaydate");//周一日期毫秒数
@@ -26,10 +29,8 @@ function onloadset() {
     let endDatetime = needYears + "-" + needMonths + "-" + needDates + " " + needHours + ":59:00";
     document.getElementById("sstartdate").value = startDatetime;
     document.getElementById("senddate").value = endDatetime;
-    document.getElementById("swhouser").value = tlv8.Context.getCurrentPersonID();
     document.getElementById("scaption").focus();
 }
-
 
 $(document).ready(function () {
     let affairsID = tlv8.RequestURLParam.getParam("sid");
@@ -41,6 +42,9 @@ $(document).ready(function () {
 
 //日期框失去焦点时执行
 function setTextdata() {
+    if (saffairstype === 3) {
+        return;
+    }
     let statertime = J$("sstartdate").value;//开始时间
     let endtime = J$("senddate").value;//结束时间
     let stime_a, stime_b, stime_c, stime_d;
