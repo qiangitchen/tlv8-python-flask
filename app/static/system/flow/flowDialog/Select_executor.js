@@ -12,10 +12,10 @@ var staticGrid; // 执行人列表
 /*
  * 打开对话框时调用 @param {Object} param
  */
-var getUrlParam = function (param) {
+function getUrlParam(param) {
     activityListStr = param;
     SelectExecutor.init();
-};
+}
 
 /*
  * 初始化
@@ -35,7 +35,7 @@ SelectExecutor.init = function () {
  * 创建执行环节列表
  */
 SelectExecutor.creatActivList = function (activityListStr) {
-    if (!activityListStr || activityListStr == "undefined") {
+    if (!activityListStr || activityListStr === "undefined") {
         alert("流程配置错误!");
         return;
     }
@@ -119,12 +119,12 @@ SelectExecutor.checkActivty = function (obj) {
     SelectExecutor.excutorNames = obj.parentNode.getAttribute("excutorNames");
     let lab = $("a[name=" + obj.parentNode.id + "]")[0];
     SelectExecutor.selectActivty(lab);
-    if (SelectExecutor.checkedAct.obj && SelectExecutor.checkedAct.obj != obj) {
+    if (SelectExecutor.checkedAct.obj && SelectExecutor.checkedAct.obj !== obj) {
         SelectExecutor.checkedAct.obj.checked = false;
         staticGrid.clearData();
     }
     SelectExecutor.checkedAct.obj = obj;
-    if (SelectExecutor.checkedAct.type == "end") {
+    if (SelectExecutor.checkedAct.type === "end") {
         SelectExecutor.excutorIDs = tlv8.Context.getCurrentPersonID();
         zNodes = [];
         orgTree = $.fn.zTree.init($("#treeDemo"), setting, zNodes);
@@ -166,7 +166,7 @@ SelectExecutor.selectActivty = function (obj) {
         let actAs = document.getElementById("activityList")
             .getElementsByTagName("a");
         for (let i = 0; i < actAs.length; i++) {
-            if (actAs[i].name != obj.name) {
+            if (actAs[i].name !== obj.name) {
                 actAs[i].style.background = "";
                 actAs[i].style.color = "#000000";
             }
@@ -180,7 +180,7 @@ SelectExecutor.selectActivty = function (obj) {
  */
 SelectExecutor.initExecutorList = function () {
     staticGrid.clearData();
-    if (SelectExecutor.excutorIDs != "") {
+    if (SelectExecutor.excutorIDs !== "") {
         let excutorIDs = SelectExecutor.excutorIDs.split(",");
         let excutorNames = SelectExecutor.excutorNames.split(",");
         for (let i = 0; i < excutorIDs.length; i++) {
@@ -188,11 +188,11 @@ SelectExecutor.initExecutorList = function () {
             json.rowid = excutorIDs[i];
             json.fName = excutorNames[i];
             json.fType = "人员";
-            if (json.rowid && json.rowid != "" && json.rowid != "null") {
+            if (json.rowid && json.rowid !== "" && json.rowid !== "null") {
                 let HaveNode = orgTree.getNodeByTId(json.rowid);
                 if (HaveNode) {
                     orgTree.checkNode(HaveNode, true, true, false);
-                    if (json.fName && json.fName != "null" && json.fName != "") {
+                    if (json.fName && json.fName !== "null" && json.fName !== "") {
                         staticGrid.addData(json);
                         staticGrid.selectRowById(json.rowid);
                     }
@@ -235,7 +235,7 @@ function personSelect(e, treeId, treeNode) {
     // alert(treeNode.checked);
     // alert(treeNode.children);
     // alert(treeNode.id);
-    if (treeNode.type == 'psm' && treeNode.checked) {
+    if (treeNode.type === 'psm' && treeNode.checked) {
         let json = {};
         json.rowid = treeNode.id;
         json.fName = treeNode.name;
@@ -246,7 +246,7 @@ function personSelect(e, treeId, treeNode) {
             staticGrid.addData(json);
             staticGrid.selectRowById(treeNode.id);
         }
-    } else if (treeNode.type == 'psm' && !treeNode.checked) {
+    } else if (treeNode.type === 'psm' && !treeNode.checked) {
         staticGrid.removeData(treeNode.id);
     } else if (treeNode.checked) {
         checkChildrenNode(treeNode.children, true);
@@ -266,7 +266,7 @@ function checkChildrenNode(parentNode, isCheck) {
     for (let i = 0; i < parentNode.length; i++) {
         child_count++;
         let cNode = parentNode[i];
-        if (cNode.type == 'psm') {
+        if (cNode.type === 'psm') {
             if (isCheck) {
                 let json = {};
                 json.rowid = cNode.id;
@@ -291,7 +291,7 @@ function checkChildrenNode(parentNode, isCheck) {
 /*
  * grid双击行事件
  */
-function staticGridDbclick(obj, stGrid) {
+function staticGridDbclick(obj) {
     let curowid = obj.id;
     let HaveNode = orgTree.getNodeByTId(curowid);
     if (HaveNode) {
@@ -305,7 +305,7 @@ function staticGridDbclick(obj, stGrid) {
  * 确定返回 @return {TypeName}
  */
 function dailogEngin() {
-    if (SelectExecutor.excutorIDs == "") {
+    if (SelectExecutor.excutorIDs === "") {
         alert("请选择执行人!");
         return false;
     }
