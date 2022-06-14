@@ -1,0 +1,83 @@
+<html lang="zh_CN">
+{% include "common/form_page_head.html" %}
+<script type="text/javascript"
+        src="{{ url_for('static',filename='system/personal/schedule/dialog/cycleAffairs.js') }}"></script>
+<body style="padding-top: 10px;">
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form id="affairsdata" class="layui-form">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" style="width: 110px;">标题</label>
+                    <div class="layui-input-inline">
+                        {{ form.scaption(value=nul2em(model.scaption)) }}
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label" style="width: 110px;">优先级别</label>
+                    <div class="layui-input-inline">
+                        {{ form.spriority(value=nul2em(model.spriority)) }}
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" style="width: 110px;">开始时间</label>
+                    <div class="layui-input-inline">
+                        {{ form.sstartdate(value=nul2em(model.sstartdate)) }}
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label" style="width: 110px;">结束时间</label>
+                    <div class="layui-input-inline">
+                        {{ form.senddate(value=nul2em(model.senddate)) }}
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label" style="width: 110px;">事务内容</label>
+                <div class="layui-input-block">
+                    {{ form.scontent(value=nul2em(model.scontent)) }}
+                </div>
+            </div>
+            <div style="display: none">
+                {{ form.swhouser(value=model.swhouser) }}
+                {{ form.saffairstype(value=model.saffairstype) }}
+                {{ form.sstartdate_axis(value=model.sstartdate_axis) }}
+                {{ form.ssenddate_axis(value=model.ssenddate_axis) }}
+
+                {{ form.csrf_token }}
+                {{ form.submit }}
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    $("#spriority").val('{{ model.spriority }}');
+    layui.form.on('submit(mainform)', function (data) {
+        $.ajax({
+            url: "/system/personal/schedule/dialog/cycleAffairs?sid={{ sid }}",
+            type: "post",
+            async: false,
+            data: data.field,
+            dataType: "json",
+            success: function (re) {
+                if (re.state === true) {
+                    layui.layer.msg("保存成功！")
+                    tlv8.portal.dailog.dailogEngin(re.data);
+                } else {
+                    layui.layer.alert("保存失败：" + re.msg);
+                }
+            }
+        });
+        return false;
+    });
+
+    //确定按钮，存储数据
+    function dailogEngin() {
+        $("#submit").click();
+        return false;
+    }
+</script>
+</html>

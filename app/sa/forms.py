@@ -400,3 +400,89 @@ class UpLoadForm(FlaskForm):
         label="文件",
         description="文件",
     )
+
+
+# 日程安排表单
+class ScheduleForm(FlaskForm):
+    scaption = StringField(
+        label="标题",
+        render_kw={
+            "class": "layui-input",
+            "lay-verify": "required",
+            "placeholder": "请输入标题",
+        }
+    )
+
+    spriority = SelectField(
+        description="优先级别",
+        choices=[(0, "普通"), (1, "不重要/不紧急"), (2, "不重要/紧急"), (3, '重要/不紧急'), (4, '重要/紧急')],
+        default=0
+    )
+
+    sstartdate = StringField(
+        label="开始时间",
+        render_kw={
+            "class": "layui-input Wdate",
+            "autocomplete": "off",
+            "lay-verify": "required",
+            "placeholder": "请选择时间",
+            "onclick": "WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})",
+            "onblur": "setTextdata()"
+        }
+    )
+
+    senddate = StringField(
+        label="结束时间",
+        render_kw={
+            "class": "layui-input Wdate",
+            "autocomplete": "off",
+            "placeholder": "请选择时间",
+            "onclick": "WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})",
+            "onblur": "setTextdata()"
+        }
+    )
+
+    scontent = TextAreaField(
+        description="事务内容",
+        render_kw={
+            "class": "layui-textarea",
+            "style": "min-height:100px;"
+        }
+    )
+
+    swhouser = StringField(
+        description="所属用户",
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    saffairstype = StringField(
+        description="事务类型",
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    sstartdate_axis = StringField(
+        description="开始时间轴",
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    ssenddate_axis = StringField(
+        description="结束时间轴",
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    submit = SubmitField(
+        '提交保存',
+        render_kw={
+            "class": "layui-btn",
+            "lay-submit": "",
+            "lay-filter": "mainform"
+        }
+    )

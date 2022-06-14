@@ -51,10 +51,10 @@ function getLeftmargin(daynum) {
 
 // ↓得到div宽度
 function getDIVwidth(startnum, endnum) {
-    if (startnum == 0) {
+    if (startnum === 0) {
         startnum = 7;
     }
-    if (endnum == 0) {
+    if (endnum === 0) {
         endnum = 7;
     }
     var widthNum;
@@ -88,14 +88,14 @@ function getDIVwidth(startnum, endnum) {
 
 // ***********************************页面加载、上一周、下一周、确定执行添加数据**********************************************
 function LastNextweek(parameter) {
-    if (parameter != "cycle") {
+    if (parameter !== "cycle") {
         hidetable("#divndays");
         hidetable("#div0_6");
         hidetable("#div7_12");
         hidetable("#div13_18");
         hidetable("#div19_23");
     }
-    if (parameter == "cycle") {
+    if (parameter === "cycle") {
         $("#divndays").show("fast");
         $("#div0_6").show("fast");
         $("#div7_12").show("fast");
@@ -105,112 +105,103 @@ function LastNextweek(parameter) {
 
     var neednum;
     var myDate = new Date();
-    if (parameter == "last") {
+    if (parameter === "last") {
         loaddate = loaddate - 604800000;
         myDate.setTime(loaddate);
     }
-    if (parameter == "next") {
+    if (parameter === "next") {
         loaddate = loaddate + 604800000;
         myDate.setTime(loaddate);
     }
-    if (parameter == "ok") {
+    if (parameter === "ok") {
         neednum = (document.getElementById("specified").value).split("-");
         myDate.setFullYear(neednum[0], neednum[1] - 1, neednum[2]);
     }
-    if (parameter == "add") {
+    if (parameter === "add") {
         myDate.setTime(loaddate);
     }
-    if (parameter == "cycle") {
+    if (parameter === "cycle") {
         myDate.setTime(loaddate);
     }
-    var specifiedMonths = myDate.getMonth() + 1;// 日期控件月份
+    let specifiedMonths = myDate.getMonth() + 1;// 日期控件月份
     if (specifiedMonths < 10) {
         specifiedMonths = "0" + specifiedMonths.toString();
     }
-    var specifiedDates = myDate.getDate();// 日期控件日
+    let specifiedDates = myDate.getDate();// 日期控件日
     if (specifiedDates < 10) {
         specifiedDates = "0" + specifiedDates.toString();
     }
     document.getElementById("specified").value = myDate.getFullYear() + "-"
         + specifiedMonths + "-" + specifiedDates;// 日期控件载入日期为当天
-    var week = myDate.getDay(); // 获取当前星期X(0-6,0代表星期天)
-    var milliseconds = myDate.getTime(); // 获取当前时间(从1970.1.1开始的毫秒数)
+    let week = myDate.getDay(); // 获取当前星期X(0-6,0代表星期天)
+    let milliseconds = myDate.getTime(); // 获取当前时间(从1970.1.1开始的毫秒数)
     loaddate = myDate.getTime();
-    if (week == 0) {
+    if (week === 0) {
         week = 7;
     }
-    var gap = week - 1;// 与周一相差天数
-    if (gap != 0) {
+    let gap = week - 1;// 与周一相差天数
+    if (gap !== 0) {
         milliseconds = milliseconds - (86400000 * gap);
     }
-    var mondaydate = new Date(milliseconds);// 星期一日期
+    let mondaydate = new Date(milliseconds);// 星期一日期
     loadMondaydate = mondaydate.getTime();
-    var sundaydate = new Date((milliseconds + 86400000 * 6));// 星期天日期
+    let sundaydate = new Date((milliseconds + 86400000 * 6));// 星期天日期
 
-    for (var i = 0; i < 7; i++) {
-        var weeks = document.getElementById("tdweek" + (i + 1));
-        var days = new Date();
+    for (let i = 0; i < 7; i++) {
+        let weeks = document.getElementById("tdweek" + (i + 1));
+        let days = new Date();
         days.setTime(milliseconds);
-        var dayweek = conversionweek(days.getDay());
+        let dayweek = conversionweek(days.getDay());
         weeks.innerHTML = (days.getMonth() + 1) + "月" + days.getDate() + "日"
             + "<br>" + dayweek;
         milliseconds = milliseconds + 86400000;
     }
     // ↓计算周一时间轴
-    var mFirstnum = mondaydate.getFullYear();// 得到周一年份
-    var mSecondnum = mondaydate.getMonth() + 1;// 得到周一月份
+    let mFirstnum = mondaydate.getFullYear();// 得到周一年份
+    let mSecondnum = mondaydate.getMonth() + 1;// 得到周一月份
     if (mSecondnum < 10) {
         mSecondnum = "0" + mSecondnum.toString();
     }
-    var mThirdnum = mondaydate.getDate();// 得到周一日期
+    let mThirdnum = mondaydate.getDate();// 得到周一日期
     if (mThirdnum < 10) {
         mThirdnum = "0" + mThirdnum.toString();
     }
-    var mNum = mFirstnum.toString() + mSecondnum.toString()
+    let mNum = mFirstnum.toString() + mSecondnum.toString()
         + mThirdnum.toString();// 周一时间轴数字
     // ↓计算周日时间轴
-    var sFirstnum = sundaydate.getFullYear();// 得到周日年份
-    var sSecondnum = sundaydate.getMonth() + 1;// 得到周日月份
+    let sFirstnum = sundaydate.getFullYear();// 得到周日年份
+    let sSecondnum = sundaydate.getMonth() + 1;// 得到周日月份
     if (sSecondnum < 10) {
         sSecondnum = "0" + sSecondnum.toString();
     }
-    var sThirdnum = sundaydate.getDate();// 得到周日日期
+    let sThirdnum = sundaydate.getDate();// 得到周日日期
     if (sThirdnum < 10) {
         sThirdnum = "0" + sThirdnum.toString();
     }
-    var sNum = sFirstnum.toString() + sSecondnum.toString()
+    let sNum = sFirstnum.toString() + sSecondnum.toString()
         + sThirdnum.toString();// 周日时间轴数字
-    var fontColor;// 字体颜色
-    var affairsTitle;// 提示状态
+    let fontColor;// 字体颜色
+    let affairsTitle;// 提示状态
 
     // ↓跨天事务*********************跨天事务***************************跨天事务********************
     document.getElementById("tdndays").innerText = "";
-    var ndaysAffairs = new Array();
-    ndaysAffairs = selectData(
-        "SSTARTDATE,SENDDATE,SCAPTION,VERSION,SID,SSTATUS,SCONTENT,SPRIORITY,SSTARTDATE_AXIS,SSENDDATE_AXIS",
-        "SA_PSNSCHEDULE",
-        " where SSENDDATE_AXIS>="
-        + mNum
-        + " and SSTARTDATE_AXIS<="
-        + sNum
-        + " and SSTARTDATE_AXIS!=SSENDDATE_AXIS and SAFFAIRSTYPE!=3 and SWHOUSER='"
-        + tlv8.Context.getCurrentPersonID()
-        + "' order by SSTARTDATE_AXIS");
+    let ndaysAffairs = [];
+    ndaysAffairs = selectData(mNum, sNum);
     try {
-        for (var i = 0; i < ndaysAffairs.length; i++) {
-            var status = ndaysAffairs[i].SSTATUS;// 状态
-            var startdate = ndaysAffairs[i].SSTARTDATE;// 开始时间
-            var enddate = ndaysAffairs[i].SENDDATE;// 结束时间
-            if (status == "已完成") {
+        for (let i = 0; i < ndaysAffairs.length; i++) {
+            let status = ndaysAffairs[i].SSTATUS;// 状态
+            let startdate = ndaysAffairs[i].SSTARTDATE;// 开始时间
+            let enddate = ndaysAffairs[i].SENDDATE;// 结束时间
+            if (status === "已完成") {
                 fontColor = "#3CB371";
                 affairsTitle = "已完成";
             }
-            if (status == "" || status == null || status == "null") {// 状态
-                var stime, stime_a, stime_b, stime_c, stime_d;
-                var etime, etime_a, etime_b, etime_c, etime_d;
-                var nowDate = new Date();
-                var nowYears = nowDate.getFullYear().toString();// 当前年份
-                var nowMonths = nowDate.getMonth() + 1;// 当前月份
+            if (status === "" || status == null || status === "null") {// 状态
+                let stime, stime_a, stime_b, stime_c, stime_d;
+                let etime, etime_a, etime_b, etime_c, etime_d;
+                let nowDate = new Date();
+                let nowYears = nowDate.getFullYear().toString();// 当前年份
+                let nowMonths = nowDate.getMonth() + 1;// 当前月份
                 if (nowMonths < 10) {
                     nowMonths = "0" + nowMonths.toString();
                 }
@@ -255,9 +246,9 @@ function LastNextweek(parameter) {
                 }
             }
 
-            var txt = "<div title="
+            let txt = "<div title="
                 + affairsTitle
-                + " style='position:relative;line-height:1.5;margin-top:1; border:1 solid #CDCDCD;background-color:#F7F7F7;' id='div"
+                + " style='position:relative;line-height:1.5;margin-top:1px; border:1px solid #CDCDCD;background-color:#F7F7F7;' id='div"
                 + ndaysAffairs[i].SID + "'>&nbsp"
                 + "<a href='javascript:void(0);' " + "sstartdate='"
                 + ndaysAffairs[i].SSTARTDATE + "' senddate='"
@@ -274,10 +265,10 @@ function LastNextweek(parameter) {
                 + "</font><font color=" + fontColor + ">"
                 + ndaysAffairs[i].SCAPTION + "</font></a></div>";
 
-            var ndaysAffairstxt = document.getElementById("tdndays");
-            if (ndaysAffairstxt.innerText == ""
+            let ndaysAffairstxt = document.getElementById("tdndays");
+            if (ndaysAffairstxt.innerText === ""
                 || ndaysAffairstxt.innerText == null
-                || ndaysAffairstxt.innerText == "null") {
+                || ndaysAffairstxt.innerText === "null") {
                 ndaysAffairstxt.innerHTML = txt;
             } else {
                 txt = ndaysAffairstxt.innerHTML + txt;
@@ -286,23 +277,23 @@ function LastNextweek(parameter) {
         }
 
         // 定位跨天DIV
-        for (var i = 0; i < ndaysAffairs.length; i++) {
-            var startdate = ndaysAffairs[i].SSTARTDATE.substring(0, 10);
-            var startdateArray = startdate.split("-");
-            var enddate = ndaysAffairs[i].SENDDATE.substring(0, 10);
-            var enddateArray = enddate.split("-");
+        for (let i = 0; i < ndaysAffairs.length; i++) {
+            let startdate = ndaysAffairs[i].SSTARTDATE.substring(0, 10);
+            let startdateArray = startdate.split("-");
+            let enddate = ndaysAffairs[i].SENDDATE.substring(0, 10);
+            let enddateArray = enddate.split("-");
 
             if (ndaysAffairs[i].SSTARTDATE_AXIS >= mNum) {// 开始日期大于等于星期一
-                var affairstartdate = new Date(startdateArray[0],
+                let affairstartdate = new Date(startdateArray[0],
                     startdateArray[1] - 1, startdateArray[2]);// 开始日期
-                var affairenddate = new Date(enddateArray[0],
+                let affairenddate = new Date(enddateArray[0],
                     enddateArray[1] - 1, enddateArray[2]);// 结束日期
-                var leftmargin = getLeftmargin(affairstartdate.getDay());// 得到左边距参数
+                let leftmargin = getLeftmargin(affairstartdate.getDay());// 得到左边距参数
                 $("#div" + ndaysAffairs[i].SID).animate({
                     left: leftmargin + "%"
                 }, "slow");// 定位DIV外左边距
                 if (ndaysAffairs[i].SSENDDATE_AXIS <= sNum) {// 结束时间小于等于星期天
-                    var divwidth = getDIVwidth(affairstartdate.getDay(),
+                    let divwidth = getDIVwidth(affairstartdate.getDay(),
                         affairenddate.getDay());// 得到宽度参数
                     $("#div" + ndaysAffairs[i].SID).animate({
                         width: (divwidth) + "%"
@@ -314,7 +305,7 @@ function LastNextweek(parameter) {
                     }
                 }
                 if (ndaysAffairs[i].SSENDDATE_AXIS > sNum) {// 结束时间大于星期天
-                    var divwidth = getDIVwidth(affairstartdate.getDay(), 0);
+                    let divwidth = getDIVwidth(affairstartdate.getDay(), 0);
                     $("#div" + ndaysAffairs[i].SID).animate({
                         width: (divwidth) + "%"
                     }, "slow");// DIV宽度
@@ -324,9 +315,9 @@ function LastNextweek(parameter) {
                 }
             }
             if (ndaysAffairs[i].SSTARTDATE_AXIS < mNum) {// 开始日期小于星期一
-                var affairstartdate = new Date(startdateArray[0],
+                let affairstartdate = new Date(startdateArray[0],
                     startdateArray[1] - 1, startdateArray[2]);// 开始日期
-                var affairenddate = new Date(enddateArray[0],
+                let affairenddate = new Date(enddateArray[0],
                     enddateArray[1] - 1, enddateArray[2]);// 结束日期
                 $("#div" + ndaysAffairs[i].SID).animate({
                     left: "0%"
@@ -355,28 +346,22 @@ function LastNextweek(parameter) {
     } catch (e) {
     }
     // 清空页面表格
-    for (var i = 1; i <= 7; i++) {
-        for (var j = 0; j < 24; j++) {
-            var newaffairstxt = document.getElementById("w" + i + "t" + j);
+    for (let i = 1; i <= 7; i++) {
+        for (let j = 0; j < 24; j++) {
+            let newaffairstxt = document.getElementById("w" + i + "t" + j);
             newaffairstxt.innerText = "";
         }
     }
     // ↓周期性事务===========================********周期性事务**********************周期性事务*****************************
-    var cycleAffairsData = selectData(
-        "SSTARTDATE,SENDDATE,SSTARTDATE_AXIS,SSENDDATE_AXIS,SID,SCAPTION,SPRIORITY,SCONTENT",
-        "SA_PSNSCHEDULE", " where SSENDDATE_AXIS>=" + mNum
-        + " and SSTARTDATE_AXIS<=" + sNum
-        + " and SAFFAIRSTYPE='3' and SWHOUSER='"
-        + tlv8.Context.getCurrentPersonID()
-        + "' order by SSTARTDATE_AXIS");
+    let cycleAffairsData = selectData(mNum, sNum, 3);
     if (cycleAffairsData.length > 0) {// cycleAffairsData != null ||
         // cycleAffairsData != undefined
-        for (var i = 0; i < cycleAffairsData.length; i++) {
-            var startdate = cycleAffairsData[i].SSTARTDATE.substring(0, 10);
-            var startdateArray = startdate.split("-");
-            var enddate = cycleAffairsData[i].SENDDATE.substring(0, 10);
-            var enddateArray = enddate.split("-");
-            var cycletxt = "<div style=\"line-height:1.5;margin-top:1; border:1 solid #CDCDCD;background-color:#F7F7F7;\" title='"
+        for (let i = 0; i < cycleAffairsData.length; i++) {
+            let startdate = cycleAffairsData[i].SSTARTDATE.substring(0, 10);
+            let startdateArray = startdate.split("-");
+            let enddate = cycleAffairsData[i].SENDDATE.substring(0, 10);
+            let enddateArray = enddate.split("-");
+            let cycletxt = "<div style=\"line-height:1.5;margin-top:1px; border:1px solid #CDCDCD;background-color:#F7F7F7;\" title='"
                 + "周期事务：每天 "
                 + cycleAffairsData[i].SSTARTDATE.substring(11, 16)
                 + "'>&nbsp"
@@ -400,30 +385,30 @@ function LastNextweek(parameter) {
                 + cycleAffairsData[i].SCAPTION + "</font></a></div>";
             if ((cycleAffairsData[i].SSTARTDATE_AXIS >= mNum)
                 && (cycleAffairsData[i].SSENDDATE_AXIS <= sNum)) {// 开始结束在本周内
-                var sDate = new Date(startdateArray[0], startdateArray[1] - 1,
+                let sDate = new Date(startdateArray[0], startdateArray[1] - 1,
                     startdateArray[2]);
-                var eDate = new Date(enddateArray[0], enddateArray[1] - 1,
+                let eDate = new Date(enddateArray[0], enddateArray[1] - 1,
                     enddateArray[2]);
-                var sDay = sDate.getDay();
+                let sDay = sDate.getDay();
                 if (sDay == 0) {
                     sDay = 7;
                 }
-                var eDay = eDate.getDay();
+                let eDay = eDate.getDay();
                 if (eDay == 0) {
                     eDay = 7;
                 }
-                var xAxis = sDay;
-                var yAxis = Number(cycleAffairsData[i].SSTARTDATE.substring(11,
+                let xAxis = sDay;
+                let yAxis = Number(cycleAffairsData[i].SSTARTDATE.substring(11,
                     13));
                 for (var j = 0; j <= (eDay - sDay); j++) {
-                    var coordinate = "w" + xAxis + "t" + yAxis;
-                    var affairstxt = document.getElementById(coordinate);
+                    let coordinate = "w" + xAxis + "t" + yAxis;
+                    let affairstxt = document.getElementById(coordinate);
                     if (affairstxt.innerText == ""
                         || affairstxt.innerText == null
                         || affairstxt.innerText == "null") {
                         affairstxt.innerHTML = cycletxt;
                     } else {
-                        var txt = cycletxt + affairstxt.innerHTML;
+                        let txt = cycletxt + affairstxt.innerHTML;
                         affairstxt.innerHTML = txt;
                     }
                     xAxis += 1;
@@ -431,17 +416,17 @@ function LastNextweek(parameter) {
             }
             if ((cycleAffairsData[i].SSTARTDATE_AXIS < mNum)
                 && (cycleAffairsData[i].SSENDDATE_AXIS <= sNum)) {// 开始在本周前，结束在本周内
-                var sDate = new Date(startdateArray[0], startdateArray[1] - 1,
+                let sDate = new Date(startdateArray[0], startdateArray[1] - 1,
                     startdateArray[2]);
-                var eDate = new Date(enddateArray[0], enddateArray[1] - 1,
+                let eDate = new Date(enddateArray[0], enddateArray[1] - 1,
                     enddateArray[2]);
-                var sDay = 1;
-                var eDay = eDate.getDay();
+                let sDay = 1;
+                let eDay = eDate.getDay();
                 if (eDay == 0) {
                     eDay = 7;
                 }
-                var xAxis = sDay;
-                var yAxis = Number(cycleAffairsData[i].SSTARTDATE.substring(11,
+                let xAxis = sDay;
+                let yAxis = Number(cycleAffairsData[i].SSTARTDATE.substring(11,
                     13));
                 for (var j = 0; j <= (eDay - sDay); j++) {
                     var coordinate = "w" + xAxis + "t" + yAxis;
@@ -459,27 +444,27 @@ function LastNextweek(parameter) {
             }
             if ((cycleAffairsData[i].SSTARTDATE_AXIS >= mNum)
                 && (cycleAffairsData[i].SSENDDATE_AXIS > sNum)) {// 开始在本周内，结束在本周后
-                var sDate = new Date(startdateArray[0], startdateArray[1] - 1,
+                let sDate = new Date(startdateArray[0], startdateArray[1] - 1,
                     startdateArray[2]);
-                var eDate = new Date(enddateArray[0], enddateArray[1] - 1,
+                let eDate = new Date(enddateArray[0], enddateArray[1] - 1,
                     enddateArray[2]);
-                var sDay = sDate.getDay();
-                if (sDay == 0) {
+                let sDay = sDate.getDay();
+                if (sDay === 0) {
                     sDay = 7;
                 }
-                var eDay = 7;
-                var xAxis = sDay;
-                var yAxis = Number(cycleAffairsData[i].SSTARTDATE.substring(11,
+                let eDay = 7;
+                let xAxis = sDay;
+                let yAxis = Number(cycleAffairsData[i].SSTARTDATE.substring(11,
                     13));
-                for (var j = 0; j <= (eDay - sDay); j++) {
-                    var coordinate = "w" + xAxis + "t" + yAxis;
-                    var affairstxt = document.getElementById(coordinate);
-                    if (affairstxt.innerText == ""
+                for (let j = 0; j <= (eDay - sDay); j++) {
+                    let coordinate = "w" + xAxis + "t" + yAxis;
+                    let affairstxt = document.getElementById(coordinate);
+                    if (affairstxt.innerText === ""
                         || affairstxt.innerText == null
-                        || affairstxt.innerText == "null") {
+                        || affairstxt.innerText === "null") {
                         affairstxt.innerHTML = cycletxt;
                     } else {
-                        var txt = cycletxt + affairstxt.innerHTML;
+                        let txt = cycletxt + affairstxt.innerHTML;
                         affairstxt.innerHTML = txt;
                     }
                     xAxis += 1;
@@ -487,20 +472,20 @@ function LastNextweek(parameter) {
             }
             if ((cycleAffairsData[i].SSTARTDATE_AXIS < mNum)
                 && (cycleAffairsData[i].SSENDDATE_AXIS > sNum)) {// 开始在本周前，结束在本周后
-                var sDay = 1;
-                var eDay = 7;
-                var xAxis = sDay;
-                var yAxis = Number(cycleAffairsData[i].SSTARTDATE.substring(11,
+                let sDay = 1;
+                let eDay = 7;
+                let xAxis = sDay;
+                let yAxis = Number(cycleAffairsData[i].SSTARTDATE.substring(11,
                     13));
-                for (var j = 0; j <= (eDay - sDay); j++) {
-                    var coordinate = "w" + xAxis + "t" + yAxis;
-                    var affairstxt = document.getElementById(coordinate);
-                    if (affairstxt.innerText == ""
+                for (let j = 0; j <= (eDay - sDay); j++) {
+                    let coordinate = "w" + xAxis + "t" + yAxis;
+                    let affairstxt = document.getElementById(coordinate);
+                    if (affairstxt.innerText === ""
                         || affairstxt.innerText == null
-                        || affairstxt.innerText == "null") {
+                        || affairstxt.innerText === "null") {
                         affairstxt.innerHTML = cycletxt;
                     } else {
-                        var txt = cycletxt + affairstxt.innerHTML;
+                        let txt = cycletxt + affairstxt.innerHTML;
                         affairstxt.innerHTML = txt;
                     }
                     xAxis += 1;
@@ -510,41 +495,32 @@ function LastNextweek(parameter) {
     }
     // ↓单天事务===============================================*************************************************
     // try{
-    var affairsdata = selectData(
-        "SSTARTDATE,SENDDATE,SCAPTION,SSTARTDATE_AXIS,SID,SSTATUS,SCONTENT,SPRIORITY",
-        "SA_PSNSCHEDULE",
-        " where SSTARTDATE_AXIS>="
-        + mNum
-        + " and SSENDDATE_AXIS<="
-        + sNum
-        + " and SSTARTDATE_AXIS=SSENDDATE_AXIS and SAFFAIRSTYPE!=3 and SWHOUSER='"
-        + tlv8.Context.getCurrentPersonID()
-        + "' order by SSTARTDATE_AXIS");
-    if (affairsdata != null || affairsdata != undefined) {
-        for (var i = 0; i < affairsdata.length; i++) {
+    let affairsdata = selectData(mNum, sNum, 0, true);
+    if (affairsdata != null || affairsdata !== undefined) {
+        for (let i = 0; i < affairsdata.length; i++) {
             try {
-                var status = affairsdata[i].SSTATUS;
-                var startdate = affairsdata[i].SSTARTDATE;
-                var enddate = affairsdata[i].SENDDATE;
-                if (status == "已完成") {
+                let status = affairsdata[i].SSTATUS;
+                let startdate = affairsdata[i].SSTARTDATE;
+                let enddate = affairsdata[i].SENDDATE;
+                if (status === "已完成") {
                     fontColor = "#3CB371";
                     affairsTitle = "已完成";
                 }
-                if (status == "" || status == null || status == "null") {// 状态
-                    var stime, stime_a, stime_b, stime_c, stime_d;
-                    var etime, etime_a, etime_b, etime_c, etime_d;
-                    var nowDate = new Date();
-                    var nowYears = nowDate.getFullYear().toString();// 当前年份
-                    var nowMonths = nowDate.getMonth() + 1;// 当前月份
+                if (status === "" || status == null || status === "null") {// 状态
+                    let stime, stime_a, stime_b, stime_c, stime_d;
+                    let etime, etime_a, etime_b, etime_c, etime_d;
+                    let nowDate = new Date();
+                    let nowYears = nowDate.getFullYear().toString();// 当前年份
+                    let nowMonths = nowDate.getMonth() + 1;// 当前月份
                     if (nowMonths < 10) {
                         nowMonths = "0" + nowMonths.toString();
                     }
-                    var nowDates = nowDate.getDate();// 当前日
+                    let nowDates = nowDate.getDate();// 当前日
                     if (nowDates < 10) {
                         nowDates = "0" + nowDates.toString();
                     }
-                    var nowTime = nowDate.toLocaleTimeString().split(":");// 获取当前时间,时分秒
-                    var mydate = nowYears + nowMonths + nowDates
+                    let nowTime = nowDate.toLocaleTimeString().split(":");// 获取当前时间,时分秒
+                    let mydate = nowYears + nowMonths + nowDates
                         + nowTime[0].toString() + nowTime[1].toString()
                         + nowTime[2].toString();
                     stime_a = startdate.toString().substring(0, 10);
@@ -580,7 +556,7 @@ function LastNextweek(parameter) {
                     }
                 }
 
-                var txt = "<div style=\"line-height:1.5;margin-top:1; border:1 solid #CDCDCD;background-color:#F7F7F7;\" title='"
+                let txt = "<div style=\"line-height:1.5;margin-top:1px; border:1px solid #CDCDCD;background-color:#F7F7F7;\" title='"
                     + affairsTitle
                     + "'>&nbsp"
                     + "<a href='javascript:void(0);' "
@@ -607,18 +583,18 @@ function LastNextweek(parameter) {
                     + ">"
                     + affairsdata[i].SCAPTION + "</font></a></div>";
                 // ↓定位坐标
-                var coordinateNumA = affairsdata[i].SSTARTDATE.substring(0, 10)
+                let coordinateNumA = affairsdata[i].SSTARTDATE.substring(0, 10)
                     .split("-");
-                var coordinateDate = new Date(coordinateNumA[0],
+                let coordinateDate = new Date(coordinateNumA[0],
                     coordinateNumA[1] - 1, coordinateNumA[2]);
-                var coordinateDay = coordinateDate.getDay();
+                let coordinateDay = coordinateDate.getDay();
                 if (coordinateDay == 0) {
                     coordinateDay = 7;
                 }
-                var coordinate = "w" + coordinateDay + "t"
+                let coordinate = "w" + coordinateDay + "t"
                     + Number(affairsdata[i].SSTARTDATE.substring(11, 13));
                 // 为坐标单元格填入数据
-                var affairstxt = document.getElementById(coordinate);
+                let affairstxt = document.getElementById(coordinate);
                 if (affairstxt.innerText == "" || affairstxt.innerText == null
                     || affairstxt.innerText == "null") {
                     affairstxt.innerHTML = txt;
@@ -633,7 +609,7 @@ function LastNextweek(parameter) {
 
     }
     // }catch(e){}
-    if (parameter != "cycle") {
+    if (parameter !== "cycle") {
         hidetable("#divndays");
         hidetable("#div0_6");
         hidetable("#div7_12");
@@ -645,14 +621,13 @@ function LastNextweek(parameter) {
 // 添加事务对话框
 function message_add(coordinate_id) {
     tlv8.portal.dailog.openDailog('添加事务',
-        '/SA/personal/schedule/dialog/message_add.html?coordinate_id='
-        + coordinate_id + '&loadMondaydate=' + loadMondaydate, 600,
-        450, addcallback, null);
+        '/system/personal/schedule/dialog/cycleAffairs?coordinate_id='
+        + coordinate_id + '&loadMondaydate=' + loadMondaydate, 700,
+        400, addcallback, null);
 }
 
 function addcallback(datas) {// 对话框回调函数
     LastNextweek("add");
-    cycleAffairsgrid.refreshData();
 }
 
 // 查看事务对话框
@@ -687,7 +662,7 @@ function lookscallback() {
 // 新建周期性事务对话框
 function message_cycleAffairs() {
     tlv8.portal.dailog.openDailog('新建周期性事务',
-        '/SA/personal/schedule/dialog/message_cycleAffairs.html', 750, 350,
+        '/system/personal/schedule/dialog/cycleAffairs', 700, 400,
         cycleAffairscallback, null);
 }
 
@@ -1099,21 +1074,30 @@ function importExport() {
 }
 
 // 查询数据-需传入3个值，字段名（列名）、表名和where条件，无where条件为""
-function selectData(coname, tbname, whe) {
-    return [];
+function selectData(m, s, a, t) {
+    let param = new tlv8.RequestParam();
+    if (m) {
+        param.set("m_num", m);
+    }
+    if (s) {
+        param.set("s_num", s);
+    }
+    param.set("af", a || 0);
+    if (t) {
+        param.set("td", t);
+    }
+    let r = tlv8.XMLHttpRequest("/system/personal/schedule/loadData", param, "post", false);
+    console.log(r);
+    return r.data;
 }
 
 function openHelp() {
-    tlv8.portal.openWindow("日程安排使用帮助",
-        "/SA/personal/schedule/help.html");
+
 }
 
 // tab选择事件
 function tabselected(param) {
-    if (param == "周期性事务") {
-        cycleAffairsgrid.refreshData();
-    }
-    if (param == "导入/导出") {
-        currentgrid.refreshData();
+    if (param === "周期性事务") {
+
     }
 }

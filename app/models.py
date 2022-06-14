@@ -249,6 +249,24 @@ class SADocPath(db.Model):
     updatetime = db.Column(db.DateTime, default=datetime.now, doc='更新时间')
 
 
+# 日程安排
+class SASchedule(db.Model):
+    __tablename__ = "sa_psnschedule"
+    __table_args__ = {"useexisting": True}
+    sid = db.Column(db.String(32), primary_key=True, default=guid, doc='主键')
+    scaption = db.Column(db.String(255), doc='标题')
+    sstatus = db.Column(db.String(100), index=True, doc='状态')
+    spriority = db.Column(db.Integer, default=0, doc='优先级别')
+    sstartdate = db.Column(db.DateTime, nullable=False, doc='开始时间')
+    senddate = db.Column(db.DateTime, doc='结束时间')
+    scontent = db.Column(db.String(2048), doc='事务内容')
+    swhouser = db.Column(db.String(36), doc='所属用户')
+    saffairstype = db.Column(db.Integer, doc='事务类型')
+    sstartdate_axis = db.Column(db.Integer, doc='开始时间轴')
+    ssenddate_axis = db.Column(db.Integer, doc='结束时间轴')
+    version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
+
+
 # OA-请假
 class OALeave(db.Model):
     __tablename__ = "oa_leave"

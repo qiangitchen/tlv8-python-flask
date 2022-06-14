@@ -9,9 +9,10 @@ from sqlalchemy import or_
 from datetime import datetime
 from app import db
 from app.sa.forms import LoginForm, ChangePassForm, OrgForm, PersonForm, RoleForm, DocNodeForm, UpLoadForm
+from app.sa.forms import ScheduleForm
 from app.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize, SAOnlineInfo
 from app.models import SAFlowDraw, SAFlowFolder, SATask
-from app.models import SADocNode, SADocPath
+from app.models import SADocNode, SADocPath, SASchedule
 from app.menus.menuutils import get_process_name, get_process_full, get_function_tree
 from app.menus.menuutils import get_function_ztree
 from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, guid, get_org_type
@@ -2008,3 +2009,84 @@ def doc_search():
 @user_login
 def personal_schedule():
     return render_template("system/personal/schedule/mainActivity.html")
+
+
+# 日程安排-添加/修改
+@system.route("/personal/schedule/dialog/cycleAffairs", methods=["GET", "POST"])
+@user_login
+def personal_schedule_cycle():
+    form = ScheduleForm()
+    sid = request.args.get('sid', '')
+    model = SASchedule.query.filter_by(sid=sid).first()
+    if not model:
+        model = SASchedule(spriority=0, saffairstype=0, sstartdate_axis=0, ssenddate_axis=0)
+    if form.is_submitted():
+        data = form.data
+        rdata = dict()
+        try:
+            model.scaption = data['scaption']
+            model.spriority = data['spriority']
+            model.sstartdate = data['sstartdate']
+            if data['senddate'] and data['senddate'] != "":
+                model.senddate = data['senddate']
+            else:
+                model.senddate = None
+            model.scontent = data['scontent']
+            model.swhouser = data['swhouser']
+            model.saffairstype = request.form.get('saffairstype', default=0, type=int)
+            model.sstartdate_axis = int(data['sstartdate_axis'])
+            model.ssenddate_axis = int(data['ssenddate_axis'])
+            db.session.add(model)
+            db.session.commit()
+            rdata['state'] = True
+            rdata['stata'] = model.sid
+        except Exception as e:
+            current_app.logger.error(e)
+            rdata['state'] = False
+            rdata['msg'] = "保存数据异常~"
+        return json.dumps(rdata, ensure_ascii=False)
+    return render_template("system/personal/schedule/dialog/cycleAffairs.html", form=form, model=model,
+                           nul2em=nul2em, sid=sid)
+
+
+# 日程安排-加载数据
+@system.route("/personal/schedule/loadData", methods=["GET", "POST"])
+@user_login
+def personal_schedule_load_data():
+    rdata = dict()
+    user_id = session['user_id']
+    m_num = request.args.get('m_num', 0, type=int)
+    s_num = request.args.get('s_num', 0, type=int)
+    af = request.args.get('af', 0, type=int)
+    td = request.args.get('td')
+    # schedule_list = list()
+    if m_num > 0 and s_num > 0:
+        data_query = SASchedule.query.filter(SASchedule.ssenddate_axis >= m_num,
+                                             SASchedule.sstartdate_axis <= s_num,
+                                             SASchedule.swhouser == user_id)
+        if af == 3:
+            data_query = data_query.filter(SASchedule.saffairstype == 3)
+        else:
+            data_query = data_query.filter(SASchedule.saffairstype != 3)
+        if td:
+            data_query = data_query.filter(SASchedule.sstartdate_axis == SASchedule.ssenddate_axis)
+        schedule_list = data_query.order_by(SASchedule.sstartdate_axis).all()
+    else:
+        schedule_list = SASchedule.query.filter(SASchedule.swhouser == user_id).order_by(SASchedule.sstartdate_axis).all()
+    data_list = list()
+    if len(schedule_list) > 0:
+        for schedule in schedule_list:
+            data = {
+                'SSTARTDATE': datetime.strftime(schedule.sstartdate, '%Y-%m-%d %H:%M:%S'),
+                'SENDDATE': datetime.strftime(schedule.senddate, '%Y-%m-%d %H:%M:%S'),
+                'SCAPTION': schedule.scaption,
+                'SID': schedule.sid,
+                'SSTATUS': schedule.sstatus,
+                'SCONTENT': schedule.scontent,
+                'SPRIORITY': schedule.spriority,
+                'SSTARTDATE_AXIS': schedule.sstartdate_axis,
+                'SSENDDATE_AXIS': schedule.ssenddate_axis
+            }
+            data_list.append(data)
+    rdata['data'] = data_list
+    return json.dumps(rdata, ensure_ascii=False)
