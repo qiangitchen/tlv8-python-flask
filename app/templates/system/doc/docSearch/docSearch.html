@@ -3,34 +3,50 @@
 <body>
 <div class="easyui-layout" fit="true" border="false">
     <div data-options="region:'north',border:false" style="height: 45px;padding: 4px; overflow: hidden;">
-        <div class="input-group" style="float:left; width:100%;">
-            <input type="text" class="form-control" id="queryText" onKeydown="EnterIpt(event,this)"
-                   placeholder="在输入框中输入关键字进行查询 可以查询包含关键字的word、txt、pdf等文件"/>
-            <span class="input-group-btn">
-						<button class="btn btn-default" type="button" onclick="queryDoc()"><span
-                                class="glyphicon glyphicon-search"></span>搜索</button>
-					</span>
-        </div>
+        <form method="post" action="">
+            <div class="input-group" style="float:left; width:100%;">
+                <input type="text" class="form-control" name="queryText" value="{{ queryText }}"
+                       placeholder="在输入框中输入关键字进行查询 可以查询包含关键字的word、txt、pdf等文件">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <span class="glyphicon glyphicon-search"></span>搜索
+                    </button>
+                </span>
+            </div>
+        </form>
     </div>
     <div data-options="region:'center',border:false" style="padding: 4px;">
         <div style='font-size:12px;background-color:#f0f7f9;height:25px;border-top:#6b90da 1px solid;line-height: 1.5;'>
-            搜索 _获得 _条结果。
+            搜索 <span style="color: green;">{{ queryText }}</span> ,获得 {{ len(doc_list) }} 条结果。
         </div>
         <table class="layui-table">
+            <thead>
             <tr style="background:#eee;font-weight: bold;">
-                <td>文档ID</td>
-                <td>文档名称</td>
-                <td>文档位置</td>
-                <td>作者</td>
-                <td>关键字</td>
+                <th>文档ID</th>
+                <th>文档名称</th>
+                <th>文档位置</th>
+                <th>作者</th>
+                <th>关键字</th>
             </tr>
+            </thead>
+            <tbody>
+            {% for doc in doc_list %}
+                <tr>
+                    <td>
+                        <a href="javascript:tlv8.viewFile('{{ doc.sfileid }}','{{ doc.sdocname }}')">{{ doc.sfileid }}</a>
+                    </td>
+                    <td>
+                        <a style="color: #0000FF;"
+                           href="javascript:tlv8.viewFile('{{ doc.sfileid }}','{{ doc.sdocname }}')">{{ doc.sdocname }}</a>
+                    </td>
+                    <td>{{ doc.sdocdisplaypath }}</td>
+                    <td>{{ doc.screatorname }}</td>
+                    <td>{{ queryText }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
         </table>
     </div>
 </div>
 </body>
-<script type="text/javascript">
-    function queryDoc(){
-
-    }
-</script>
 </html>

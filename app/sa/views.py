@@ -1991,7 +1991,16 @@ def file_delete(fileid=0):
 @system.route("/doc/docSearch", methods=["GET", "POST"])
 @user_login
 def doc_search():
-    return render_template("system/doc/docSearch/docSearch.html")
+    queryText = url_decode(request.form.get('queryText', ''))
+    doc_list = list()
+    if queryText and queryText != "":
+        user_id = session['user_id']  # 只搜索自己的文件
+        doc_list = SADocNode.query.filter(or_(SADocNode.screatorid == user_id, SADocNode.seditorid == user_id),
+                                          or_(SADocNode.sdocname.ilike('%' + queryText + '%'),
+                                              SADocNode.skeywords.ilike('%' + queryText + '%'))).all()
+    else:
+        queryText = ""
+    return render_template("system/doc/docSearch/docSearch.html", doc_list=doc_list, queryText=queryText, len=len)
 
 
 # 日程安排
