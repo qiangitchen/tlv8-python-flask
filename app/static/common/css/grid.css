@@ -1,24 +1,24 @@
 /* CSS Document */
 
 .grid {
-	margin: 0px auto;
+	margin: 0 auto;
 	padding: 0;
 	font-size: 11pt;
 	color: #666;
 	border-collapse: collapse;
-	border-spacing: 0px;
+	border-spacing: 0;
 	table-layout: fixed;
 	word-wrap: break-word;
 	word-break: break-all;
 }
 
 .gridtable {
-	margin: 0px auto;
+	margin: 0 auto;
 	padding: 0;
 	font-size: 11pt;
 	color: #666;
 	border-collapse: collapse;
-	border-spacing: 0px;
+	border-spacing: 0;
 	word-wrap: break-word;
 	word-break: break-all;
 }
@@ -29,8 +29,8 @@
 }
 
 .grid td {
-	padding: 0px;
-	margin: 0px;
+	padding: 0;
+	margin: 0;
 }
 
 .grid_td {
@@ -54,7 +54,6 @@
 
 td.grid_td {
 	margin: 0;
-	padding: 0;
 	border: 1px solid #ddd;
 	font-size: 11pt;
 	line-height: 28px;
@@ -155,7 +154,6 @@ tr.t3:hover{
 }
 
 .grid th {
-	align: left;
 	text-align: left;
 }
 
@@ -165,10 +163,8 @@ tr.t3:hover{
 }
 
 .page_input {
-	align: center;
 	font-size: 11pt;
 	float: left;
-	font-color: red;
 }
 
 .firt a {
@@ -192,7 +188,7 @@ input.Dselect {
 }
 
 .toolbar {
-	margin: 0px auto;
+	margin: 0 auto;
 	padding: 0;
 	font-size: 11pt;
 	border-collapse: collapse; /*细线表格*/
@@ -211,24 +207,22 @@ img {
 }
 
 .page {
-	padding: 0px 0px;
+	padding: 0;
 	margin: 1px;
-	border: 0px;
+	border: 0;
 	text-decoration: none;
 	height: 28px;
 }
 
 a.toobar_item {
 	display: block;
-	padding: 0px 0px;
 	margin: 1px;
-	border: 0px;
 	text-decoration: none;
 	height: 30px;
 	border: 1px #ccc solid;
 	font: 12px 宋体, "Arial Narrow", arial, serif;
 	cursor: pointer;
-	padding: 5px 10px;
+	padding: 5px 5px;
 	border-radius: 4px;
 }
 
@@ -243,7 +237,7 @@ a.toobar_item:active {
 
 .grid_label_sf {
 	margin: 0;
-	padding: 0px 2px;
+	padding: 0 2px;
 	height: 20px;
 	text-align: left;
 	vertical-align: Middle;

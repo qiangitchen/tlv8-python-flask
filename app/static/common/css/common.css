@@ -1,7 +1,6 @@
 /*页面文字样式*/
 .spanFont{
-	font-family: '\'cb\'ce\'cc\'e5'; 
-	color: #000000; 
+	color: #000000;
 	font-size: 13px;
 }
 
@@ -16,7 +15,7 @@
 	text-align:left;
 }
 
-.output-body{readonly:expression(this.readOnly=true);border:0px;}
+.output-body{readonly:expression(this.readOnly=true);border:0;}
 
 .layui-fluid{
 	padding: 10px;
