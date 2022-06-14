@@ -1,4 +1,9 @@
-const cpath = "";
+var cpath = "";
+/**
+ * 名空间
+ */
+var tlv8 = {};
+
 /**
  * @name J$
  * @description 根据ID获取HTML的Element对象
@@ -76,11 +81,6 @@ const createMeta = function () {
 };
 if (!checkEncode())
     createMeta();
-
-/**
- * 名空间
- */
-const tlv8 = {};
 
 /**
  * 请求参数为了统一编码
@@ -1787,7 +1787,7 @@ tlv8.portal.dailog = {
      * @param data
      * @param b_g
      */
-    dailogEngin: function (data, b_g) {
+    dailogEngin: function (data, b_g,) {
         this.returnData = data ? data : this.returnData;
         try {
             let callbackFn;
@@ -2415,7 +2415,7 @@ let zhuanhuan = function () {
 tlv8.numberL2U = function (data) {
     let input = (data) ? data.toString() : "0";
     let xiaoshu = 0;
-    let re = /^0+/g;
+    //let re = /^0+/g;
     let output = "";
     let output2 = "";
     let chafen = [];
