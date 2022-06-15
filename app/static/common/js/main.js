@@ -1,8 +1,8 @@
-var cpath = "";
+window.cpath = "";
 /**
  * 名空间
  */
-var tlv8 = {};
+window.tlv8 = {};
 
 /**
  * @name J$
@@ -514,9 +514,6 @@ tlv8.Data = function () {
     this.orderby = "";
     this.readonly = false;
     this.childrenData = new Map();
-    this.setVersion = function (vi) {
-        this.version = vi;
-    };
     /**
      * @name setReadonly
      * @description 设置表单只读状态
@@ -1381,7 +1378,7 @@ tlv8.exportbar = function (div, expid, canprint, isword, isexcel, ispdf) {
     if (!checkPathisHave($commonpath + "print/print.js"))
         createJSSheet($commonpath + "print/print.js");
     div.style.overflow = "hidden";
-    let Stander = "<table style='align:left;' class='standard_toolbar' border='0' id='"
+    let Stander = "<table style='text-align:left;' class='standard_toolbar' border='0' id='"
         + div.id + "exportbar'><tr>";
     if (canprint) {
         Stander += "<td width='70px' align='left' id='"
@@ -2997,7 +2994,7 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
             , accept: accept || 'file'
             , multiple: (limit && limit > 1)
             , size: 1024 * 1024 * 100 //限定大小100M
-            , before: function (obj) {
+            , before: function () {
                 if (!data.rowid || data.rowid === "") {
                     layui.layer.alert("请先保存数据~");
                     return false;
