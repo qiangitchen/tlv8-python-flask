@@ -260,10 +260,43 @@ class SASchedule(db.Model):
     sstartdate = db.Column(db.DateTime, nullable=False, doc='开始时间')
     senddate = db.Column(db.DateTime, doc='结束时间')
     scontent = db.Column(db.String(2048), doc='事务内容')
-    swhouser = db.Column(db.String(36), doc='所属用户')
+    swhouser = db.Column(db.String(36), index=True, doc='所属用户')
     saffairstype = db.Column(db.Integer, doc='事务类型')
     sstartdate_axis = db.Column(db.Integer, doc='开始时间轴')
     ssenddate_axis = db.Column(db.Integer, doc='结束时间轴')
+    version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
+
+
+# 个人文件柜
+class SAPersonalDocNode(db.Model):
+    __tablename__ = "sa_personal_docnode"
+    __table_args__ = {"useexisting": True}
+    sid = db.Column(db.String(32), primary_key=True, default=guid, doc='主键')
+    sparentid = db.Column(db.String(32), index=True, doc='父id')
+    sparentname = db.Column(db.String(128), doc='名称')
+    sdescription = db.Column(db.String(2048), doc='描述')
+    spath = db.Column(db.String(1024), doc='路径')
+    screatorid = db.Column(db.String(32), index=True, doc='创建人id')
+    screatorname = db.Column(db.String(128), doc='创建人')
+    screatetime = db.Column(db.DateTime, default=datetime.now, doc='创建时间')
+    version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
+
+
+# 个人文-列表
+class SAPersonalFile(db.Model):
+    __tablename__ = "sa_personal_file"
+    __table_args__ = {"useexisting": True}
+    sid = db.Column(db.String(32), primary_key=True, default=guid, doc='主键')
+    smasterid = db.Column(db.String(32), index=True, doc='目录id')
+    sfileid = db.Column(db.String(100), doc='文件id')
+    sfilename = db.Column(db.String(255), doc='文件名')
+    sfilesize = db.Column(db.String(100), doc='文件大小')
+    saccessory = db.Column(db.String(1024), doc='文件信息')
+    screatorid = db.Column(db.String(32), index=True, doc='创建人id')
+    screatorname = db.Column(db.String(128), doc='创建人')
+    screatetime = db.Column(db.DateTime, default=datetime.now, doc='创建时间')
+    saccesscurrentid = db.Column(db.String(2048), doc='分享的人员id')
+    saccesscurrentname = db.Column(db.String(2048), doc='分享的人员姓名')
     version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
 
 

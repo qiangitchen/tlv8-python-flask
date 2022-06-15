@@ -9,10 +9,10 @@ from sqlalchemy import or_
 from datetime import datetime
 from app import db
 from app.sa.forms import LoginForm, ChangePassForm, OrgForm, PersonForm, RoleForm, DocNodeForm, UpLoadForm
-from app.sa.forms import ScheduleForm
+from app.sa.forms import ScheduleForm, PersonalDocForm
 from app.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize, SAOnlineInfo
 from app.models import SAFlowDraw, SAFlowFolder, SATask
-from app.models import SADocNode, SADocPath, SASchedule
+from app.models import SADocNode, SADocPath, SASchedule, SAPersonalDocNode, SAPersonalFile
 from app.menus.menuutils import get_process_name, get_process_full, get_function_tree
 from app.menus.menuutils import get_function_ztree
 from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, guid, get_org_type
@@ -170,6 +170,9 @@ def write_system_log():
         if not activateName or len(activateName) < 1:
             activateName = get_process_name(srcPath)
         sprocessName = get_process_full(srcPath)
+        if sprocessName == "" and activateName == "":  # 如果功能名称和模块名称都为空则不写日志直接返回
+            rdata['status'] = False
+            return json.dumps(rdata, ensure_ascii=False)
         person_info = get_curr_person_info()
         ip = request.remote_addr
         log = SALogs(sdescription=discription,
@@ -2172,6 +2175,187 @@ def personal_schedule_del_data():
 @user_login
 def personal_doc_node():
     return render_template("system/personal/docnode/PersonalDocNode.html")
+
+
+# 个人文件柜-目录管理
+@system.route("/personal/docnode/dialog/FolderManage", methods=["GET", "POST"])
+@user_login
+def personal_doc_node_folder():
+    form = PersonalDocForm()
+    model = SAPersonalDocNode(sparentname="", sdescription="")
+    if form.is_submitted():
+        rdata = dict()
+        data = form.data
+        if data['sid'] and data['sid'] != "":
+            model = SAPersonalDocNode.query.filter_by(sid=data['sid']).first()
+        else:
+            model.sid = guid()
+        model.sparentname = data['sparentname']
+        model.sdescription = data['sdescription']
+        if data['sparentid'] and data['sparentid'] != "":
+            model.sparentid = data['sparentid']
+            par = SAPersonalDocNode.query.filter_by(sid=data['sparentid']).first()
+            if par:
+                model.spath = par.spath + '/' + model.sid
+            else:
+                model.spath = '/' + model.sid
+        else:
+            model.spath = '/' + model.sid
+        person = get_curr_person_info()
+        model.screatorid = person['personid']
+        model.screatorname = person['personName']
+        db.session.add(model)
+        db.session.commit()
+        rdata['state'] = True
+        rdata['data'] = model.sid
+        return json.dumps(rdata, ensure_ascii=False)
+    sid = request.args.get('sid')
+    if sid:
+        model = SAPersonalDocNode.query.filter_by(sid=sid).first()
+    parent = request.args.get('parent')
+    if parent:
+        model.sparentid = parent
+    form.sdescription.data = model.sdescription
+    return render_template("system/personal/docnode/dialog/FolderManage.html", form=form, model=model, nul2em=nul2em)
+
+
+# 个人文件柜-加载文档目录
+@system.route("/personal/docnode/TreeSelectAction", methods=["GET", "POST"])
+@user_login
+def psn_doc_tree_select():
+    rdata = dict()
+    data = request.form
+    params = url_decode(data.get('params', ''))  # 接收的参数需要解码
+    param_dict = eval(params)  # 字符串转字典
+    others = param_dict.get('other', '').split(',')
+    user_id = session['user_id']
+    org_query = SAPersonalDocNode.query.filter_by(screatorid=user_id)
+    currenid = data.get('currenid')
+    if currenid:
+        org_query = org_query.filter(SAPersonalDocNode.sparentid == currenid)
+    else:
+        org_query = org_query.filter(or_(SAPersonalDocNode.sparentid.is_(None), SADocNode.sparentid == ''))
+    docs = org_query.order_by(SAPersonalDocNode.screatetime.desc()).all()
+    json_result = list()
+    for doc in docs:
+        item = dict()
+        item['id'] = getattr(doc, param_dict['id'])
+        item['name'] = getattr(doc, param_dict['name'])
+        item['parent'] = getattr(doc, param_dict['parent'])
+        item['isParent'] = True
+        for o in others:
+            item[o] = getattr(doc, o)
+        json_result.append(item)
+    rdata['jsonResult'] = json_result
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 个人文件柜-删除文档目录
+@system.route("/personal/docnode/deleteFolder", methods=["GET", "POST"])
+@user_login
+def psn_doc_delete_folder():
+    rdata = dict()
+    rowid = request.args.get('rowid')
+    node = SAPersonalDocNode.query.filter_by(sid=rowid).first()
+    if node:
+        file = SAPersonalFile.query.filter_by(smasterid=node.sid).first()
+        child = SAPersonalDocNode.query.filter_by(sparentid=node.sid).first()
+        if file or child:
+            rdata['state'] = False
+            rdata['msg'] = "目录下有文件，不能删除~"
+        else:
+            db.session.delete(node)
+            db.session.commit()
+            rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "指定的id无效~"
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 个人文件柜-保存文件数据
+@system.route("/personal/docnode/saveFileData", methods=["GET", "POST"])
+@user_login
+def psn_doc_save_file():
+    rdata = dict()
+    try:
+        folder = url_decode(request.form.get('folder'))
+        file = url_decode(request.form.get('file'))
+        person = get_curr_person_info()
+        doc = SAPersonalFile(saccessory=file)
+        doc.smasterid = folder
+        doc.screatorid = person['personid']
+        doc.screatorname = person['personName']
+        file_info = eval(file)
+        doc.sfileid = file_info['fileID']
+        doc.sfilename = file_info['fileName']
+        doc.sfilesize = file_info['fileSize']
+        db.session.add(doc)
+        db.session.commit()
+        rdata['state'] = True
+    except Exception as e:
+        current_app.logger.error(e)
+        rdata['state'] = False
+        rdata['msg'] = "后台操作异常~"
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 个人文件柜-删除文件数据
+@system.route("/personal/docnode/deleteFileData", methods=["GET", "POST"])
+@user_login
+def psn_doc_delete_file():
+    rdata = dict()
+    rowid = url_decode(request.form.get('rowid'))
+    doc = SAPersonalFile.query.filter_by(sid=rowid).first()
+    if doc:
+        file_delete(int(doc.sfileid))
+        db.session.delete(doc)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "指定的id错误~"
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 个人文件柜-加载文件列表
+@system.route("/personal/docnode/docDataList", methods=["GET", "POST"])
+@user_login
+def psn_doc_data_list():
+    rdata = dict()
+    rdata['code'] = 0
+    folder = url_decode(request.args.get('folder'))
+    shared = url_decode(request.args.get('shared'))
+    user_id = session['user_id']
+    if shared:
+        data_query = SAPersonalFile.query.filter(
+            or_(SAPersonalFile.screatorid == user_id, SAPersonalFile.saccesscurrentid.ilike('%' + user_id + '%')))
+    else:
+        data_query = SAPersonalFile.query.filter_by(smasterid=folder, screatorid=user_id)
+    search_text = url_decode(request.args.get('search_text', ''))
+    if search_text and search_text != '':
+        data_query = data_query.filter(SAPersonalFile.sfilename.ilike('%' + search_text + '%'))
+    count = data_query.count()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    rdata['count'] = count
+    page_data = data_query.order_by(SAPersonalFile.screatetime.desc()).paginate(page, limit)
+    no = 1
+    data = list()
+    for d in page_data.items:
+        row_data = dict()
+        row_data['no'] = no + (page - 1) * limit
+        row_data['sid'] = d.sid
+        row_data['sfileid'] = d.sfileid
+        row_data['sfilename'] = d.sfilename
+        row_data['sfilesize'] = d.sfilesize
+        row_data['screatorid'] = d.screatorid
+        row_data['screatorname'] = d.screatorname
+        row_data['screatetime'] = datetime.strftime(d.screatetime, '%Y-%m-%d %H:%M:%S')
+        data.append(row_data)
+        no += 1
+    rdata['data'] = data
+    return json.dumps(rdata, ensure_ascii=False)
 
 
 # 分享文件列表

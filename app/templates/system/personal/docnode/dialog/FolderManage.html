@@ -1,0 +1,60 @@
+<html lang="zh_CN">
+{% include "common/table_page_head.html" %}
+<body style="padding-top: 10px; padding-right: 40px;">
+<form id="org_create_mng" class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-block">
+            {{ form.sparentname(value=model.sparentname) }}
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">描述</label>
+        <div class="layui-input-block">
+            {{ form.sdescription(value=model.sdescription) }}
+        </div>
+    </div>
+    <div style="display: none;">
+        {{ form.sid(value=nul2em(model.sid)) }}
+        {{ form.sparentid(value=nul2em(model.sparentid)) }}
+    </div>
+    <div style="display: none;">
+        {{ form.csrf_token }}
+        {{ form.submit }}
+    </div>
+</form>
+</body>
+<script type="text/javascript">
+    function saveDatafn(formfield) {
+        $.ajax({
+            url: "/system/personal/docnode/dialog/FolderManage",
+            type: "post",
+            async: false,
+            data: formfield,
+            dataType: "json",
+            success: function (re) {
+                if (re.state === true) {
+                    rowid = re.data;
+                    layui.layer.alert("保存成功！", function () {
+                        tlv8.portal.dailog.dailogEngin(rowid);
+                    })
+                } else {
+                    layui.layer.alert("保存失败：" + re.msg);
+                }
+            }
+        });
+        return rowid;
+    }
+
+    function dailogEngin() {
+        $("#submit").click();
+        return false;
+    }
+
+    layui.form.on('submit(mainform)', function (data) {
+        //console.log(JSON.stringify(data.field));
+        saveDatafn(data.field);
+        return false;
+    });
+</script>
+</html>

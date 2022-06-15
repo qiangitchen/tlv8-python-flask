@@ -492,3 +492,44 @@ class ScheduleForm(FlaskForm):
             "lay-filter": "mainform"
         }
     )
+
+
+# 个人文件柜目录表单
+class PersonalDocForm(FlaskForm):
+    sid = StringField(
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    sparentname = StringField(
+        label="名称",
+        render_kw={
+            "class": "layui-input",
+            "lay-verify": "required",
+            "placeholder": "请输入名称",
+        }
+    )
+
+    sdescription = TextAreaField(
+        description="描述",
+        render_kw={
+            "class": "layui-textarea",
+            "style": "min-height:90px;"
+        }
+    )
+
+    sparentid = StringField(
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    submit = SubmitField(
+        '提交保存',
+        render_kw={
+            "class": "layui-btn",
+            "lay-submit": "",
+            "lay-filter": "mainform"
+        }
+    )
