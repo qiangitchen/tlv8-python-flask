@@ -3009,6 +3009,15 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
                 if (res.code === 0) {
                     layui.layer.msg("上传成功~");
                     loadFileList();
+                    try {
+                        //上传完成回调
+                        let onuploaded = $(div).attr("onuploaded");
+                        if (onuploaded && onuploaded !== "") {
+                            let upcallback = window.eval(onuploaded);
+                            upcallback(res.data);
+                        }
+                    } catch (e) {
+                    }
                 } else {
                     layui.layer.alert("上传失败！");
                 }
