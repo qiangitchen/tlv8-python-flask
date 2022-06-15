@@ -36,6 +36,7 @@ CREATE TABLE `oa_leave` (
   `fstate` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `freason` varchar(512) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `version` int(11) NOT NULL,
+  `fenclosure` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`fid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -46,8 +47,107 @@ CREATE TABLE `oa_leave` (
 
 LOCK TABLES `oa_leave` WRITE;
 /*!40000 ALTER TABLE `oa_leave` DISABLE KEYS */;
-INSERT INTO `oa_leave` VALUES ('0F243D91B06446DF93ED0041A068A0B3','system','PSN01','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 10:16:43','2022-06-09 10:16:46','2022-06-09 10:16:47',1,'事假','','',0),('40DA9136A31EF77121AE326205FE6B00','system','PSN01','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 18:14:52','2022-06-10 18:14:55','2022-06-11 18:14:58',2,'事假','','22',0);
+INSERT INTO `oa_leave` VALUES ('0F243D91B06446DF93ED0041A068A0B3','system','PSN01','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 10:16:43','2022-06-09 10:16:46','2022-06-09 10:16:47',1,'事假','','',0,NULL),('1B658382A55295130ECEB76A3E87ADB1','system','PSN01','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-13 10:12:21','2022-06-13 10:12:22','2022-06-14 10:12:24',2,'事假','','333',0,''),('40DA9136A31EF77121AE326205FE6B00','system','PSN01','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 18:14:52','2022-06-10 18:14:55','2022-06-11 18:14:58',2,'事假','','22',0,'');
 /*!40000 ALTER TABLE `oa_leave` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sa_docnode`
+--
+
+DROP TABLE IF EXISTS `sa_docnode`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sa_docnode` (
+  `sid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sdocname` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sparentid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sfileid` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ssize` float DEFAULT NULL,
+  `skind` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sdocpath` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sdocdisplaypath` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `screatorid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `screatorname` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `screatetime` datetime DEFAULT NULL,
+  `seditorid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `seditorname` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `slastwritetime` datetime DEFAULT NULL,
+  `sdescription` text COLLATE utf8mb4_unicode_ci,
+  `skeywords` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `version` int(11) NOT NULL,
+  PRIMARY KEY (`sid`),
+  KEY `ix_sa_docnode_sfileid` (`sfileid`),
+  KEY `ix_sa_docnode_skind` (`skind`),
+  KEY `ix_sa_docnode_sparentid` (`sparentid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sa_docnode`
+--
+
+LOCK TABLES `sa_docnode` WRITE;
+/*!40000 ALTER TABLE `sa_docnode` DISABLE KEYS */;
+/*!40000 ALTER TABLE `sa_docnode` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sa_docpath`
+--
+
+DROP TABLE IF EXISTS `sa_docpath`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sa_docpath` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `filename` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extname` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filesize` float DEFAULT NULL,
+  `filetype` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `filepath` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `addtime` datetime DEFAULT NULL,
+  `updatetime` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sa_docpath`
+--
+
+LOCK TABLES `sa_docpath` WRITE;
+/*!40000 ALTER TABLE `sa_docpath` DISABLE KEYS */;
+/*!40000 ALTER TABLE `sa_docpath` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sa_flowconclusion`
+--
+
+DROP TABLE IF EXISTS `sa_flowconclusion`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sa_flowconclusion` (
+  `sid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sorder` int(11) NOT NULL,
+  `sconclusionname` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `screatorid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `screatorname` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `screatetime` datetime DEFAULT NULL,
+  `version` int(11) NOT NULL,
+  PRIMARY KEY (`sid`),
+  KEY `ix_sa_flowconclusion_screatorid` (`screatorid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sa_flowconclusion`
+--
+
+LOCK TABLES `sa_flowconclusion` WRITE;
+/*!40000 ALTER TABLE `sa_flowconclusion` DISABLE KEYS */;
+/*!40000 ALTER TABLE `sa_flowconclusion` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -298,7 +398,7 @@ CREATE TABLE `sa_oppermission` (
 
 LOCK TABLES `sa_oppermission` WRITE;
 /*!40000 ALTER TABLE `sa_oppermission` DISABLE KEYS */;
-INSERT INTO `sa_oppermission` VALUES ('072EAF7E05FF5F2CBFFFC2DD12109030','62C986B66A97D0F6F251698A0553FC42','/oa/leave/Process','/OA系统/人事管理/返回申请人','bizActivity8',NULL,NULL,0,'/oa/leave/bizActivity8',4,1,0),('0CF6C83DE6FD16BEBF75D2A8FD056881','RL01','/SA/log/logProcess','/系统管理/系统工具/操作日志','mainActivity',NULL,NULL,0,'/system/logs',9,1,0),('17C6F4FE19E6A556F61A066164ACD546','RL01','/oa/leave/Process','/OA系统/人事管理/部门审批','bizActivity4',NULL,NULL,0,'/oa/leave/bizActivity4',2,1,0),('1CE9B0FF633B989E55BC6E793A851E32','RL02-doc','/SA/doc/docCenter/docCenterProcess','/系统管理/文档管理/文档中心','docCenter',NULL,NULL,0,'/system/doc/docCenter',1,1,0),('1DC3831C34AC8ED61524C41E177B67C4','RL01','/SA/OPM/authorization/authorizationProcess','/系统管理/组织机构/授权管理','mainActivity',NULL,NULL,0,'/system/OPM/authorization',3,1,0),('29C03CAC0C63C98D5F32593292BBB5C2','62C986B66A97D0F6F251698A0553FC42','/oa/leave/Process','/OA系统/人事管理/领导审批','bizActivity6',NULL,NULL,0,'/oa/leave/bizActivity6',3,1,0),('325BFA75C55FD1DB49075F44C4B72628','RL01','/SA/task/taskCenter/process','/系统管理/流程管理/流程监控','monitorActivity',NULL,NULL,0,'/system/flow/monitor',5,1,0),('57EF14E4A669882A9843271C4EBA7E58','RL01','/SA/doc/docCenter/docCenterProcess','/系统管理/文档管理/文档中心','docCenter',NULL,NULL,0,'/system/doc/docCenter',7,1,0),('5C5DA17E97DFF3148C2CAAD054684473','RL01','/flw/dwr/process','/系统管理/流程管理/流程设计','vml-dwr-editor',NULL,NULL,0,'/system/flow/flow_design',6,1,0),('61DE4409DE340D7387D0C2FBF7595F46','62C986B66A97D0F6F251698A0553FC42','/oa/leave/Process','/OA系统/人事管理/部门审批','bizActivity4',NULL,NULL,0,'/oa/leave/bizActivity4',2,1,0),('630E9DFA815B532F5C2D50253EB19DF2','RL02','/flw/dwr/process','/系统管理/流程管理/流程设计','vml-dwr-editor',NULL,NULL,0,'/system/flow/flow_design',2,1,0),('7A62182221B15DCE20F289F315680340','RL01','/SA/OPM/role/roleProcess','/系统管理/组织机构/角色管理','mainActivity',NULL,NULL,0,'/system/OPM/role',2,1,0),('8037E66DAD0A90DC4256EC9848E536AF','RL01','/SA/online/onlineProcess','/系统管理/系统工具/在线用户','mainActivity',NULL,NULL,0,'/system/online',10,1,0),('8091869B1201127C4B54F200AC7E878F','RL01','/SA/doc/docSearch/docSearchProcess','/系统管理/文档管理/文档检索','mainActivity',NULL,NULL,0,'/system/doc/docSearch',8,1,0),('8225AA1231F37D5A98EC3A476F031AA0','62C986B66A97D0F6F251698A0553FC42','/oa/leave/Process','/OA系统/人事管理/请假申请','mainActivity',NULL,NULL,0,'/oa/leave/mainActivity',1,1,0),('A7FA204F027AF509F2762F4990F6F1CC','RL02-doc','/SA/doc/docSearch/docSearchProcess','/系统管理/文档管理/文档检索','mainActivity',NULL,NULL,0,'/system/doc/docSearch',2,1,0),('B1E719EBCCF8CEF030C083CFA7DF0966','RL01','/SA/OPM/organization/organizationProcess','/系统管理/组织机构/机构管理','mainActivity',NULL,NULL,0,'/system/OPM/organization',1,1,0),('BCB09BC3E99CD319DBF8009A9CBAB1AC','RL01','/oa/leave/Process','/OA系统/人事管理/请假申请','mainActivity',NULL,NULL,0,'/oa/leave/mainActivity',1,1,0),('CFA94636F5844609400AB0322D9C27DA','RL01','/oa/leave/Process','/OA系统/人事管理/返回申请人','bizActivity8',NULL,NULL,0,'/oa/leave/bizActivity8',4,1,0),('E572B9CCC095B962A41AE8D8B7878D54','RL02','/SA/task/taskCenter/process','/系统管理/流程管理/流程监控','monitorActivity',NULL,NULL,0,'/system/flow/monitor',1,1,0),('F3613C14223CFDE0396DC82D8D8F10CB','RL01','/oa/leave/Process','/OA系统/人事管理/领导审批','bizActivity6',NULL,NULL,0,'/oa/leave/bizActivity6',3,1,0),('F669B3828A5E307943559F69E938DD51','RL01','/SA/OPM/recycled/recycledProcess','/系统管理/组织机构/回收站','mainActivity',NULL,NULL,0,'/system/OPM/recycled',4,1,0);
+INSERT INTO `sa_oppermission` VALUES ('0CF6C83DE6FD16BEBF75D2A8FD056881','RL01','/SA/log/logProcess','/系统管理/系统工具/操作日志','mainActivity',NULL,NULL,0,'/system/logs',9,1,0),('17C6F4FE19E6A556F61A066164ACD546','RL01','/oa/leave/Process','/OA系统/人事管理/部门审批','bizActivity4',NULL,NULL,0,'/oa/leave/bizActivity4',2,1,0),('1CE9B0FF633B989E55BC6E793A851E32','RL02-doc','/SA/doc/docCenter/docCenterProcess','/系统管理/文档管理/文档中心','docCenter',NULL,NULL,0,'/system/doc/docCenter',1,1,0),('1DC3831C34AC8ED61524C41E177B67C4','RL01','/SA/OPM/authorization/authorizationProcess','/系统管理/组织机构/授权管理','mainActivity',NULL,NULL,0,'/system/OPM/authorization',3,1,0),('2BD4857CB8069793990F186B0E986439','62C986B66A97D0F6F251698A0553FC42','/oa/leave/Process','/OA系统/人事管理/返回申请人','bizActivity8',NULL,NULL,0,'/oa/leave/bizActivity8',4,1,0),('325BFA75C55FD1DB49075F44C4B72628','RL01','/SA/task/taskCenter/process','/系统管理/流程管理/流程监控','monitorActivity',NULL,NULL,0,'/system/flow/monitor',5,1,0),('36D5BF85AD5EEEEA7122F4069E0F204D','62C986B66A97D0F6F251698A0553FC42','/oa/leave/Process','/OA系统/人事管理/部门审批','bizActivity4',NULL,NULL,0,'/oa/leave/bizActivity4',2,1,0),('57EF14E4A669882A9843271C4EBA7E58','RL01','/SA/doc/docCenter/docCenterProcess','/系统管理/文档管理/文档中心','docCenter',NULL,NULL,0,'/system/doc/docCenter',7,1,0),('5C5DA17E97DFF3148C2CAAD054684473','RL01','/flw/dwr/process','/系统管理/流程管理/流程设计','vml-dwr-editor',NULL,NULL,0,'/system/flow/flow_design',6,1,0),('630E9DFA815B532F5C2D50253EB19DF2','RL02','/flw/dwr/process','/系统管理/流程管理/流程设计','vml-dwr-editor',NULL,NULL,0,'/system/flow/flow_design',2,1,0),('7A62182221B15DCE20F289F315680340','RL01','/SA/OPM/role/roleProcess','/系统管理/组织机构/角色管理','mainActivity',NULL,NULL,0,'/system/OPM/role',2,1,0),('8037E66DAD0A90DC4256EC9848E536AF','RL01','/SA/online/onlineProcess','/系统管理/系统工具/在线用户','mainActivity',NULL,NULL,0,'/system/online',10,1,0),('8091869B1201127C4B54F200AC7E878F','RL01','/SA/doc/docSearch/docSearchProcess','/系统管理/文档管理/文档检索','mainActivity',NULL,NULL,0,'/system/doc/docSearch',8,1,0),('8D4CBA9B74D45ABE5726D5E14A779DB0','62C986B66A97D0F6F251698A0553FC42','/oa/leave/Process','/OA系统/人事管理/请假申请','mainActivity',NULL,NULL,0,'/oa/leave/mainActivity',1,1,0),('A7FA204F027AF509F2762F4990F6F1CC','RL02-doc','/SA/doc/docSearch/docSearchProcess','/系统管理/文档管理/文档检索','mainActivity',NULL,NULL,0,'/system/doc/docSearch',2,1,0),('B1E719EBCCF8CEF030C083CFA7DF0966','RL01','/SA/OPM/organization/organizationProcess','/系统管理/组织机构/机构管理','mainActivity',NULL,NULL,0,'/system/OPM/organization',1,1,0),('BCB09BC3E99CD319DBF8009A9CBAB1AC','RL01','/oa/leave/Process','/OA系统/人事管理/请假申请','mainActivity',NULL,NULL,0,'/oa/leave/mainActivity',1,1,0),('CFA94636F5844609400AB0322D9C27DA','RL01','/oa/leave/Process','/OA系统/人事管理/返回申请人','bizActivity8',NULL,NULL,0,'/oa/leave/bizActivity8',4,1,0),('E572B9CCC095B962A41AE8D8B7878D54','RL02','/SA/task/taskCenter/process','/系统管理/流程管理/流程监控','monitorActivity',NULL,NULL,0,'/system/flow/monitor',1,1,0),('EAA850865197E41D5F597DAC4A0CAAFC','62C986B66A97D0F6F251698A0553FC42','/oa/leave/Process','/OA系统/人事管理/领导审批','bizActivity6',NULL,NULL,0,'/oa/leave/bizActivity6',3,1,0),('F3613C14223CFDE0396DC82D8D8F10CB','RL01','/oa/leave/Process','/OA系统/人事管理/领导审批','bizActivity6',NULL,NULL,0,'/oa/leave/bizActivity6',3,1,0),('F669B3828A5E307943559F69E938DD51','RL01','/SA/OPM/recycled/recycledProcess','/系统管理/组织机构/回收站','mainActivity',NULL,NULL,0,'/system/OPM/recycled',4,1,0);
 /*!40000 ALTER TABLE `sa_oppermission` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -337,7 +437,7 @@ CREATE TABLE `sa_opperson` (
 
 LOCK TABLES `sa_opperson` WRITE;
 /*!40000 ALTER TABLE `sa_opperson` DISABLE KEYS */;
-INSERT INTO `sa_opperson` VALUES ('7BA4523D57DB87BE42614FA76B34B122','测试人员1','test1','','E10ADC3949BA59ABBE56E057F20F883E',NULL,1,'97DA9DF40D94E4EDD350A1A0DC4C0917','','','','',NULL,'','',0),('BB75847554AB9BEE10BE6770D8C24DE8','测试人员2','test2','','E10ADC3949BA59ABBE56E057F20F883E',NULL,1,'97DA9DF40D94E4EDD350A1A0DC4C0917','','','','',NULL,'','',0),('D8B1FF9943C8C87CB1C8C8B9F94D0B16','测试人员3','test3','','E10ADC3949BA59ABBE56E057F20F883E',NULL,1,'B8AE1E355B0F86B3CC80D35DC31C25C9','','','','',NULL,'','',0),('PSN01','system','SYSTEM',NULL,'C4CA4238A0B923820DCC509A6F75849B',0,1,'ORG01',NULL,NULL,NULL,NULL,NULL,NULL,NULL,0);
+INSERT INTO `sa_opperson` VALUES ('7BA4523D57DB87BE42614FA76B34B122','测试人员1','test1','','E10ADC3949BA59ABBE56E057F20F883E',NULL,1,'97DA9DF40D94E4EDD350A1A0DC4C0917','','','','',NULL,'','',0),('BB75847554AB9BEE10BE6770D8C24DE8','测试人员2','test2','','E10ADC3949BA59ABBE56E057F20F883E',NULL,1,'97DA9DF40D94E4EDD350A1A0DC4C0917','','','','',NULL,'','',0),('D8B1FF9943C8C87CB1C8C8B9F94D0B16','测试人员3','test3','','E10ADC3949BA59ABBE56E057F20F883E',NULL,1,'B8AE1E355B0F86B3CC80D35DC31C25C9','','','','',NULL,'','',0),('PSN01','system','SYSTEM',NULL,'C4CA4238A0B923820DCC509A6F75849B',0,1,'ORG01','','男','2022-06-15','','',NULL,NULL,0);
 /*!40000 ALTER TABLE `sa_opperson` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -369,6 +469,108 @@ LOCK TABLES `sa_oprole` WRITE;
 /*!40000 ALTER TABLE `sa_oprole` DISABLE KEYS */;
 INSERT INTO `sa_oprole` VALUES ('62C986B66A97D0F6F251698A0553FC42','测试角色','testrole','业务功能','',NULL,1,0),('RL01','超级管理员','opm','业务功能','请勿删除',9999,1,0),('RL02','任务','task','系统管理',NULL,9997,1,0),('RL02-doc','文档','doc','系统管理',NULL,9996,1,0);
 /*!40000 ALTER TABLE `sa_oprole` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sa_personal_docnode`
+--
+
+DROP TABLE IF EXISTS `sa_personal_docnode`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sa_personal_docnode` (
+  `sid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sparentid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sparentname` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sdescription` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `spath` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `screatorid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `screatorname` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `screatetime` datetime DEFAULT NULL,
+  `version` int(11) NOT NULL,
+  PRIMARY KEY (`sid`),
+  KEY `ix_sa_personal_docnode_screatorid` (`screatorid`),
+  KEY `ix_sa_personal_docnode_sparentid` (`sparentid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sa_personal_docnode`
+--
+
+LOCK TABLES `sa_personal_docnode` WRITE;
+/*!40000 ALTER TABLE `sa_personal_docnode` DISABLE KEYS */;
+/*!40000 ALTER TABLE `sa_personal_docnode` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sa_personal_file`
+--
+
+DROP TABLE IF EXISTS `sa_personal_file`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sa_personal_file` (
+  `sid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `smasterid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sfileid` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sfilename` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sfilesize` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `saccessory` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `screatorid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `screatorname` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `screatetime` datetime DEFAULT NULL,
+  `saccesscurrentid` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `saccesscurrentname` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `version` int(11) NOT NULL,
+  PRIMARY KEY (`sid`),
+  KEY `ix_sa_personal_file_screatorid` (`screatorid`),
+  KEY `ix_sa_personal_file_smasterid` (`smasterid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sa_personal_file`
+--
+
+LOCK TABLES `sa_personal_file` WRITE;
+/*!40000 ALTER TABLE `sa_personal_file` DISABLE KEYS */;
+/*!40000 ALTER TABLE `sa_personal_file` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sa_psnschedule`
+--
+
+DROP TABLE IF EXISTS `sa_psnschedule`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sa_psnschedule` (
+  `sid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scaption` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `spriority` int(11) DEFAULT NULL,
+  `sstartdate` datetime NOT NULL,
+  `senddate` datetime DEFAULT NULL,
+  `scontent` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `swhouser` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `saffairstype` int(11) DEFAULT NULL,
+  `sstartdate_axis` int(11) DEFAULT NULL,
+  `ssenddate_axis` int(11) DEFAULT NULL,
+  `version` int(11) NOT NULL,
+  `sstatus` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`sid`),
+  KEY `ix_sa_psnschedule_sstatus` (`sstatus`),
+  KEY `ix_sa_psnschedule_swhouser` (`swhouser`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sa_psnschedule`
+--
+
+LOCK TABLES `sa_psnschedule` WRITE;
+/*!40000 ALTER TABLE `sa_psnschedule` DISABLE KEYS */;
+/*!40000 ALTER TABLE `sa_psnschedule` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -429,7 +631,7 @@ CREATE TABLE `sa_task` (
 
 LOCK TABLES `sa_task` WRITE;
 /*!40000 ALTER TABLE `sa_task` DISABLE KEYS */;
-INSERT INTO `sa_task` VALUES ('07B039490F8D6203B7D6C3D4BD6717D2','3EA26484F5E662037B1A193308415611','请假申请:请假流程','3EA26484F5E662037B1A193308415611','/oa/leave/Process','bizActivity2','tesFinished','已完成','2022-06-06 18:19:35',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-06 18:19:40','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'','/oa/leave/mainActivity','C9DA139CAC800001EDC2AD8010301A30','task',NULL,1),('0DF208464B9B0CE809F88AFC1C6ABF6A',NULL,'请假流程','0DF208464B9B0CE809F88AFC1C6ABF6A','/oa/leave/Process',NULL,'tesExecuting','正在处理','2022-06-06 18:34:23',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1',NULL,NULL,NULL,'C9DA147589800001D43E109014601501','task',NULL,0),('0EFCE24A356C75D304895A231C557B4D','0DF208464B9B0CE809F88AFC1C6ABF6A','请假申请:请假流程','0DF208464B9B0CE809F88AFC1C6ABF6A','/oa/leave/Process','bizActivity2','tesReady','尚未处理','2022-06-06 18:34:23',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1','7BA4523D57DB87BE42614FA76B34B122','','/oa/leave/mainActivity','C9DA147589800001D43E109014601501','task',NULL,1),('28771185FEEB6DC3EEB11594DCB3676D','8A13B81B2567FC2FCA689F6E71DC371D','部门审批:请假流程','6E5B1A5B244D3FA542B24481190079F7','/oa/leave/Process','bizActivity4','tesReady','尚未处理','2022-06-06 18:51:41',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1',NULL,'D8B1FF9943C8C87CB1C8C8B9F94D0B16','测试人员3','E21FD204D22403C8F010B849D6450D6A','测试部门2','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/E21FD204D22403C8F010B849D6450D6A.dpt/B8AE1E355B0F86B3CC80D35DC31C25C9.pos/D8B1FF9943C8C87CB1C8C8B9F94D0B16@B8AE1E355B0F86B3CC80D35DC31C25C9.psm','/测试机构/测试部门2/测试岗位2/测试人员3',NULL,'/oa/leave/mainActivity','/oa/leave/bizActivity4','C9DA1478640000012F492E0A1F201696','task',NULL,2),('3EA26484F5E662037B1A193308415611',NULL,'请假流程','3EA26484F5E662037B1A193308415611','/oa/leave/Process',NULL,'tesExecuting','正在处理','2022-06-06 18:19:35',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 16:27:11','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,NULL,NULL,'C9DA139CAC800001EDC2AD8010301A30','task',NULL,8),('6E5B1A5B244D3FA542B24481190079F7',NULL,'请假流程','6E5B1A5B244D3FA542B24481190079F7','/oa/leave/Process',NULL,'tesExecuting','正在处理','2022-06-06 18:34:35',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1','2022-06-09 15:23:49','7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1',NULL,NULL,NULL,'C9DA1478640000012F492E0A1F201696','task',NULL,2),('6FD1E81D86E2DA24242F5CAFB3AD24AA','D69B14BE69AB0F60A4288A9B63C81DE1','请假申请:请假流程','D69B14BE69AB0F60A4288A9B63C81DE1','/oa/leave/Process','bizActivity2','tesPause','已暂停','2022-06-09 10:18:55',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 13:48:32','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','PSN01','','/oa/leave/mainActivity','0F243D91B06446DF93ED0041A068A0B3','task',NULL,1),('756281414288444A2555B2DAC6D57D63','07B039490F8D6203B7D6C3D4BD6717D2','部门审批:请假流程','3EA26484F5E662037B1A193308415611','/oa/leave/Process','bizActivity4','tesFinished','已完成','2022-06-06 18:19:40',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 16:38:56','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','PSN01','/oa/leave/mainActivity','/oa/leave/bizActivity4','C9DA139CAC800001EDC2AD8010301A30','task',NULL,11),('76D4B52BB0CA98FA1918D494ADA63F24',NULL,'请假流程','76D4B52BB0CA98FA1918D494ADA63F24','/oa/leave/Process',NULL,'tesAborted','已终止','2022-06-06 18:19:21',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 14:08:14','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,NULL,NULL,'C9DA139941800001D2DF1100C7D619B4','task',NULL,3),('8A13B81B2567FC2FCA689F6E71DC371D','6E5B1A5B244D3FA542B24481190079F7','请假申请:请假流程','6E5B1A5B244D3FA542B24481190079F7','/oa/leave/Process','bizActivity2','tesFinished','已完成','2022-06-06 18:34:35',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1','2022-06-06 18:51:41','7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1','7BA4523D57DB87BE42614FA76B34B122','','/oa/leave/mainActivity','C9DA1478640000012F492E0A1F201696','task',NULL,1),('9ACE9E05A6D3AF9C5ABC5433CB4FB51B','756281414288444A2555B2DAC6D57D63','领导审批:请假流程','3EA26484F5E662037B1A193308415611','/oa/leave/Process','bizActivity6','tesReady','尚未处理','2022-06-09 16:38:56',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1','PSN01','/oa/leave/bizActivity4','/oa/leave/bizActivity6',NULL,'task',NULL,0),('9E1369FAD4E9D3FA8F453D61DE49E8F9','C9B05E5EBEDE6118A48AC326B25DB9D7','部门审批:请假流程','A38E985D92586D3E9A61FA8399EDEA5C','/oa/leave/Process','bizActivity4','tesReady','尚未处理','2022-06-09 18:15:09',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','PSN01','/oa/leave/mainActivity','/oa/leave/bizActivity4','40DA9136A31EF77121AE326205FE6B00','task',NULL,0),('A38E985D92586D3E9A61FA8399EDEA5C',NULL,'请假流程','A38E985D92586D3E9A61FA8399EDEA5C','/oa/leave/Process',NULL,'tesExecuting','正在处理','2022-06-09 18:15:04',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,NULL,NULL,'40DA9136A31EF77121AE326205FE6B00','task',NULL,0),('A7B3525540D1A84CAFAE9E267207FA26','76D4B52BB0CA98FA1918D494ADA63F24','请假申请:请假流程','76D4B52BB0CA98FA1918D494ADA63F24','/oa/leave/Process','bizActivity2','tesAborted','已终止','2022-06-06 18:19:21',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 14:08:14','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','PSN01','','/oa/leave/mainActivity','C9DA139941800001D2DF1100C7D619B4','task',NULL,3),('C9B05E5EBEDE6118A48AC326B25DB9D7','A38E985D92586D3E9A61FA8399EDEA5C','请假申请:请假流程','A38E985D92586D3E9A61FA8399EDEA5C','/oa/leave/Process','mainActivity','tesFinished','已完成','2022-06-09 18:15:04',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 18:15:09','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'','/oa/leave/mainActivity','40DA9136A31EF77121AE326205FE6B00','task',NULL,1),('D69B14BE69AB0F60A4288A9B63C81DE1',NULL,'请假流程','D69B14BE69AB0F60A4288A9B63C81DE1','/oa/leave/Process',NULL,'tesPause','已暂停','2022-06-09 10:18:55',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 13:48:32','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,NULL,NULL,'0F243D91B06446DF93ED0041A068A0B3','task',NULL,1);
+INSERT INTO `sa_task` VALUES ('07B039490F8D6203B7D6C3D4BD6717D2','3EA26484F5E662037B1A193308415611','请假申请:请假流程','3EA26484F5E662037B1A193308415611','/oa/leave/Process','bizActivity2','tesFinished','已完成','2022-06-06 18:19:35',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-06 18:19:40','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'','/oa/leave/mainActivity','C9DA139CAC800001EDC2AD8010301A30','task',NULL,1),('0DF208464B9B0CE809F88AFC1C6ABF6A',NULL,'请假流程','0DF208464B9B0CE809F88AFC1C6ABF6A','/oa/leave/Process',NULL,'tesExecuting','正在处理','2022-06-06 18:34:23',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1',NULL,NULL,NULL,'C9DA147589800001D43E109014601501','task',NULL,0),('0EFCE24A356C75D304895A231C557B4D','0DF208464B9B0CE809F88AFC1C6ABF6A','请假申请:请假流程','0DF208464B9B0CE809F88AFC1C6ABF6A','/oa/leave/Process','bizActivity2','tesReady','尚未处理','2022-06-06 18:34:23',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1','7BA4523D57DB87BE42614FA76B34B122','','/oa/leave/mainActivity','C9DA147589800001D43E109014601501','task',NULL,1),('28771185FEEB6DC3EEB11594DCB3676D','8A13B81B2567FC2FCA689F6E71DC371D','部门审批:请假流程','6E5B1A5B244D3FA542B24481190079F7','/oa/leave/Process','bizActivity4','tesReady','尚未处理','2022-06-06 18:51:41',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1',NULL,'D8B1FF9943C8C87CB1C8C8B9F94D0B16','测试人员3','E21FD204D22403C8F010B849D6450D6A','测试部门2','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/E21FD204D22403C8F010B849D6450D6A.dpt/B8AE1E355B0F86B3CC80D35DC31C25C9.pos/D8B1FF9943C8C87CB1C8C8B9F94D0B16@B8AE1E355B0F86B3CC80D35DC31C25C9.psm','/测试机构/测试部门2/测试岗位2/测试人员3',NULL,'/oa/leave/mainActivity','/oa/leave/bizActivity4','C9DA1478640000012F492E0A1F201696','task',NULL,2),('35F6C6A30F8720A6081F2145754EBE1B',NULL,'请假流程','35F6C6A30F8720A6081F2145754EBE1B','/oa/leave/Process',NULL,'tesExecuting','正在处理','2022-06-13 10:12:30',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,NULL,NULL,'1B658382A55295130ECEB76A3E87ADB1','task',NULL,0),('3EA26484F5E662037B1A193308415611',NULL,'请假流程','3EA26484F5E662037B1A193308415611','/oa/leave/Process',NULL,'tesExecuting','正在处理','2022-06-06 18:19:35',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 16:27:11','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,NULL,NULL,'C9DA139CAC800001EDC2AD8010301A30','task',NULL,8),('6E5B1A5B244D3FA542B24481190079F7',NULL,'请假流程','6E5B1A5B244D3FA542B24481190079F7','/oa/leave/Process',NULL,'tesExecuting','正在处理','2022-06-06 18:34:35',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1','2022-06-09 15:23:49','7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1',NULL,NULL,NULL,'C9DA1478640000012F492E0A1F201696','task',NULL,2),('6FD1E81D86E2DA24242F5CAFB3AD24AA','D69B14BE69AB0F60A4288A9B63C81DE1','请假申请:请假流程','D69B14BE69AB0F60A4288A9B63C81DE1','/oa/leave/Process','bizActivity2','tesPause','已暂停','2022-06-09 10:18:55',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 13:48:32','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','PSN01','','/oa/leave/mainActivity','0F243D91B06446DF93ED0041A068A0B3','task',NULL,1),('756281414288444A2555B2DAC6D57D63','07B039490F8D6203B7D6C3D4BD6717D2','部门审批:请假流程','3EA26484F5E662037B1A193308415611','/oa/leave/Process','bizActivity4','tesFinished','已完成','2022-06-06 18:19:40',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 16:38:56','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','PSN01','/oa/leave/mainActivity','/oa/leave/bizActivity4','C9DA139CAC800001EDC2AD8010301A30','task',NULL,11),('76D4B52BB0CA98FA1918D494ADA63F24',NULL,'请假流程','76D4B52BB0CA98FA1918D494ADA63F24','/oa/leave/Process',NULL,'tesAborted','已终止','2022-06-06 18:19:21',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 14:08:14','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,NULL,NULL,'C9DA139941800001D2DF1100C7D619B4','task',NULL,3),('8A13B81B2567FC2FCA689F6E71DC371D','6E5B1A5B244D3FA542B24481190079F7','请假申请:请假流程','6E5B1A5B244D3FA542B24481190079F7','/oa/leave/Process','bizActivity2','tesFinished','已完成','2022-06-06 18:34:35',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1','2022-06-06 18:51:41','7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1','7BA4523D57DB87BE42614FA76B34B122','','/oa/leave/mainActivity','C9DA1478640000012F492E0A1F201696','task',NULL,1),('9ACE9E05A6D3AF9C5ABC5433CB4FB51B','756281414288444A2555B2DAC6D57D63','领导审批:请假流程','3EA26484F5E662037B1A193308415611','/oa/leave/Process','bizActivity6','tesReady','尚未处理','2022-06-09 16:38:56',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1','PSN01','/oa/leave/bizActivity4','/oa/leave/bizActivity6',NULL,'task',NULL,0),('9E1369FAD4E9D3FA8F453D61DE49E8F9','C9B05E5EBEDE6118A48AC326B25DB9D7','部门审批:请假流程','A38E985D92586D3E9A61FA8399EDEA5C','/oa/leave/Process','bizActivity4','tesReady','尚未处理','2022-06-09 18:15:09',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','PSN01','/oa/leave/mainActivity','/oa/leave/bizActivity4','40DA9136A31EF77121AE326205FE6B00','task',NULL,0),('A38E985D92586D3E9A61FA8399EDEA5C',NULL,'请假流程','A38E985D92586D3E9A61FA8399EDEA5C','/oa/leave/Process',NULL,'tesExecuting','正在处理','2022-06-09 18:15:04',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,NULL,NULL,'40DA9136A31EF77121AE326205FE6B00','task',NULL,0),('A7B3525540D1A84CAFAE9E267207FA26','76D4B52BB0CA98FA1918D494ADA63F24','请假申请:请假流程','76D4B52BB0CA98FA1918D494ADA63F24','/oa/leave/Process','bizActivity2','tesAborted','已终止','2022-06-06 18:19:21',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 14:08:14','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','PSN01','','/oa/leave/mainActivity','C9DA139941800001D2DF1100C7D619B4','task',NULL,3),('BAFF4F662365352923D92811A2B41A83','35F6C6A30F8720A6081F2145754EBE1B','请假申请:请假流程','35F6C6A30F8720A6081F2145754EBE1B','/oa/leave/Process','mainActivity','tesReady','尚未处理','2022-06-13 10:12:30',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','PSN01','','/oa/leave/mainActivity','1B658382A55295130ECEB76A3E87ADB1','task',NULL,0),('C9B05E5EBEDE6118A48AC326B25DB9D7','A38E985D92586D3E9A61FA8399EDEA5C','请假申请:请假流程','A38E985D92586D3E9A61FA8399EDEA5C','/oa/leave/Process','mainActivity','tesFinished','已完成','2022-06-09 18:15:04',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 18:15:09','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'','/oa/leave/mainActivity','40DA9136A31EF77121AE326205FE6B00','task',NULL,1),('D69B14BE69AB0F60A4288A9B63C81DE1',NULL,'请假流程','D69B14BE69AB0F60A4288A9B63C81DE1','/oa/leave/Process',NULL,'tesPause','已暂停','2022-06-09 10:18:55',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 13:48:32','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,NULL,NULL,'0F243D91B06446DF93ED0041A068A0B3','task',NULL,1);
 /*!40000 ALTER TABLE `sa_task` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -442,4 +644,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-06-09 18:16:49
+-- Dump completed on 2022-06-15 19:16:08
