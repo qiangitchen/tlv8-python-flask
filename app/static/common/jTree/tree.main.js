@@ -89,15 +89,13 @@ Jtree.prototype.get = function (treeID) {
  * 字符串类似比较 @param {Object} str @memberOf {TypeName} @return {TypeName}
  */
 String.prototype.like = function (str) {
-    if (this.indexOf(str) > -1)
-        return true;
-    return false;
+    return this.indexOf(str) > -1;
 };
 
 function quickPosition(event, obj) {
-    var treeID = obj.id.substring(0, obj.id.indexOf("_quicktext"));
-    if (event.keyCode == 13) {
-        var Jtree_ext = document.getElementById(treeID).Jtree;
+    let treeID = obj.id.substring(0, obj.id.indexOf("_quicktext"));
+    if (event.keyCode === 13) {
+        let Jtree_ext = document.getElementById(treeID).Jtree;
         Jtree_ext.quickPosition(obj.value);
     }
 }
@@ -119,14 +117,14 @@ Jtree.prototype.Jtreeparent;// 树的层级
 Jtree.prototype.Jtreeother;
 Jtree.prototype.tableName;// 表名
 Jtree.prototype.databaseName;
-var rowid = "";
-var torowid = "";
+let rowid = "";
+let torowid = "";
 Jtree.prototype.init = function (treebody, setting, param) {
     this.treeId = treebody;
-    var exeJtree = this;
+    let exeJtree = this;
     if (setting.isquickPosition.enable && setting.isquickPosition.url
-        && setting.isquickPosition.enable != "") {
-        var treeHTML = '<table style="width:100%;height:100%;table-layout:fixed;"><tr height="30px">'
+        && setting.isquickPosition.enable !== "") {
+        let treeHTML = '<table style="width:100%;height:100%;table-layout:fixed;"><tr height="30px">'
             + '<td align="left" style="padding-left:5px;">'
             + '<input type="text" id="'
             + treebody
@@ -135,7 +133,7 @@ Jtree.prototype.init = function (treebody, setting, param) {
             + treebody
             + "_quickbutton' href='javascript:void(0)' class='toobar_item' align='left' "
             + "style='margin-left: 1px; width:36px;height:25px;float:left;text-align:left;'><img src='/static/common/image/toolbar/search.gif' title='查询' style='font-size:12px'/></a></td></tr>";
-        var streeheight = $("#" + treebody).parent().height() - 30;
+        let streeheight = $("#" + treebody).parent().height() - 30;
         if (streeheight > 0) {
             streeheight = streeheight + "px";
         } else {
@@ -169,7 +167,7 @@ Jtree.prototype.init = function (treebody, setting, param) {
             autoParam: null
         }
     };
-    var action = "TreeSelectAction";
+    let action = "TreeSelectAction";
     // 提取构建树的字段
     this.Jtreeid = param.cell.id;
     this.Jtreename = param.cell.name;
@@ -178,7 +176,7 @@ Jtree.prototype.init = function (treebody, setting, param) {
     this.tableName = param.cell.tableName;
     this.databaseName = param.cell.databaseName;
     this.param = param;
-    var str = "{\"id\":\"" + this.Jtreeid + "\",\"name\":\"" + this.Jtreename
+    let str = "{\"id\":\"" + this.Jtreeid + "\",\"name\":\"" + this.Jtreename
         + "\",\"parent\":\"" + this.Jtreeparent + "\",\"other\":\""
         + this.Jtreeother + "\",\"tableName\":\"" + this.tableName
         + "\",\"databaseName\":\"" + this.databaseName
@@ -198,7 +196,7 @@ Jtree.prototype.init = function (treebody, setting, param) {
     }
     // alert(action);
 
-    var pams = new tlv8.RequestParam();
+    let pams = new tlv8.RequestParam();
     pams.set("params", str);
     pams.set("orderby", param.cell.orderby ? param.cell.orderby : "");
     $("#" + treebody).html(
@@ -230,7 +228,7 @@ Jtree.prototype.init = function (treebody, setting, param) {
 
 // 回调函数集
 function beforeDrag(treeId, treeNodes) {
-    for (var i = 0, l = treeNodes.length; i < l; i++) {
+    for (let i = 0, l = treeNodes.length; i < l; i++) {
         rowid = treeNodes[i].id;
     }
     return true;
@@ -238,8 +236,8 @@ function beforeDrag(treeId, treeNodes) {
 
 function zTreeBeforeDrop(treeId, treeNodes, targetNode, moveType) {
     torowid = targetNode.id;
-    var param = document.getElementById(treeId).param;
-    var pm = new tlv8.RequestParam();
+    let param = document.getElementById(treeId).param;
+    let pm = new tlv8.RequestParam();
     pm.set("result", param.cell.id + "," + param.cell.name + ","
         + param.cell.parent + "," + param.cell.tableName + ","
         + param.cell.databaseName);
@@ -252,8 +250,8 @@ function zTreeBeforeDrop(treeId, treeNodes, targetNode, moveType) {
 
 // 点击删除动作
 function zTreeBeforeRemove(treeId, treeNode) {
-    var param = document.getElementById(treeId).param;
-    var delpm = new tlv8.RequestParam();
+    let param = document.getElementById(treeId).param;
+    let delpm = new tlv8.RequestParam();
     delpm.set("delCount", param.cell.id + "," + param.cell.name + ","
         + param.cell.parent + "," + param.cell.tableName + ","
         + param.cell.databaseName);
@@ -263,8 +261,8 @@ function zTreeBeforeRemove(treeId, treeNode) {
 
 // 点击编辑按钮后的操作
 function zTreeOnRename(event, treeId, treeNode) {
-    var param = document.getElementById(treeId).param;
-    var updatename = new tlv8.RequestParam();
+    let param = document.getElementById(treeId).param;
+    let updatename = new tlv8.RequestParam();
     updatename.set("updCount", param.cell.id + "," + param.cell.name + ","
         + param.cell.tableName + "," + param.cell.databaseName);
     updatename.set("rowid", treeNode.id);
@@ -282,19 +280,19 @@ function zTreeOnRename(event, treeId, treeNode) {
  * @memberOf {TypeName}
  */
 Jtree.prototype.quickPosition = function (text) {
-    if (!text || text == ""){
+    if (!text || text === "") {
         this.refreshJtree();
         return;
     }
-    var qNode = new Array();
+    let qNode = [];
     try {
-        var action = this.setting.isquickPosition.url ? this.setting.isquickPosition.url
+        let action = this.setting.isquickPosition.url ? this.setting.isquickPosition.url
             : "";
-        var path = this.setting.isquickPosition.path ? this.setting.isquickPosition.path
+        let path = this.setting.isquickPosition.path ? this.setting.isquickPosition.path
             : "";
-        var quickCells = this.setting.isquickPosition.quickCells ? this.setting.isquickPosition.quickCells
+        let quickCells = this.setting.isquickPosition.quickCells ? this.setting.isquickPosition.quickCells
             : "";
-        var param = new tlv8.RequestParam();
+        let param = new tlv8.RequestParam();
         // var str = "{\"id\":\"" + this.Jtreeid + "\",\"name\":\"" + this.Jtreename
         // + "\",\"parent\":\"" + this.Jtreeparent + "\",\"other\":\""
         // + this.Jtreeother + "\",\"tableName\":\"" + this.tableName
@@ -304,7 +302,7 @@ Jtree.prototype.quickPosition = function (text) {
         // + "\",\"filter\":\""
         // + (this.param.cell.filter ? this.param.cell.filter : "") + "\"}";
         // param.set("params", str);
-        var quicktext = text;
+        let quicktext = text;
         // var quicktext = this.Jtreeid
         //     + ","
         //     + this.Jtreename
@@ -326,7 +324,7 @@ Jtree.prototype.quickPosition = function (text) {
         // param.set("cloums", this.Jtreeother);
         param.set("path", path);
         action = (action.startWith(cpath) ? action : (cpath + action));
-        var nodes = (this.setting.async.enable) ? (eval(tlv8
+        let nodes = (this.setting.async.enable) ? (eval(tlv8
                 .XMLHttpRequest(action, param, "post", false, null).jsonResult))
             : this.zNodes;
         qNode = nodes;
@@ -334,27 +332,27 @@ Jtree.prototype.quickPosition = function (text) {
             alert("未找到[" + text + "]对应的内容!");
             return;
         }
-        var node = qNode[0];
+        let node = qNode[0];
 
-        var myparentsID = node[path].split("/");
+        let myparentsID = node[path].split("/");
 
         if (myparentsID.length < 1)
             return;
-        if (myparentsID.length == 1) {
-            if (node.id != "") {
-                var snode = this.tree.getNodeByTId(node.id);
+        if (myparentsID.length === 1) {
+            if (node.id !== "") {
+                let snode = this.tree.getNodeByTId(node.id);
                 if (snode && !snode.open)
                     this.tree.expandNode(snode);
                 node = snode;
             }
         } else {
-            for (var i = 0; i < myparentsID.length; i++) {
+            for (let i = 0; i < myparentsID.length; i++) {
                 try {
-                    var nodeid = myparentsID[i].indexOf(".") > 0 ? myparentsID[i]
+                    let nodeid = myparentsID[i].indexOf(".") > 0 ? myparentsID[i]
                             .substring(0, myparentsID[i].indexOf("."))
                         : myparentsID[i];
-                    if (nodeid != "") {
-                        var snode = this.tree.getNodeByTId(nodeid);
+                    if (nodeid !== "") {
+                        let snode = this.tree.getNodeByTId(nodeid);
                         if (!snode.open && i < myparentsID.length - 1)// 不展开最后一个节点
                             this.tree.expandNode(snode);
                         node = snode;
@@ -371,8 +369,8 @@ Jtree.prototype.quickPosition = function (text) {
 
 // 刷新
 Jtree.prototype.refreshJtree = function (panle, afcalback) {
-    var action = this.setting.async.url;
-    var str = "{\"id\":\"" + this.Jtreeid + "\",\"name\":\"" + this.Jtreename
+    let action = this.setting.async.url;
+    let str = "{\"id\":\"" + this.Jtreeid + "\",\"name\":\"" + this.Jtreename
         + "\",\"parent\":\"" + this.Jtreeparent + "\",\"other\":\""
         + this.Jtreeother + "\",\"tableName\":\"" + this.tableName
         + "\",\"databaseName\":\"" + this.databaseName
@@ -380,16 +378,16 @@ Jtree.prototype.refreshJtree = function (panle, afcalback) {
         + (this.param.cell.rootFilter ? this.param.cell.rootFilter : "")
         + "\",\"filter\":\""
         + (this.param.cell.filter ? this.param.cell.filter : "") + "\"}";
-    var pamstens = new tlv8.RequestParam();
+    let pamstens = new tlv8.RequestParam();
     pamstens.set("params", str);
     pamstens.set("orderby", this.param.cell.orderby ? this.param.cell.orderby
         : "");
-    var Jtree_Ext = this;
+    let Jtree_Ext = this;
     action = (action.startWith(cpath) ? action : (cpath + action));
     panle = panle || this.treeId;
     $.fn.zTree.init($("#" + panle), Jtree_Ext.setting, [], Jtree_Ext.param);
-    var afterRefresh = this.setting.callback.afterRefresh;
-    if(afterRefresh && typeof afterRefresh == "function"){
+    let afterRefresh = this.setting.callback.afterRefresh;
+    if (afterRefresh && typeof afterRefresh == "function") {
         afterRefresh(Jtree_Ext)
     }
     // tlv8.XMLHttpRequest(action, pamstens, "post", true, function (data) {
