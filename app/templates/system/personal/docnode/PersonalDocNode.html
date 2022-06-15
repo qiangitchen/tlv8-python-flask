@@ -168,7 +168,25 @@
     }
 
     function shareFile() {
-
+        let url = "/system/dialog/SelectChPsm";
+        tlv8.portal.dailog.openDailog("选择分享的人员", url, 1000, 700, function (data) {
+            if (data) {
+                $.ajax({
+                    url: "/system/personal/docnode/shareFileData",
+                    type: "post",
+                    async: true,
+                    data: {rowid: currentRow.sid, ids: data.id, names: data.name},
+                    dataType: "json",
+                    success: function (re) {
+                        if (re.state === true) {
+                            layui.layer.msg("分享成功！");
+                        } else {
+                            layui.layer.alert("分享失败：" + re.msg);
+                        }
+                    }
+                });
+            }
+        });
     }
 
     function deleteFile() {

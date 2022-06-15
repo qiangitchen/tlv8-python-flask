@@ -2318,6 +2318,27 @@ def psn_doc_delete_file():
     return json.dumps(rdata, ensure_ascii=False)
 
 
+# 个人文件柜-分享文件
+@system.route("/personal/docnode/shareFileData", methods=["GET", "POST"])
+@user_login
+def psn_doc_share_file():
+    rdata = dict()
+    rowid = url_decode(request.form.get('rowid'))
+    ids = url_decode(request.form.get('ids'))
+    names = url_decode(request.form.get('names'))
+    doc = SAPersonalFile.query.filter_by(sid=rowid).first()
+    if doc:
+        doc.saccesscurrentid = ids
+        doc.saccesscurrentname = names
+        db.session.add(doc)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "指定的id错误~"
+    return json.dumps(rdata, ensure_ascii=False)
+
+
 # 个人文件柜-加载文件列表
 @system.route("/personal/docnode/docDataList", methods=["GET", "POST"])
 @user_login
@@ -2328,8 +2349,7 @@ def psn_doc_data_list():
     shared = url_decode(request.args.get('shared'))
     user_id = session['user_id']
     if shared:
-        data_query = SAPersonalFile.query.filter(
-            or_(SAPersonalFile.screatorid == user_id, SAPersonalFile.saccesscurrentid.ilike('%' + user_id + '%')))
+        data_query = SAPersonalFile.query.filter(SAPersonalFile.saccesscurrentid.ilike('%' + user_id + '%'))
     else:
         data_query = SAPersonalFile.query.filter_by(smasterid=folder, screatorid=user_id)
     search_text = url_decode(request.args.get('search_text', ''))

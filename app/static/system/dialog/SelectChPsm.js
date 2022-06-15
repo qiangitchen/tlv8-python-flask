@@ -2,7 +2,7 @@ var currenttreeID = null, currentNode;
 
 /* =========创建树========== */
 
-var param = {
+const param = {
     cell: {
         id: "sid",// 设置构建树的id
         name: "sname",// 树显示的名称
@@ -10,7 +10,7 @@ var param = {
         other: "sfid,sfname,sorgkindid,scode,sfcode"// 树中所带字段信息
     }
 };
-var setting = {
+const setting = {
     view: {
         selectedMulti: false, // 设置是否允许同时选中多个节点。默认值: true
         autoCancelSelected: false,
@@ -52,7 +52,7 @@ function beforeClick(treeId, treeNode) {
     loadList();
 }
 
-var MainJtree = new Jtree();
+let MainJtree = new Jtree();
 
 function pageLoad() {
     MainJtree.init("JtreeView", setting, param);
@@ -64,7 +64,7 @@ function loadList() {
     })
 }
 
-var checkData = new Map();
+let checkData = new Map();
 
 function gridChecked(data, checked) {
     if (checked) {
@@ -85,18 +85,18 @@ function gridChecked(data, checked) {
 
 function gridCheckedAll(checked) {
     if (checked) {
-        var checkStatus = layui.table.checkStatus('psmlist');
-        var data = checkStatus.data;
+        let checkStatus = layui.table.checkStatus('psmlist');
+        let data = checkStatus.data;
         for (let i in data) {
             checkData.put(data[i].sid, data[i].sname);
         }
     } else {
         checkData = new Map();
     }
-    var kset = checkData.keySet();
-    var html = "";
-    for (var i in kset) {
-        var value = checkData.get(kset[i]);
+    let kset = checkData.keySet();
+    let html = "";
+    for (let i in kset) {
+        let value = checkData.get(kset[i]);
         html += "<span id='" + kset[i] + "'><input id='" + kset[i] + "' name='"
             + kset[i] + "' type='checkbox' value='" + value
             + "'  onclick='checkItem()' class='selectedItem'>" + value + "</span>";
@@ -105,7 +105,7 @@ function gridCheckedAll(checked) {
 }
 
 // 删除
-var chid = '';
+let chid = '';
 
 function deleteBills() {
     $("span[id='" + chid + "']").remove();
@@ -126,8 +126,8 @@ function deleteAll() {
 
 // 确定-返回
 function dailogEngin() {
-    var tid = [];
-    var txt = [];
+    let tid = [];
+    let txt = [];
     $(".selectedItem").each(function () {
         tid.push($(this).attr("name"));
         txt.push($(this).attr("value"));
