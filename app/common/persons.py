@@ -14,7 +14,7 @@ from sqlalchemy import or_
 def get_person_info(person_id):
     person_info = dict()
     person_info['personid'] = person_id
-    org = SAOrganization.query.filter_by(spersonid=person_id).first()
+    org = SAOrganization.query.filter_by(spersonid=person_id, svalidstate=1).first()
     person_info['personName'] = org.sname
     person_info['username'] = org.scode
     person_info['personcode'] = org.scode
@@ -35,7 +35,7 @@ def get_person_info(person_id):
     person_info['ognid'] = ognid
     person_info['ogncode'] = ogncode
     person_info['ognname'] = ognname
-    main_org = SAOrganization.query.filter_by(sid=org.sparent).first()
+    main_org = SAOrganization.query.filter_by(sid=org.sparent, svalidstate=1).first()
     person_info['orgid'] = main_org.sid
     person_info['orgcode'] = main_org.scode
     person_info['orgname'] = main_org.sname
@@ -130,11 +130,11 @@ def get_person_list_by_org(orgidss):
     relist = list()
     orgids = orgidss.split(",")
     for orgid in orgids:
-        orgs = SAOrganization.query.filter(
+        orgs = SAOrganization.query.filter_by(svalidstate=1).filter(
             or_(SAOrganization.sid == orgid, SAOrganization.sfid == orgid, SAOrganization.spersonid == orgid)).all()
         for org in orgs:
-            pmo = SAOrganization.query.filter(SAOrganization.sfid.ilike(org.sfid + '%'),
-                                              SAOrganization.sorgkindid == 'psm').all()
+            pmo = SAOrganization.query.filter_by(svalidstate=1).filter(SAOrganization.sfid.ilike(org.sfid + '%'),
+                                                                       SAOrganization.sorgkindid == 'psm').all()
             for pm in pmo:
                 p = get_person_info(pm.spersonid)
                 relist.append(p)
