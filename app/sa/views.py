@@ -12,7 +12,7 @@ from app.sa.forms import LoginForm, ChangePassForm, OrgForm, PersonForm, RoleFor
 from app.sa.forms import ScheduleForm, PersonalDocForm
 from app.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize, SAOnlineInfo
 from app.models import SAFlowDraw, SAFlowFolder, SATask
-from app.models import SADocNode, SADocPath, SASchedule, SAPersonalDocNode, SAPersonalFile
+from app.models import SADocNode, SADocPath, SASchedule, SAPersonalDocNode, SAPersonalFile, SAFlowConclusion
 from app.menus.menuutils import get_process_name, get_process_full, get_function_tree
 from app.menus.menuutils import get_function_ztree
 from app.common.pubstatic import url_decode, create_icon, nul2em, md5_code, guid, get_org_type
@@ -2383,3 +2383,40 @@ def psn_doc_data_list():
 @user_login
 def personal_doc_node_list():
     return render_template("system/personal/docnode/PersonaList.html")
+
+
+# 我的常用意见设置
+@system.route("/personal/flowset/myOpinion", methods=["GET", "POST"])
+@user_login
+def personal_flow_set_op():
+    return render_template("system/personal/flowset/myOpinion/mainActivity.html")
+
+
+# 我的常用意见设置-加载数据列表
+@system.route("/personal/flowset/myOpinion/dataList", methods=["GET", "POST"])
+@user_login
+def personal_flow_set_op_list():
+    rdata = dict()
+    rdata['code'] = 0
+    user_id = session['user_id']
+    data_query = SAFlowConclusion.query.filter_by(screatorid=user_id)
+    search_text = url_decode(request.args.get('search_text', ''))
+    if search_text and search_text != '':
+        data_query = data_query.filter(SAFlowConclusion.sconclusionname.ilike('%' + search_text + '%'))
+    count = data_query.count()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    rdata['count'] = count
+    page_data = data_query.order_by(SAFlowConclusion.sorder.asc()).paginate(page, limit)
+    data = list()
+    for d in page_data.items:
+        row_data = dict()
+        row_data['no'] = d.sorder
+        row_data['sid'] = d.sid
+        row_data['sconclusionname'] = d.sconclusionname
+        row_data['screatorid'] = d.screatorid
+        row_data['screatorname'] = d.screatorname
+        row_data['screatetime'] = datetime.strftime(d.screatetime, '%Y-%m-%d %H:%M:%S')
+        data.append(row_data)
+    rdata['data'] = data
+    return json.dumps(rdata, ensure_ascii=False)

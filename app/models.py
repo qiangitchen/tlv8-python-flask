@@ -300,6 +300,19 @@ class SAPersonalFile(db.Model):
     version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
 
 
+# 常用审批意见
+class SAFlowConclusion(db.Model):
+    __tablename__ = "sa_flowconclusion"
+    __table_args__ = {"useexisting": True}
+    sid = db.Column(db.String(32), primary_key=True, default=guid, doc='主键')
+    sorder = db.Column(db.Integer, nullable=False, default=0, doc='排序')
+    sconclusionname = db.Column(db.String(255), nullable=False, doc='意见')
+    screatorid = db.Column(db.String(32), index=True, doc='创建人id')
+    screatorname = db.Column(db.String(128), doc='创建人')
+    screatetime = db.Column(db.DateTime, default=datetime.now, doc='创建时间')
+    version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
+
+
 # OA-请假
 class OALeave(db.Model):
     __tablename__ = "oa_leave"
