@@ -150,6 +150,33 @@ LOCK TABLES `sa_flowconclusion` WRITE;
 /*!40000 ALTER TABLE `sa_flowconclusion` ENABLE KEYS */;
 UNLOCK TABLES;
 
+
+-- ----------------------------
+-- Table structure for sa_flowrecord
+-- ----------------------------
+
+DROP TABLE IF EXISTS `sa_flowrecord`;
+CREATE TABLE `sa_flowrecord`  (
+  `sid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sbillid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `snodeid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `snodename` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `sagreetext` varchar(2048) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `sopviewid` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `staskid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `sflowid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `screatorid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `screatorname` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `ssign` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `screatetime` datetime NULL DEFAULT NULL,
+  `version` int(11) NOT NULL,
+  PRIMARY KEY (`sid`) USING BTREE,
+  INDEX `ix_sa_flowrecord_sbillid`(`sbillid`) USING BTREE,
+  INDEX `ix_sa_flowrecord_screatorid`(`screatorid`) USING BTREE,
+  INDEX `ix_sa_flowrecord_sopviewid`(`sopviewid`) USING BTREE,
+  INDEX `ix_sa_flowrecord_staskid`(`staskid`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 --
 -- Table structure for table `sa_flowdrawlg`
 --
