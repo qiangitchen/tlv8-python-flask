@@ -32,7 +32,7 @@
     <tr>
         <th lay-data="{field:'sid',hide:true}"></th>
         <th lay-data="{field:'sfileid',hide:true}"></th>
-        <th lay-data="{field:'no',width:60}">序号</th>
+        <th lay-data="{field:'sorder',width:60}">序号</th>
         <th lay-data="{field:'sconclusionname'}">意见</th>
         <th lay-data="{field:'screatorname',width:100}">创建人</th>
         <th lay-data="{field:'screatetime', width:160}">创建时间</th>
@@ -40,6 +40,33 @@
     </tr>
     </thead>
 </table>
+<div id="editView" style="display:none;padding-right: 20px; padding-top: 20px;">
+    <form class="layui-form" action="" id="maindataform">
+        <div class="layui-form-item">
+            <label class="layui-form-label">序号</label>
+            <div class="layui-input-block">
+                {{ form.sorder }}
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">意见</label>
+            <div class="layui-input-block">
+                {{ form.sconclusionname }}
+            </div>
+        </div>
+        <div style="display: none">
+            {{ form.sid }}
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                {{ form.csrf_token }}
+                {{ form.submit }}
+                <button type="reset" class="layui-btn layui-btn-primary" style="display: none">重置</button>
+                <button type="button" class="layui-btn layui-btn-primary" onclick="layui.layer.closeAll()">取消</button>
+            </div>
+        </div>
+    </form>
+</div>
 </body>
 <script type="text/javascript">
     let currentRow = {};
@@ -72,7 +99,7 @@
     });
 
     //监听行工具事件
-    layui.table.on('tool(role_list)', function (obj) {
+    layui.table.on('tool(datalist)', function (obj) {
         //console.log(obj)
         let data = obj.data;
         if (obj.event === 'edit') {
@@ -85,15 +112,66 @@
 
 
     function addData() {
-
+        J$("maindataform").reset();
+        layui.layer.open({
+            title: '添加',
+            type: 1,
+            area: ['400px', '300px'],
+            content: $('#editView')
+        });
     }
 
     function editData(data) {
-
+        $("#sorder").val(data.sorder);
+        $("#sconclusionname").val(data.sconclusionname);
+        $("#sid").val(data.sid);
+        layui.layer.open({
+            title: '编辑',
+            type: 1,
+            area: ['400px', '300px'],
+            content: $('#editView')
+        });
     }
 
     function delData(data) {
-
+        layui.layer.confirm("文件删除后不能恢复，确认删除吗？", function () {
+            $.ajax({
+                url: "/system/personal/flowset/myOpinion/deleteData",
+                type: "post",
+                async: true,
+                data: {rowid: data.sid},
+                dataType: "json",
+                success: function (re) {
+                    if (re.state === true) {
+                        layui.layer.msg("删除成功！");
+                        doQuery();
+                    } else {
+                        layui.layer.alert("删除失败：" + re.msg);
+                    }
+                }
+            });
+        });
     }
+
+    layui.form.on('submit(mainform)', function (data) {
+        //console.log(data.field)
+        $.ajax({
+            url: "/system/personal/flowset/myOpinion",
+            type: "post",
+            async: false,
+            data: data.field,
+            dataType: "json",
+            success: function (re) {
+                if (re.state === true) {
+                    layui.layer.closeAll();
+                    layui.layer.msg("保存成功！")
+                    doQuery();
+                } else {
+                    layui.layer.alert("保存失败：" + re.msg);
+                }
+            }
+        });
+        return false;
+    });
 </script>
 </html>

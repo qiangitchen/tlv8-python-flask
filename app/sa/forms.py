@@ -533,3 +533,40 @@ class PersonalDocForm(FlaskForm):
             "lay-filter": "mainform"
         }
     )
+
+
+# 审批意见设置表单
+class FlowConclusionForm(FlaskForm):
+    sid = StringField(
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    sorder = StringField(
+        label="序号",
+        render_kw={
+            "class": "layui-input",
+            "type": "number",
+            "lay-verify": "required",
+            "placeholder": "请输入数字"
+        }
+    )
+
+    sconclusionname = TextAreaField(
+        description="意见",
+        render_kw={
+            "lay-verify": "required",
+            "class": "layui-textarea",
+            "placeholder": "请输入意见内容"
+        }
+    )
+
+    submit = SubmitField(
+        '提交保存',
+        render_kw={
+            "class": "layui-btn",
+            "lay-submit": "",
+            "lay-filter": "mainform"
+        }
+    )

@@ -9,7 +9,7 @@ from sqlalchemy import or_
 from datetime import datetime
 from app import db
 from app.sa.forms import LoginForm, ChangePassForm, OrgForm, PersonForm, RoleForm, DocNodeForm, UpLoadForm
-from app.sa.forms import ScheduleForm, PersonalDocForm
+from app.sa.forms import ScheduleForm, PersonalDocForm, FlowConclusionForm
 from app.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize, SAOnlineInfo
 from app.models import SAFlowDraw, SAFlowFolder, SATask
 from app.models import SADocNode, SADocPath, SASchedule, SAPersonalDocNode, SAPersonalFile, SAFlowConclusion
@@ -2389,7 +2389,25 @@ def personal_doc_node_list():
 @system.route("/personal/flowset/myOpinion", methods=["GET", "POST"])
 @user_login
 def personal_flow_set_op():
-    return render_template("system/personal/flowset/myOpinion/mainActivity.html")
+    form = FlowConclusionForm()
+    if form.is_submitted():
+        rdata = dict()
+        data = form.data
+        conclusion = SAFlowConclusion.query.filter_by(sid=data['sid']).first()
+        if not conclusion:
+            conclusion = SAFlowConclusion()
+            person = get_curr_person_info()
+            conclusion.screatorid = person['personid']
+            conclusion.screatorname = person['personName']
+        else:
+            conclusion.version = conclusion.version + 1
+        conclusion.sorder = int(data['sorder'])
+        conclusion.sconclusionname = data['sconclusionname']
+        db.session.add(conclusion)
+        db.session.commit()
+        rdata['state'] = True
+        return json.dumps(rdata, ensure_ascii=False)
+    return render_template("system/personal/flowset/myOpinion/mainActivity.html", form=form)
 
 
 # 我的常用意见设置-加载数据列表
@@ -2411,7 +2429,7 @@ def personal_flow_set_op_list():
     data = list()
     for d in page_data.items:
         row_data = dict()
-        row_data['no'] = d.sorder
+        row_data['sorder'] = d.sorder
         row_data['sid'] = d.sid
         row_data['sconclusionname'] = d.sconclusionname
         row_data['screatorid'] = d.screatorid
@@ -2419,4 +2437,21 @@ def personal_flow_set_op_list():
         row_data['screatetime'] = datetime.strftime(d.screatetime, '%Y-%m-%d %H:%M:%S')
         data.append(row_data)
     rdata['data'] = data
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 我的常用意见设置-删除文件数据
+@system.route("/personal/flowset/myOpinion/deleteData", methods=["GET", "POST"])
+@user_login
+def personal_flow_del_op():
+    rdata = dict()
+    rowid = url_decode(request.form.get('rowid'))
+    data = SAFlowConclusion.query.filter_by(sid=rowid).first()
+    if data:
+        db.session.delete(data)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "指定的id错误~"
     return json.dumps(rdata, ensure_ascii=False)
