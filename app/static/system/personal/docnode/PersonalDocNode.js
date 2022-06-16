@@ -47,11 +47,13 @@ function treeselected(event, treeId, treeNode) {
     treeRowid = treeNode.id;
     parentid = treeNode.parent;
     if (uploadInst) {
-        uploadInst.reload({});
+        uploadInst.reload({
+            url: '/system/doc/docCenter/uploadFile?t=' + new Date().getTime()
+        });
     } else {
         uploadInst = layui.upload.render({
             elem: '#upbtn'
-            , url: '/system/doc/docCenter/uploadFile'
+            , url: '/system/doc/docCenter/uploadFile?t=' + new Date().getTime()
             , data: {docPath: "/root/个人文件柜" + tlv8.Context.getCurrentPersonFName()}
             , accept: 'file'
             , multiple: false
@@ -67,6 +69,9 @@ function treeselected(event, treeId, treeNode) {
                 } else {
                     layui.layer.alert("上传失败！");
                 }
+            }
+            , error: function () {
+                layui.layer.closeAll('loading');
             }
         });
     }

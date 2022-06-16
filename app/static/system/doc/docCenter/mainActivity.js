@@ -78,7 +78,7 @@ function treeselected(event, treeId, node) {
     if (!uploadInst) {
         uploadInst = layui.upload.render({
             elem: '#upbtn'
-            , url: '/system/doc/docCenter/uploadFile'
+            , url: '/system/doc/docCenter/uploadFile?t=' + new Date().getTime()
             , data: {folder: currenttreeID}
             , accept: 'file'
             , multiple: true
@@ -95,9 +95,15 @@ function treeselected(event, treeId, node) {
                     layui.layer.alert("上传失败！");
                 }
             }
+            , error: function () {
+                layui.layer.closeAll('loading');
+            }
         });
     } else {
-        uploadInst.reload({data: {folder: currenttreeID}});
+        uploadInst.reload({
+            url: '/system/doc/docCenter/uploadFile?t=' + new Date().getTime(),
+            data: {folder: currenttreeID}
+        });
     }
 
     doQuery();

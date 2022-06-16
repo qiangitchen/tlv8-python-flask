@@ -2992,7 +2992,7 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
     this.buildUploader = function () {
         layui.upload.render({
             elem: '#' + upload_btn
-            , url: '/system/doc/docCenter/uploadFile'
+            , url: '/system/doc/docCenter/uploadFile?t=' + new Date().getTime()
             , data: {docPath: docPath || "/root", tablename: data.table, cellname: cellname, rowid: data.rowid}
             , accept: accept || 'file'
             , multiple: (limit && limit > 1)
@@ -3021,6 +3021,9 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
                 } else {
                     layui.layer.alert("上传失败！");
                 }
+            }
+            , error: function () {
+                layui.layer.closeAll('loading');
             }
         });
     };
