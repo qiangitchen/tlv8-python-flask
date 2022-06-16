@@ -164,17 +164,17 @@ def flow_send_notes(flowID, taskID, sdata1, noteActivity):
         if not activitylabel:
             processName = act.getActivityname() + ":" + act.getProcessName()
         else:
-            activitylabel = activitylabel.replace("getProcessID()", flowID);
-            activitylabel = activitylabel.replace("getTaskID()", taskID);
-            activitylabel = activitylabel.replace("getProcesssData1()", sdata1);
+            activitylabel = activitylabel.replace("getProcessID()", flowID)
+            activitylabel = activitylabel.replace("getTaskID()", taskID)
+            activitylabel = activitylabel.replace("getProcesssData1()", sdata1)
             processName = eval(activitylabel)
         excutorids = act.getExcutorIDs()
         if not excutorids or excutorids == "":
             exp_executors = act.getExcutorGroup()
             if exp_executors and exp_executors != "":
-                exp_executors = exp_executors.replace("getProcessID()", flowID);
-                exp_executors = exp_executors.replace("getTaskID()", taskID);
-                exp_executors = exp_executors.replace("getProcesssData1()", sdata1);
+                exp_executors = exp_executors.replace("getProcessID()", flowID)
+                exp_executors = exp_executors.replace("getTaskID()", taskID)
+                exp_executors = exp_executors.replace("getProcesssData1()", sdata1)
                 excutorids = eval(exp_executors)
             else:
                 excutorids = get_org_unit_has_activity(processID, noteActivity, True, False)
@@ -222,6 +222,7 @@ def flow_back(processID, processName, Activity, flowID, taskID, sData1, ePersonL
     nprocessName = act.getActivityname()  # 任务标题
     processName = nprocessName + "←回退-" + processName
     person = get_curr_person_info()
+    newtaskID = None
     for eperson in ePersonList:
         newtaskID = guid()
         task = SATask(sid=newtaskID, sparentid=taskID, sflowid=flowID,
@@ -255,6 +256,7 @@ def flow_back(processID, processName, Activity, flowID, taskID, sData1, ePersonL
 # 流程转发
 def flow_forward(task, ePersonList):
     person = get_curr_person_info()
+    newtaskID = None
     for eperson in ePersonList:
         newtaskID = guid()
         n_task = SATask(

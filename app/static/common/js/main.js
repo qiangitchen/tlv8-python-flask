@@ -3328,7 +3328,7 @@ tlv8.writeOpinion = function (view) {
     let taptt = tlv8.RequestURLParam.getParam("activity-pattern");
     let isTasksub = (taptt === "detail");
     if (isTasksub) {
-        alert("已办任务不能再填写意见!");
+        layui.layer.alert("已办任务不能再填写意见!");
         return;
     }
     let sData1 = tlv8.RequestURLParam.getParam("sData1");
@@ -3498,7 +3498,7 @@ function DateDiff(startDate, endDate) {
                 type: opts.method,
                 async: false,
                 url: opts.url,
-                success: function (result, textStatus) {
+                success: function (result) {
                     optiondata = result;
                     if (opts.onLoadSuccess && typeof opts.onLoadSuccess == "function") {
                         opts.onLoadSuccess(optiondata);

@@ -221,8 +221,8 @@ def flow_get_executor_tree():
     exGroup = url_decode(request.form.get('exGroup', ''))
     excutorIDs = url_decode(request.form.get('excutorIDs', ''))
     # isflowMonitor = url_decode(request.form.get('isflowMonitor')) #流程监控调用-可能需要特殊处理
-    sql = ("select distinct a.sparent,a.sid,a.scode,a.sname,a.sfid,a.sorgkindid,a.ssequence,a.slevel from "
-           " sa_oporg a inner join (select sfid from sa_oporg where svalidstate=1 ")
+    sql = ("select distinct a.sparent,a.sid,a.scode,a.sname,a.sfid,a.sorgkindid,a.ssequence,a.slevel from  sa_oporg ")
+    sql += " a inner join (select sfid from sa_oporg where svalidstate=1"
     if exGroup and exGroup != "":
         sql += " and (1=2 "
         for sid in exGroup.split(","):
