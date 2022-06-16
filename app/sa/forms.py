@@ -570,3 +570,61 @@ class FlowConclusionForm(FlaskForm):
             "lay-filter": "mainform"
         }
     )
+
+
+# 流程审批意见表单
+class FlowRecordForm(FlaskForm):
+    sid = StringField(
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    sbillid = StringField(
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    sopviewid = StringField(
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    staskid = StringField(
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    sflowid = StringField(
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    ssign = StringField(
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    sagreetext = TextAreaField(
+        description="意见",
+        render_kw={
+            "lay-verify": "required",
+            "class": "layui-textarea",
+            "placeholder": "请输入意见内容",
+            "style": "width:100%;height:100%"
+        }
+    )
+
+    submit = SubmitField(
+        '提交保存',
+        render_kw={
+            "class": "layui-btn",
+            "lay-submit": "",
+            "lay-filter": "mainform"
+        }
+    )

@@ -104,6 +104,13 @@
                 </form>
             </div>
         </div>
+        <div class="layui-card">
+            <div class="layui-card-header">
+                审批信息&nbsp;<button class="layui-btn" onclick="tlv8.writeOpinion('flowOption')">填写审批意见</button>
+            </div>
+            <div class="layui-card-body" id="flowOption">
+            </div>
+        </div>
     </div>
     <script type="text/javascript">
         //工具条
@@ -147,6 +154,7 @@
                 //这里做数据加载
                 MainData.setRowId(rowid);
                 MainData.refreshData(true, false);
+                tlv8.loadOption("flowOption", rowid);//加载审批意见
             } else {
                 initPsData();
             }

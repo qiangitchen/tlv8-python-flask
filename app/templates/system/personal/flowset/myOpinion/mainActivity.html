@@ -74,7 +74,6 @@
     function doQuery() {
         let search_text = $("#query_text").val();
         let surl = '/system/personal/flowset/myOpinion/dataList?search_text=' + J_u_encode(search_text);
-        surl += "&shared=true";
         currentRow = {};
         layui.table.reload('datalist', {
             url: surl,

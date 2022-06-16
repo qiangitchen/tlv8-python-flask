@@ -1,0 +1,82 @@
+<html lang="zh_CN">
+{% include "common/tab_page_head.html" %}
+<script type="text/javascript" src="{{ url_for('static',filename="system/flow/flowDialog/processAudit.js") }}"></script>
+<body onload="pageInit()" style="width: 100%; height: 100%; overflow: hidden;">
+<div class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'west',title:'常用意见&nbsp;<a style=\'color:blue;\' href=\'javascript:managemyop();\'>管理</a>',split:true"
+         style="width: 360px;">
+        <div id="selectListView" style="width: 100%;height: 100%; overflow: auto;">
+        </div>
+    </div>
+    <div data-options="region:'center',title:'当前意见'" style="overflow: hidden;">
+        <!--
+        <textarea id="opinionData" style="width:100%;height: 100%;border:0px none;"></textarea>
+         -->
+        <div class="easyui-layout" fit="true">
+            <div data-options="region:'west',split:false,border:false" style="width: 70px;">
+                <table style="height:100%;">
+                    <!--
+                    <tr>
+                        <td valign="bottom">
+                            <a href="javascript:void(0)" class="easyui-linkbutton">选择</a>
+                        </td>
+                    </tr>
+                     -->
+                    <tr>
+                        <td valign="middle">
+                            <button href="javascript:void(0)" class="easyui-linkbutton" onclick="clearData()"
+                                    style="width:60px; height:25px;">清空
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div data-options="region:'center',border:true">
+                <div class="easyui-layout" fit="true">
+                    <form class="layui-form">
+                        <div data-options="region:'center',border:false" style="overflow: hidden;">
+                            {{ form.sagreetext }}
+                        </div>
+                        <div style="display: none;">
+                            {{ form.sid(value=nul2em(model.sid)) }}
+                            {{ form.sbillid(value=nul2em(model.sbillid)) }}
+                            {{ form.staskid(value=nul2em(model.staskid)) }}
+                            {{ form.sflowid(value=nul2em(model.sflowid)) }}
+                            {{ form.ssign(value=nul2em(model.ssign)) }}
+                            {{ form.sopviewid(value=nul2em(model.sopviewid)) }}
+                            {{ form.csrf_token }}
+                            {{ form.submit }}
+                        </div>
+                    </form>
+                    <div data-options="region:'south',split:false,border:false" style="height: 30px;">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" onclick="saveDatatoMyOp()">保存为常用</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    layui.form.on('submit(mainform)', function (data) {
+        //console.log(data.field)
+        $.ajax({
+            url: "/system/flow/flowDialog/processAudit",
+            type: "post",
+            async: false,
+            data: data.field,
+            dataType: "json",
+            success: function (re) {
+                if (re.state === true) {
+                    layui.layer.closeAll();
+                    layui.layer.msg("保存成功！")
+                    tlv8.portal.dailog.dailogEngin(true);
+                } else {
+                    layui.layer.alert("保存失败：" + re.msg);
+                }
+            }
+        });
+        return false;
+    });
+</script>
+</html>

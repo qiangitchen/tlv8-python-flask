@@ -313,6 +313,25 @@ class SAFlowConclusion(db.Model):
     version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
 
 
+# 审批意见记录
+class SAFlowRecord(db.Model):
+    __tablename__ = "sa_flowrecord"
+    __table_args__ = {"useexisting": True}
+    sid = db.Column(db.String(32), primary_key=True, default=guid, doc='主键')
+    sbillid = db.Column(db.String(32), index=True, doc='业务id')
+    snodeid = db.Column(db.String(255), doc='环节标识')
+    snodename = db.Column(db.String(255), doc='环节名称')
+    sagreetext = db.Column(db.String(2048), doc='审批意见')
+    sopviewid = db.Column(db.String(100), index=True, doc='显示位置的div id')
+    staskid = db.Column(db.String(32), index=True, doc='任务id')
+    sflowid = db.Column(db.String(32), doc='流程id')
+    screatorid = db.Column(db.String(32), index=True, doc='创建人id')
+    screatorname = db.Column(db.String(128), doc='审批人姓名')
+    ssign = db.Column(db.Text, doc='审批人签名')
+    screatetime = db.Column(db.DateTime, default=datetime.now, doc='创建时间')
+    version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
+
+
 # OA-请假
 class OALeave(db.Model):
     __tablename__ = "oa_leave"

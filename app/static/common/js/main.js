@@ -976,7 +976,7 @@ tlv8.Data = function () {
             isEdited = false;
             return true;
         } else {
-            layui.layer.confirm("确定删除数据吗?", function (index) {
+            layui.layer.confirm("确定删除数据吗?", function () {
                 layui.layer.closeAll();
                 tlv8.DeleteAction(self.deleteAction, "post", function (r) {
                     if (r.state === true) {
@@ -1321,39 +1321,39 @@ tlv8.toolbar = function (div, insertitem, saveitem, deleteitem, refreshitem) {
     if (!checkPathisHave($dpcsspath + "toolbar.css"))
         createStyleSheet($dpcsspath + "toolbar.css");
     div.style.overflow = "hidden";
-    div.innerHTML = "<table class='standard_toolbar' border='0' id='toolbar'><tr>"
-        + "<td width='75px' align='left' id='"
+    div.innerHTML = "<table class='standard_toolbar' id='toolbar'><tr>"
+        + "<td id='"
         + div.id
         + "insert-item-tr'><button class='btn btn-default btn-sm' style='float:left;margin-right:5px;' id='"
         + div.id
-        + "insert-item' title='新增'><span class='glyphicon'><img id='"
+        + "insert-item' title='新增'><span class='glyphicon'><img alt='' id='"
         + div.id
         + "insert-item-img'  src='"
         + $dpimgpath
         + "toolbar/insert.gif' style='height:20px;margin-top:-2px;'/></span></button></td>"
-        + "<td width='75px' align='left' id='"
+        + "<td id='"
         + div.id
         + "save-item-tr'><button class='btn btn-default btn-sm' style='float:left;margin-right:5px;' id='"
         + div.id
-        + "save-item' title='保存'><span class='glyphicon'><img id='"
+        + "save-item' title='保存'><span class='glyphicon'><img alt='' id='"
         + div.id
         + "save-item-img'  src='"
         + $dpimgpath
         + "toolbar/save.gif' style='height:20px;margin-top:-2px;'/></span></button></td>"
-        + "<td width='75px' align='left' id='"
+        + "<td id='"
         + div.id
         + "delete-item-tr'><button class='btn btn-default btn-sm' style='float:left;margin-right:5px;' id='"
         + div.id
-        + "delete-item' title='删除'><span class='glyphicon'><img id='"
+        + "delete-item' title='删除'><span class='glyphicon'><img alt='' id='"
         + div.id
         + "delete-item-img'  src='"
         + $dpimgpath
         + "toolbar/remove.gif' style='height:20px;margin-top:-2px;'/></span></button></td>"
-        + "<td width='75px' align='left' id='"
+        + "<td id='"
         + div.id
         + "refresh-item-tr'><button class='btn btn-default btn-sm' style='float:left;margin-right:5px;' id='"
         + div.id
-        + "refresh-item' title='刷新'><span class='glyphicon'><img id='"
+        + "refresh-item' title='刷新'><span class='glyphicon'><img alt='' id='"
         + div.id
         + "refresh-item-img' src='"
         + $dpimgpath
@@ -1378,47 +1378,47 @@ tlv8.exportbar = function (div, expid, canprint, isword, isexcel, ispdf) {
     if (!checkPathisHave($commonpath + "print/print.js"))
         createJSSheet($commonpath + "print/print.js");
     div.style.overflow = "hidden";
-    let Stander = "<table style='text-align:left;' class='standard_toolbar' border='0' id='"
+    let Stander = "<table style='text-align:left;' class='standard_toolbar' id='"
         + div.id + "exportbar'><tr>";
     if (canprint) {
-        Stander += "<td width='70px' align='left' id='"
+        Stander += "<td style='width:70px;' id='"
             + div.id
             + "print-item-tr'><a href='javascript:void(0)' id='"
             + div.id
-            + "print-item' class='toobar_item' title='打印' style='height:25px; line-height: 25px; color:#000; font-size:10px;'><img id='"
+            + "print-item' class='toobar_item' title='打印' style='height:25px; line-height: 25px; color:#000; font-size:10px;'><img alt='' id='"
             + div.id
             + "print-item-img' style='float: left;' src='"
             + $dpimgpath
             + "toolbar/standard_toolbar/standard/print.gif'/><SPAN style='float: left;'>打印</SPAN></a></td>";
     }
     if (isword) {
-        Stander += "<td width='128px' align='left' id='"
+        Stander += "<td style='width:128px;' id='"
             + div.id
             + "word-item-tr'><a href='javascript:void(0)' id='"
             + div.id
-            + "word-item' class='toobar_item' title='导出为Word文件' style='height:25px; line-height: 25px; color:#000; font-size:10px;'><img id='"
+            + "word-item' class='toobar_item' title='导出为Word文件' style='height:25px; line-height: 25px; color:#000; font-size:10px;'><img alt='' id='"
             + div.id
             + "word-item-img' style='float: left;' src='"
             + $dpimgpath
             + "toolbar/exp_doc.bmp'/><SPAN style='float: left;'>导出为Word文件</SPAN></a></td>";
     }
     if (isexcel) {
-        Stander += "<td width='125px' align='left' id='"
+        Stander += "<td style='width:125px;' id='"
             + div.id
             + "excel-item-tr'><a href='javascript:void(0)' id='"
             + div.id
-            + "excel-item' class='toobar_item' title='导出为Excel文件' style='height:25px; line-height: 25px; color:#000; font-size:10px;'><img id='"
+            + "excel-item' class='toobar_item' title='导出为Excel文件' style='height:25px; line-height: 25px; color:#000; font-size:10px;'><img alt='' id='"
             + div.id
             + "excel-item-img' style='float: left;' src='"
             + $dpimgpath
             + "toolbar/exp_xls.bmp'/><SPAN style='float: left;'>导出为Excel文件</SPAN></a></td>";
     }
     if (ispdf) {
-        Stander += "<td width='118px' align='left' id='"
+        Stander += "<td style='width:118px;' id='"
             + div.id
             + "pdf-item-tr'><a href='javascript:void(0)' id='"
             + div.id
-            + "pdf-item' class='toobar_item' title='导出为PDF文件' style='height:25px; line-height: 25px; color:#000; font-size:10px;'><img id='"
+            + "pdf-item' class='toobar_item' title='导出为PDF文件' style='height:25px; line-height: 25px; color:#000; font-size:10px;'><img alt='' id='"
             + div.id
             + "pdf-item-img' style='float: left;' src='"
             + $dpimgpath
@@ -1444,7 +1444,7 @@ tlv8.exportbar = function (div, expid, canprint, isword, isexcel, ispdf) {
         let tableToPrint = $("#" + expid).clone();
         // tableToPrint.css("width", "100%");
         let phtml = $("<div></div>").append(tableToPrint).html();
-        let pwdoc = "<html lang='zh'><head>" + div.getHead() + "</head><body>" + phtml + "</body></html>";
+        let pwdoc = "<html lang='zh'><head><title></title>" + div.getHead() + "</head><body>" + phtml + "</body></html>";
         // console.log(pwdoc);
         let windowAttr = "location=yes,statusbar=no,directories=no,menubar=no,titlebar=no,toolbar=no,dependent=no";
         let newWin = window.open("", "_blank", windowAttr);
@@ -2237,16 +2237,19 @@ String.prototype.rtrim = function () {
 String.prototype.startWith = function (str) {
     return this.indexOf(str) === 0;
 };
-const reMoveStr = function (str1, str2) {
+
+function reMoveStr(str1, str2) {
     if (str1.indexOf(str2) > -1)
         str1 = str1.replace(str2, "");
     return str1;
-};
-const replaceFirst = function (str, p, m) {
+}
+
+function replaceFirst(str, p, m) {
     if (str.indexOf(p) === 0)
         str = str.replace(p, m);
     return str;
-};
+}
+
 /**
  * @name replaceFirst
  * @param p {string}
@@ -3253,7 +3256,7 @@ tlv8.isIE = function () { // ie?
  * @param msg
  *            提示信息
  */
-tlv8.showModelState = function (state, msg) {
+tlv8.showModelState = function (state) {
     if (state && state === true) {
         tlv8.loadindex = layui.layer.load(2);
     } else {
@@ -3311,13 +3314,13 @@ function getNevType() {
 }
 
 function getIEVersion() {
-    if (navigator.appVersion.match(/6./i) === "6.") {
+    if (navigator.appVersion.match(/6./i) == "6.") {
         return "IE6";
-    } else if (navigator.appVersion.match(/7./i) === "7.") {
+    } else if (navigator.appVersion.match(/7./i) == "7.") {
         return "IE7";
-    } else if (navigator.appVersion.match(/8./i) === "8.") {
+    } else if (navigator.appVersion.match(/8./i) == "8.") {
         return "IE8";
-    } else if (navigator.appVersion.match(/9./i) === "9.") {
+    } else if (navigator.appVersion.match(/9./i) == "9.") {
         return "IE9";
     }
     return "Other";
@@ -3334,7 +3337,7 @@ tlv8.writeOpinion = function (view) {
     let sData1 = tlv8.RequestURLParam.getParam("sData1");
     let flowID = tlv8.RequestURLParam.getParam("flowID");
     let taskID = tlv8.RequestURLParam.getParam("taskID");
-    let url = "/flw/flwcommo/flowDialog/processAudit.html";
+    let url = "/system/flow/flowDialog/processAudit";
     url += "?flowID=" + flowID;
     url += "&taskID=" + taskID;
     url += "&sData1=" + sData1;
@@ -3350,42 +3353,24 @@ tlv8.loadOption = function (viewID, sData1) {
     let param = new tlv8.RequestParam();
     param.set("fbillID", sData1);
     param.set("fopviewID", viewID);
-    let re = tlv8.XMLHttpRequest("LoadAuditOpinionAction", param, "POST", false);
-    let redata = re.data.data;
-    try {
-        redata = window.eval("(" + redata + ")");
-    } catch (e) {
-    }
+    let re = tlv8.XMLHttpRequest("/system/flow/LoadAuditOpinion", param, "POST", false);
+    let redata = re.data;
     let viewHTml = "<ul style='width:100%;font-size:14px;display: block;overflow:hidden;'>";
     for (let i = 0; i < redata.length; i++) {
-        let opinion = redata[i].FAGREETEXT;
-        let writeDate = redata[i].FCREATETIME;
-        let personid = redata[i].FCREATEPERID;
-        let personname = redata[i].FCREATEPERNAME;
-        let psign = redata[i].FSIGN;
+        let opinion = redata[i].sagreetext;
+        let writeDate = redata[i].screatetime;
+        //let personid = redata[i].screatorid;
+        let personname = redata[i].screatorname;
+        let psign = redata[i].ssign;
         if (writeDate && writeDate !== "") {
             writeDate = tlv8.System.Date.strToDate(writeDate);
             writeDate = writeDate.format("yyyy-MM-dd HH:mm");
         }
         let hdws = viewID + "_handwrite";
         if (psign && psign !== "") {
-            writpsm = '<img src="data:image/png;base64,' + psign + '" style="height:30px;">&nbsp;&nbsp;';
+            writpsm = '<img src="data:image/png;base64,' + psign + '" style="height:30px;" alt="">&nbsp;&nbsp;';
         } else {
-            let param1 = new tlv8.RequestParam();
-            param1.set("personid", personid);
-            let pcre = tlv8.XMLHttpRequest("LoadAuditOpinionAction", param1, "POST", false);
-            let picID = "";
-            if (pcre.data.length > 0) {
-                picID = pcre.data[0].SID;
-            }
-            let url = cpath + "/common/picCompact/Pic-read?dbkey=sa"
-                + "&tablename=sa_handwr_signature&cellname=shspic&fID=" + picID
-                + "&Temp=" + new UUID().toString();
-            let image = "<img src='" + url + "' style='width:100px;;height:30px;'></img>";
-            let writpsm = personname;
-            if (picID && picID !== "") {
-                writpsm = image;
-            }
+            writpsm = personname;
         }
         viewHTml += "<li style='margin-bottom:10px;width:100%;float:left;'>";
         viewHTml += "<ul style='width:100%;display: block;overflow:hidden;'>";

@@ -9,9 +9,9 @@ from sqlalchemy import or_
 from datetime import datetime
 from app import db
 from app.sa.forms import LoginForm, ChangePassForm, OrgForm, PersonForm, RoleForm, DocNodeForm, UpLoadForm
-from app.sa.forms import ScheduleForm, PersonalDocForm, FlowConclusionForm
+from app.sa.forms import ScheduleForm, PersonalDocForm, FlowConclusionForm, FlowRecordForm
 from app.models import SAOrganization, SAPerson, SALogs, SARole, SAPermission, SAAuthorize, SAOnlineInfo
-from app.models import SAFlowDraw, SAFlowFolder, SATask
+from app.models import SAFlowDraw, SAFlowFolder, SATask, SAFlowRecord
 from app.models import SADocNode, SADocPath, SASchedule, SAPersonalDocNode, SAPersonalFile, SAFlowConclusion
 from app.menus.menuutils import get_process_name, get_process_full, get_function_tree
 from app.menus.menuutils import get_function_ztree
@@ -22,6 +22,7 @@ from app.sa.onlineutils import set_online, clear_online
 from app.sa.orgutils import can_move_to, up_child_org_path
 from app.flow.expressions import get_expression_tree
 from app.flow.flowcontroller import seach_process_id
+from app.flow.flowentity import FlowActivity
 from app.sa.docutils import get_doc_folder_by_path
 from mimetypes import MimeTypes
 import json
@@ -1475,6 +1476,75 @@ def wait_task_view():
 @user_login
 def select_executor():
     return render_template("system/flow/flowDialog/Select_executor.html")
+
+
+# 流程执行-填写审批意见
+@system.route("/flow/flowDialog/processAudit", methods=["GET", "POST"])
+@user_login
+def select_process_audit():
+    form = FlowRecordForm()
+    if form.is_submitted():
+        rdata = dict()
+        data = form.data
+        person = get_curr_person_info()
+        record = SAFlowRecord.query.filter_by(sid=data['sid']).first()
+        if not record:
+            record = SAFlowRecord()
+        record.screatorid = person['personid']
+        record.screatorname = person['personName']
+        record.sbillid = data['sbillid']
+        record.staskid = data['staskid']
+        record.sflowid = data['sflowid']
+        record.sopviewid = data['sopviewid']
+        record.sagreetext = data['sagreetext']
+        record.ssign = data['ssign']
+        ctask = SATask.query.filter(SATask.sid == data['staskid'], SATask.sflowid == data['sflowid']).first()
+        if ctask:
+            processID = ctask.sprocess
+            Activity = ctask.sactivity
+            if not Activity:
+                Activity = 'start'
+            flwA = FlowActivity(processID, Activity)
+            record.snodeid = flwA.getActivity()
+            record.snodename = flwA.getActivityname()
+        db.session.add(record)
+        db.session.commit()
+        rdata['state'] = True
+        return json.dumps(rdata, ensure_ascii=False)
+    sData1 = request.args.get('sData1')
+    flowID = request.args.get('flowID')
+    taskID = request.args.get('taskID')
+    opviewID = request.args.get('opviewID')
+    user_id = session['user_id']
+    model = SAFlowRecord.query.filter_by(sbillid=sData1, staskid=taskID, screatorid=user_id).first()
+    if not model:
+        model = SAFlowRecord(sbillid=sData1, staskid=taskID, sflowid=flowID, sopviewid=opviewID, screatorid=user_id)
+    if model.sagreetext:
+        form.sagreetext.data = model.sagreetext
+    return render_template("system/flow/flowDialog/processAudit.html", form=form, model=model, nul2em=nul2em)
+
+
+# 流程执行-加载审批意见
+@system.route("/flow/LoadAuditOpinion", methods=["GET", "POST"])
+@user_login
+def load_audit_opinion():
+    rdata = dict()
+    fbillID = request.form.get('fbillID')
+    fopviewID = request.form.get('fopviewID')
+    record_list = SAFlowRecord.query.filter_by(sbillid=fbillID, sopviewid=fopviewID).order_by(
+        SAFlowRecord.screatetime).all()
+    data_list = list()
+    for d in record_list:
+        data_list.append({
+            'sagreetext': d.sagreetext,
+            'screatetime': datetime.strftime(d.screatetime, "%Y-%m-%d %H:%M:%S"),
+            'screatorid': d.screatorid,
+            'screatorname': d.screatorname,
+            'ssign': nul2em(d.ssign)
+        })
+    rdata['data'] = data_list
+    rdata['state'] = True
+    return json.dumps(rdata, ensure_ascii=False)
 
 
 # 任务中心
