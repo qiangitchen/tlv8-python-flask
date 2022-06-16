@@ -1,8 +1,7 @@
-var currenttreeID = null;
-var rowid = tlv8.RequestURLParam.getParam("rowid");
+let currenttreeID = null;
 
 /*创建树*/
-var param = {
+let param = {
     cell: {
         id: "sid",//设置构建树的id
         name: "sname",//树显示的名称
@@ -11,7 +10,7 @@ var param = {
     }
 };
 //设置树的属性
-var setting = {
+let setting = {
     view: {
         selectedMulti: false, //设置是否允许同时选中多个节点。默认值: true
         autoCancelSelected: false,
@@ -31,8 +30,8 @@ var setting = {
     isquickPosition: {
         enable: true, //是否有快速查询框
         url: "/system/OPM/QuickTreeAction",
-        quickCells: "SCODE,SNAME",//用于快速查询的字段
-        path: "SFID"//查询路径字段
+        quickCells: "scode,sname",//用于快速查询的字段
+        path: "sfid"//查询路径字段
     },
     edit: {
         enable: false
@@ -45,6 +44,11 @@ var setting = {
 function treeselected(event, treeId, treeNode) {
     currenttreeID = treeNode.id;
 }
+
+let JtreeOrg = new Jtree();
+$(document).ready(function () {
+    JtreeOrg.init("mainJtree", setting, param);
+})
 
 /*
  * 确认返回
