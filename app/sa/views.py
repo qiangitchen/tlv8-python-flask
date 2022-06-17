@@ -1342,7 +1342,6 @@ def flow_load_io_cus():
 def save_flow_draw():
     rdata = dict()
     sprocessid = url_decode(request.form.get('sprocessid', ''))
-    print(sprocessid)
     # sprocessname = url_decode(request.form.get('sprocessname', ''))
     sdrawlg = url_decode(request.form.get('sdrawlg', ''))
     sprocessacty = url_decode(request.form.get('sprocessacty', ''))
@@ -1381,7 +1380,7 @@ def get_function_ztree_action():
     return json.dumps(rdata, ensure_ascii=False)
 
 
-# 流程设计-表单时编辑器对话框
+# 流程设计-表达式编辑器对话框
 @system.route("/flow/dwr/dialog/expressionEditor", methods=["GET", "POST"])
 @user_login
 def expression_editor():
@@ -1849,7 +1848,7 @@ def upload_file():
     if not os.path.exists(doc_folder):
         # 创建一个多级目录
         os.makedirs(doc_folder)  # 创建文件夹
-        os.chmod(doc_folder, 777)  # 设置权限
+        # os.chmod(doc_folder, 777)  # 设置权限
     extname = os.path.splitext(fileName)[1]
     file_mime = MimeTypes()
     mime_type = file_mime.guess_type(fileName)
@@ -1913,7 +1912,7 @@ def upload_file():
     return json.dumps(rdata, ensure_ascii=False)
 
 
-# 查看文件（在线编辑）
+# 查看文件（在线编辑WPS）
 @system.route("/doc/wps/fileEditor", methods=["GET", "POST"])
 @user_login
 def wps_file_editor():
@@ -2510,7 +2509,7 @@ def personal_flow_set_op_list():
     return json.dumps(rdata, ensure_ascii=False)
 
 
-# 我的常用意见设置-删除文件数据
+# 我的常用意见设置-删除数据
 @system.route("/personal/flowset/myOpinion/deleteData", methods=["GET", "POST"])
 @user_login
 def personal_flow_del_op():
