@@ -2987,6 +2987,9 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
                         file_list = [];
                     }
                 }
+                if (!file_list) {
+                    file_list = [];
+                }
             }
         });
         return file_list;
