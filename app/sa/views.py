@@ -2001,10 +2001,10 @@ def file_cell_view():
         if rs:
             rdata['data'] = rs[cellname]
         else:
-            rdata['data'] = ""
+            rdata['data'] = "[]"
     except Exception as e:
         # print(e)
-        rdata['data'] = ""
+        rdata['data'] = "[]"
     rdata['state'] = True
     return json.dumps(rdata, ensure_ascii=False)
 
