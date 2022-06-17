@@ -1,0 +1,89 @@
+<html lang="zh_CN">
+{% include "common/form_page_head.html" %}
+<body>
+<div class="layui-fluid">
+    <form id="sa_opperson_form" class="layui-form">
+        <div class="layui-card">
+            <div class="layui-card-header">基本信息</div>
+            <div class="layui-card-body">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label" style="width:110px;">姓名</label>
+                        <div class="layui-input-inline">
+                            {{ form.sname(value=person.sname) }}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label" style="width:110px;">性别</label>
+                        <div class="layui-input-inline">
+                            {{ form.ssex(value=nul2em(person.ssex)) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label" style="width:110px;">生日</label>
+                        <div class="layui-input-inline">
+                            {{ form.sbirthday(value=nul2em(person.sbirthday)) }}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label" style="width:110px;">手机号</label>
+                        <div class="layui-input-inline">
+                            {{ form.smobilephone(value=nul2em(person.smobilephone)) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label" style="width:110px;">邮箱</label>
+                        <div class="layui-input-inline">
+                            {{ form.smail(value=nul2em(person.smail)) }}
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label" style="width:110px;">描述</label>
+                        <div class="layui-input-inline">
+                            {{ form.sdescription }}
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-inline" style="float:right;margin-top:-170px;">
+                    <div class="layui-input-inline" style="background-color: #ffffff;">
+                        <div id="picDemo" style="width: 250px; height: 150px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="display: none">
+            {{ form.sid(value=person.sid) }}
+            {{ form.smainorgid(value=person.smainorgid) }}
+        </div>
+        <div class="layui-btn-container" style="text-align:left; padding-left: 80px;">
+            {{ form.csrf_token }}
+            {{ form.submit }}
+        </div>
+    </form>
+</div>
+</body>
+<script type="text/javascript">
+    $("#ssex").val('{{ person.ssex }}');
+    layui.form.on('submit(mainform)', function (data) {
+        $.ajax({
+            url: "/oa/PersonUse/personInfo/mainActivity",
+            type: "post",
+            async: false,
+            data: data.field,
+            dataType: "json",
+            success: function (re) {
+                if (re.state === true) {
+                    layui.layer.msg("保存成功！")
+                } else {
+                    layui.layer.alert("保存失败：" + re.msg);
+                }
+            }
+        });
+        return false;
+    });
+</script>
+</html>

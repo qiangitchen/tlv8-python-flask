@@ -122,7 +122,6 @@ def change_password():
 def personal_entry():
     form = PersonForm()
     person = SAPerson.query.filter_by(sid=session['user_id']).first()
-    form.sdescription.data = person.sdescription
     if form.is_submitted():
         data = form.data
         rdata = dict()
@@ -149,6 +148,7 @@ def personal_entry():
             rdata['state'] = False
             rdata['msg'] = '保存到数据库时异常!'
         return json.dumps(rdata, ensure_ascii=False)
+    form.sdescription.data = person.sdescription
     return render_template("system/personal/cnttSrc/PersonData.html", form=form, person=person, nul2em=nul2em)
 
 

@@ -5,7 +5,8 @@ from flask import request, render_template, url_for, redirect, session, send_fil
 from app import db
 from app.common.decorated import user_login
 from app.common.pubstatic import url_decode, guid, serialize, nul2em, form_set_data_model
-from app.models import OALeave, OAPersonDayReport, OAWorkLog, OAMyGroup, OAMyGroupPerson
+from app.models import SAPerson, SAOrganization, OALeave, OAPersonDayReport, OAWorkLog, OAMyGroup, OAMyGroupPerson
+from app.sa.forms import PersonForm
 from app.oa.forms import PersonDayReportForm, WorkLogForm, MyGroupForm
 from app.common.persons import get_curr_person_info, get_person_list_by_org
 from datetime import datetime
@@ -398,6 +399,37 @@ def person_mygroup_person_del():
         rdata['state'] = False
         rdata['msg'] = "指定的id无效~"
     return json.dumps(rdata, ensure_ascii=False)
+
+
+# 人事自助
+@oa.route("/PersonUse/personInfo/mainActivity", methods=["GET", "POST"])
+@user_login
+def person_use_person_info():
+    form = PersonForm()
+    person = SAPerson.query.filter_by(sid=session['user_id']).first()
+    if form.is_submitted():
+        data = form.data
+        rdata = dict()
+        try:
+            form_set_data_model(form, person)
+            db.session.add(person)
+            db.session.commit()
+            org = SAOrganization.query.filter_by(spersonid=person.sid).first()
+            parent_org = SAOrganization.query.filter_by(sid=person.smainorgid).first()
+            if org:
+                org.sname = person.sname
+                if parent_org:
+                    org.sfname = parent_org.sfname + '/' + person.sname
+                db.session.add(org)
+                db.session.commit()
+            rdata['state'] = True
+        except Exception as e:
+            print(e)
+            rdata['state'] = False
+            rdata['msg'] = '保存到数据库时异常!'
+        return json.dumps(rdata, ensure_ascii=False)
+    form.sdescription.data = person.sdescription
+    return render_template("oa/PersonUse/personInfo/mainActivity.html", form=form, person=person, nul2em=nul2em)
 
 
 # 首页Email展示
