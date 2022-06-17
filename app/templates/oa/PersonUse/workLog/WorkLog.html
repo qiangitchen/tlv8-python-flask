@@ -1,0 +1,120 @@
+<html lang="zh_CN">
+{% include "common/table_page_head.html" %}
+<body>
+<div style="padding: 5px; width: 100%; position: relative; height: 35px;">
+    <div style='float:left; height: 30px; margin-right: 5px;'>
+        <button class="layui-btn layui-btn-sm layui-btn-normal" onclick="addData()"
+                id="addOrgItem"><span
+                class='glyphicon glyphicon-plus'></span>&nbsp;新增
+        </button>
+        <button class="layui-btn layui-btn-sm" onclick="doQuery()">
+            <span class='glyphicon glyphicon-repeat'></span>&nbsp;刷新
+        </button>
+    </div>
+    <div class='input-group input-group-sm'
+         style='float:left; width:280px; height: 30px; margin-left: 5px;'>
+        <input type="text" id="query_text" placeholder="快速查询..."
+               class='form-control'>
+        <span class='input-group-btn'>
+            <button class='btn btn-default' onclick="doQuery()">
+                <span class='glyphicon glyphicon-search'></span>查询
+            </button>
+        </span>
+    </div>
+</div>
+<script type="text/html" id="actionBar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<table lay-filter="datalist" class="layui-table"
+       lay-data="{height:'full-60', page:true,even:true, id:'datalist'}" id="datalist">
+    <thead>
+    <tr>
+        <th lay-data="{field:'fid',hide:true}"></th>
+        <th lay-data="{field:'no',width:60}">序号</th>
+        <th lay-data="{field:'fcode',width:160}">编号</th>
+        <th lay-data="{field:'fname'}">标题</th>
+        <th lay-data="{field:'fcustomer',width:160}">客户</th>
+        <th lay-data="{field:'fproject',width:200}">项目</th>
+        <th lay-data="{field:'fimportance',width:100}">重要性</th>
+        <th lay-data="{field:'fplan',width:100}">计划</th>
+        <th lay-data="{field:'fcreatorname',width:100}">创建人</th>
+        <th lay-data="{field:'fcreatetime', width:160}">创建时间</th>
+        <th lay-data="{toolbar:'#actionBar', width:120}">操作</th>
+    </tr>
+    </thead>
+</table>
+</body>
+<script type="text/javascript">
+    let currentRow = {};
+
+    function doQuery() {
+        let search_text = $("#query_text").val();
+        let surl = '/oa/PersonUse/workLog/WorkLog/dataList?search_text=' + J_u_encode(search_text);
+        currentRow = {};
+        layui.table.reload('datalist', {
+            url: surl,
+            done: function () {//res, curr, count
+                $("#search_text").val(search_text);
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        doQuery();
+    });
+
+
+    //触发行单击事件
+    layui.table.on('row(datalist)', function (obj) {
+        //console.log(obj.tr) //得到当前行元素对象
+        //console.log(obj.data) //得到当前行数据
+        obj.tr.parent().find('tr').removeClass('active')
+        obj.tr.addClass('active') //选中行加特殊背景颜色
+        currentRow = obj.data;
+    });
+
+    //监听行工具事件
+    layui.table.on('tool(datalist)', function (obj) {
+        //console.log(obj)
+        let data = obj.data;
+        if (obj.event === 'edit') {
+            editData(data);
+        }
+        if (obj.event === 'del') {
+            delData(data);
+        }
+    });
+
+
+    function addData() {
+        let tabid = tlv8.portal.currentTabId();
+        tlv8.portal.openWindow("工作日志", "/oa/PersonUse/workLog/editData?tabid=" + tabid);
+    }
+
+    function editData(data) {
+        let tabid = tlv8.portal.currentTabId();
+        tlv8.portal.openWindow("工作日志", "/oa/PersonUse/workLog/editData?tabid=" + tabid + "&rowid=" + data.fid);
+    }
+
+    function delData(data) {
+        layui.layer.confirm("文件删除后不能恢复，确认删除吗？", function () {
+            $.ajax({
+                url: "/oa/PersonUse/workLog/WorkLog/deleteData",
+                type: "post",
+                async: true,
+                data: {rowid: data.fid},
+                dataType: "json",
+                success: function (re) {
+                    if (re.state === true) {
+                        layui.layer.msg("删除成功！");
+                        doQuery();
+                    } else {
+                        layui.layer.alert("删除失败：" + re.msg);
+                    }
+                }
+            });
+        });
+    }
+</script>
+</html>

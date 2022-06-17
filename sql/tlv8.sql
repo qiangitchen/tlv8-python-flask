@@ -671,16 +671,40 @@ CREATE TABLE `oa_dayreport`  (
   `ftitle` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `fcontext` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `ffile` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `screatorid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `screatorname` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `fcreatorid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `fcreatorname` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `fcreatedeptid` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `fcreatedeptname` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `screatetime` datetime NULL DEFAULT NULL,
+  `fcreatetime` datetime NULL DEFAULT NULL,
   `fpushdatetime` datetime NULL DEFAULT NULL,
   `version` int(11) NOT NULL,
   PRIMARY KEY (`fid`) USING BTREE,
-  INDEX `ix_oa_dayreport_screatorid`(`screatorid`) USING BTREE
+  INDEX `ix_oa_dayreport_fcreatorid`(`fcreatorid`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ----------------------------
+-- Table structure for oa_worklog
+-- ----------------------------
+DROP TABLE IF EXISTS `oa_worklog`;
+CREATE TABLE `oa_worklog`  (
+  `fid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fcode` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `fcustomer` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `fimportance` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `fplan` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `femergency` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `flimittime` datetime NULL DEFAULT NULL,
+  `fname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `fproject` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `fcontext` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `fcreatorid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `fcreatorname` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `fcreatetime` datetime NULL DEFAULT NULL,
+  `version` int(11) NOT NULL,
+  PRIMARY KEY (`fid`) USING BTREE,
+  INDEX `ix_oa_worklog_fcreatorid`(`fcreatorid`) USING BTREE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

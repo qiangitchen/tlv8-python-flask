@@ -4,10 +4,11 @@ from . import oa
 from flask import request, render_template, url_for, redirect, session, send_file, current_app
 from app import db
 from app.common.decorated import user_login
-from app.common.pubstatic import url_decode, guid, serialize
-from app.models import OALeave, OAPersonDayReport
-from app.oa.forms import PersonDayReportForm
+from app.common.pubstatic import url_decode, guid, serialize, nul2em, form_set_data_model
+from app.models import OALeave, OAPersonDayReport, OAWorkLog
+from app.oa.forms import PersonDayReportForm, WorkLogForm
 from app.common.persons import get_curr_person_info
+from datetime import datetime
 import json
 
 
@@ -116,7 +117,7 @@ def person_use_day_report():
     count = data_query.count()
     page = request.args.get('page', 1, type=int)
     limit = request.args.get('limit', 20, type=int)
-    page_data = data_query.order_by(OAPersonDayReport.screatetime.desc()).paginate(page, limit)
+    page_data = data_query.order_by(OAPersonDayReport.fcreatetime.desc()).paginate(page, limit)
     return render_template("oa/PersonUse//DayReport/reportList.html", page_data=page_data, search_text=search_text,
                            count=count, limit=limit, page=page)
 
@@ -133,8 +134,8 @@ def person_use_day_report_edit():
         if not day_report:
             day_report = OAPersonDayReport()
         person = get_curr_person_info()
-        day_report.screatorid = person['personid']
-        day_report.screatorname = person['personName']
+        day_report.fcreatorid = person['personid']
+        day_report.fcreatorname = person['personName']
         day_report.fcreatedeptid = person['deptid']
         day_report.fcreatedeptname = person['deptname']
         day_report.ftitle = data['ftitle']
@@ -170,3 +171,88 @@ def person_use_day_report_del():
         rdata['state'] = False
         rdata['msg'] = "指定的id错误~"
     return json.dumps(rdata, ensure_ascii=False)
+
+
+# 工作日志-功能页面
+@oa.route("/PersonUse/workLog/WorkLog", methods=["GET", "POST"])
+@user_login
+def person_work_log():
+    return render_template("oa/PersonUse/workLog/WorkLog.html")
+
+
+# 工作日志-加载数据列表
+@oa.route("/PersonUse/workLog/WorkLog/dataList", methods=["GET", "POST"])
+@user_login
+def person_work_log_list():
+    rdata = dict()
+    rdata['code'] = 0
+    user_id = session['user_id']
+    data_query = OAWorkLog.query.filter_by(fcreatorid=user_id)
+    search_text = url_decode(request.args.get('search_text', ''))
+    if search_text and search_text != '':
+        data_query = data_query.filter(or_(OAWorkLog.fname.ilike('%' + search_text + '%'),
+                                           OAWorkLog.fproject.ilike('%' + search_text + '%'),
+                                           OAWorkLog.fcontext.ilike('%' + search_text + '%')))
+    count = data_query.count()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    rdata['count'] = count
+    page_data = data_query.order_by(OAWorkLog.fcreatetime.desc()).paginate(page, limit)
+    data = list()
+    no = 1
+    for d in page_data.items:
+        row_data = serialize(d)
+        row_data['no'] = no + (page - 1) * limit
+        data.append(row_data)
+        no += 1
+    rdata['data'] = data
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 工作日志-删除数据
+@oa.route("/PersonUse/workLog/WorkLog/deleteData", methods=["GET", "POST"])
+@user_login
+def person_work_log_del():
+    rdata = dict()
+    rowid = url_decode(request.form.get('rowid'))
+    data = OAWorkLog.query.filter_by(fid=rowid).first()
+    if data:
+        db.session.delete(data)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "指定的id错误~"
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 工作日志-添加/编辑数据
+@oa.route("/PersonUse/workLog/editData", methods=["GET", "POST"])
+@user_login
+def person_work_log_edit():
+    form = WorkLogForm()
+    if form.is_submitted():
+        rdata = dict()
+        data = form.data
+        model = OAWorkLog.query.filter_by(fid=data['fid']).first()
+        if not model:
+            model = OAWorkLog()
+        form_set_data_model(form, model)
+        person = get_curr_person_info()
+        model.fcreatorid = person['personid']
+        model.fcreatorname = person['personName']
+        db.session.add(model)
+        db.session.commit()
+        rdata['state'] = True
+        rdata['data'] = model.fid
+        return json.dumps(rdata, ensure_ascii=False)
+    rowid = request.args.get("rowid")
+    model = None
+    if rowid and rowid != "":
+        model = OAWorkLog.query.filter_by(fid=rowid).first()
+    if not model:
+        model = OAWorkLog(fid=guid(), fcode='W' + datetime.strftime(datetime.now(), '%Y%m%d%H%M%S'), version=0)
+    form.fimportance.data = nul2em(model.fimportance)
+    form.femergency.data = nul2em(model.femergency)
+    form.fcontext.data = nul2em(model.fcontext)
+    return render_template("oa/PersonUse//workLog/editData.html", form=form, model=model, nul2em=nul2em)

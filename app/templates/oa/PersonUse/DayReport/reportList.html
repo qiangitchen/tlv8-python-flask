@@ -34,8 +34,8 @@
             <th lay-data="{field:'fcontext'}">内容</th>
             <th lay-data="{field:'fpushdatetime', hide: true}">发布时间</th>
             <th lay-data="{field:'fcreatedeptname', width:200}">登记部门</th>
-            <th lay-data="{field:'screatorname', width:100}">登记人</th>
-            <th lay-data="{field:'screatetime', width:160}">登记时间</th>
+            <th lay-data="{field:'fcreatorname', width:100}">登记人</th>
+            <th lay-data="{field:'fcreatetime', width:160}">登记时间</th>
             <th lay-data="{toolbar:'#actionBar', width:120}">操作</th>
         </tr>
         </thead>
@@ -47,8 +47,8 @@
                 <td>{{ d.fcontext }}</td>
                 <td>{{ d.fpushdatetime }}</td>
                 <td>{{ d.fcreatedeptname }}</td>
-                <td>{{ d.screatorname }}</td>
-                <td>{{ d.screatetime }}</td>
+                <td>{{ d.fcreatorname }}</td>
+                <td>{{ d.fcreatetime }}</td>
                 <td></td>
             </tr>
         {% endfor %}
