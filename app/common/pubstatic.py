@@ -7,6 +7,7 @@ from flask import url_for
 from datetime import date, datetime
 from urllib.parse import unquote_to_bytes
 from sqlalchemy.orm import class_mapper
+from sqlalchemy.sql.sqltypes import DateTime, Date
 
 
 # md5加密
@@ -97,3 +98,18 @@ def get_org_type(kind):
         return '岗位'
     if kind == 'psm':
         return '人员'
+
+
+# form的值自动赋值给model
+def form_set_data_model(form, model):
+    columns = class_mapper(model.__class__).columns
+    for field in form:
+        if field.name in columns:
+            if type(columns[field.name].type) == DateTime or type(columns[field.name].type) == Date:
+                if field.data and field.data != "":  # 日期类型的字段不能直接给空字符，所以需要判断处理
+                    setattr(model, field.name, field.data)
+                else:  # 如果是空字符赋值给None
+                    setattr(model, field.name, None)
+            else:
+                setattr(model, field.name, field.data)
+    return model
