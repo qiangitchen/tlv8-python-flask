@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh">
+{% include "common/form_page_head.html" %}
+<body>
+<div class="layui-fluid" style="background: #eee; padding: 10px; width: 100%; height: 100%; overflow: auto;">
+    <form id='WorkLog' class="layui-form">
+        <div class="layui-card">
+            <div class="layui-card-header">
+                基础信息
+                &nbsp;
+                <button type="button" class="layui-btn layui-btn-sm" onclick="saveData()">保存
+                </button>
+            </div>
+            <div class="layui-card-body">
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width:110px;">编号</label>
+                    <div class="layui-input-block">
+                        {{ form.fcode(value=nul2em(model.fcode)) }}
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width:110px;">群组名称</label>
+                    <div class="layui-input-block">
+                        {{ form.fname(value=nul2em(model.fname)) }}
+                    </div>
+                </div>
+                <div style="display: none;">
+                    {{ form.fid(value=nul2em(model.fid)) }}
+                    {{ form.version(value=model.version) }}
+                    {{ form.csrf_token }}
+                    {{ form.submit }}
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="layui-card" style="margin-top: 10px;">
+        <div class="layui-card-header">
+            群组人员
+            &nbsp;
+            <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" onclick="addPerson()">添加人员
+            </button>
+        </div>
+        <div class="layui-card-body">
+            <script type="text/html" id="actionBar">
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+            </script>
+            <table lay-filter="datalist" class="layui-table"
+                   lay-data="{height:'full-300', page:true,even:true, id:'datalist'}" id="datalist">
+                <thead>
+                <tr>
+                    <th lay-data="{field:'fid',hide:true}"></th>
+                    <th lay-data="{field:'no',width:60}">序号</th>
+                    <th lay-data="{field:'fpersonname'}">姓名</th>
+                    <th lay-data="{toolbar:'#actionBar', width:90}">操作</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    let currentRow = {};
+
+    function doQuery() {
+        let rowid = $("#fid").val();
+        let surl = '/oa/PersonUse/MYGROUP/person/dataList?rowid=' + rowid;
+        currentRow = {};
+        layui.table.reload('datalist', {
+            url: surl
+        });
+    }
+
+    $(document).ready(function () {
+        doQuery();
+    });
+
+
+    //触发行单击事件
+    layui.table.on('row(datalist)', function (obj) {
+        //console.log(obj.tr) //得到当前行元素对象
+        //console.log(obj.data) //得到当前行数据
+        obj.tr.parent().find('tr').removeClass('active')
+        obj.tr.addClass('active') //选中行加特殊背景颜色
+        currentRow = obj.data;
+    });
+
+    //监听行工具事件
+    layui.table.on('tool(datalist)', function (obj) {
+        //console.log(obj)
+        let data = obj.data;
+        if (obj.event === 'del') {
+            delData(data);
+        }
+    });
+
+
+    //监听表单提交
+    layui.form.on('submit(mainform)', function (data) {
+        $.ajax({
+            url: "/oa/PersonUse/MYGROUP/editData",
+            type: "post",
+            async: false,
+            data: data.field,
+            dataType: "json",
+            success: function (re) {
+                if (re.state === true) {
+                    layui.layer.msg("保存成功！");
+                    if (!handSave) {//如果不是手动保存则关闭对话框
+                        tlv8.portal.dailog.dailogEngin(re.data);
+                    }
+                } else {
+                    layui.layer.alert("保存失败：" + re.msg);
+                }
+            }
+        });
+        return false;
+    });
+
+    let handSave = false;//记录手动保存还是“确认”自动保存
+
+    function saveData() {
+        handSave = true;
+        $('#submit').click();
+    }
+
+    function addPerson() {
+        let rowid = $("#fid").val();
+        if (!rowid || rowid === "") {
+            saveData();
+            return;
+        }
+        tlv8.portal.dailog.openDailog("选择人员", "/system/dialog/SelectChPsm", 800, 600, function (data) {
+            if (data) {
+                $.ajax({
+                    url: "/oa/PersonUse/MYGROUP/person/addData",
+                    type: "post",
+                    async: true,
+                    data: {rowid: rowid, ids: data.id, names: data.name},
+                    dataType: "json",
+                    success: function (re) {
+                        if (re.state === true) {
+                            layui.layer.msg("添加成功！");
+                            doQuery();
+                        } else {
+                            layui.layer.alert("添加失败：" + re.msg);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function delData(data) {
+        layui.layer.confirm("数据删除后不能恢复，确认删除吗？", function () {
+            $.ajax({
+                url: "/oa/PersonUse/MYGROUP/person/delData",
+                type: "post",
+                async: true,
+                data: {rowid: data.fid},
+                dataType: "json",
+                success: function (re) {
+                    if (re.state === true) {
+                        layui.layer.msg("删除成功！");
+                        doQuery();
+                    } else {
+                        layui.layer.alert("删除失败：" + re.msg);
+                    }
+                }
+            });
+        });
+    }
+
+    //对话框确认
+    function dailogEngin() {
+        handSave = false;
+        $("#submit").click();
+        return false;
+    }
+</script>
+</html>

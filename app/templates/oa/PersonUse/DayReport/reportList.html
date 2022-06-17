@@ -147,7 +147,7 @@
     }
 
     function delData(data) {
-        layui.layer.confirm("文件删除后不能恢复，确认删除吗？", function () {
+        layui.layer.confirm("数据删除后不能恢复，确认删除吗？", function () {
             $.ajax({
                 url: "/oa/PersonUse/DayReport/deleteData",
                 type: "post",

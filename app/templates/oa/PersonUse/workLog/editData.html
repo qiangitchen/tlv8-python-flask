@@ -94,7 +94,7 @@
             dataType: "json",
             success: function (re) {
                 if (re.state === true) {
-                    layui.layer.msg("保存成功！")
+                    layui.layer.msg("保存成功！");
                     if (tabid) {
                         tlv8.portal.callBack(tabid, "doQuery", re.data);
                     }

@@ -387,3 +387,28 @@ class OAWorkLog(db.Model):
     fcreatorname = db.Column(db.String(128), doc='创建人姓名')
     fcreatetime = db.Column(db.DateTime, default=datetime.now, doc='创建时间')
     version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
+
+
+# 我的群组
+class OAMyGroup(db.Model):
+    __tablename__ = "oa_mygroup"
+    __table_args__ = {"useexisting": True}
+    fid = db.Column(db.String(32), primary_key=True, default=guid, doc='主键')
+    fcode = db.Column(db.String(100), doc='编号')
+    fname = db.Column(db.String(255), doc='群组名称')
+    fcreatorid = db.Column(db.String(32), index=True, doc='创建人id')
+    fcreatorname = db.Column(db.String(128), doc='创建人姓名')
+    fcreatetime = db.Column(db.DateTime, default=datetime.now, doc='创建时间')
+    version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
+
+
+# 我的群组-群组人员列表
+class OAMyGroupPerson(db.Model):
+    __tablename__ = "oa_mygroup_person"
+    __table_args__ = {"useexisting": True}
+    fid = db.Column(db.String(32), primary_key=True, default=guid, doc='主键')
+    fgroupid = db.Column(db.String(32), index=True, doc='群组id')
+    forgid = db.Column(db.String(100), doc='人员组织id')
+    fpersonid = db.Column(db.String(32), doc='人员id')
+    fpersonname = db.Column(db.String(128), doc='人员姓名')
+    version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')

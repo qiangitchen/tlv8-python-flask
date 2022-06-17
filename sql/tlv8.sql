@@ -707,6 +707,39 @@ CREATE TABLE `oa_worklog`  (
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- ----------------------------
+-- Table structure for oa_mygroup
+-- ----------------------------
+DROP TABLE IF EXISTS `oa_mygroup`;
+CREATE TABLE `oa_mygroup`  (
+  `fid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fcode` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `fname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `fcreatorid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `fcreatorname` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `fcreatetime` datetime(0) NULL DEFAULT NULL,
+  `version` int(11) NOT NULL,
+  PRIMARY KEY (`fid`) USING BTREE,
+  INDEX `ix_oa_mygroup_fcreatorid`(`fcreatorid`) USING BTREE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ----------------------------
+-- Table structure for oa_mygroup_person
+-- ----------------------------
+DROP TABLE IF EXISTS `oa_mygroup_person`;
+CREATE TABLE `oa_mygroup_person`  (
+  `fid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fgroupid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `forgid` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `fpersonid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `fpersonname` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+  `version` int(11) NOT NULL,
+  PRIMARY KEY (`fid`) USING BTREE,
+  INDEX `ix_oa_mygroup_person_fgroupid`(`fgroupid`) USING BTREE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

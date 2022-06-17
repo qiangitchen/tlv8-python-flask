@@ -5,9 +5,9 @@ from flask import request, render_template, url_for, redirect, session, send_fil
 from app import db
 from app.common.decorated import user_login
 from app.common.pubstatic import url_decode, guid, serialize, nul2em, form_set_data_model
-from app.models import OALeave, OAPersonDayReport, OAWorkLog
-from app.oa.forms import PersonDayReportForm, WorkLogForm
-from app.common.persons import get_curr_person_info
+from app.models import OALeave, OAPersonDayReport, OAWorkLog, OAMyGroup, OAMyGroupPerson
+from app.oa.forms import PersonDayReportForm, WorkLogForm, MyGroupForm
+from app.common.persons import get_curr_person_info, get_person_list_by_org
 from datetime import datetime
 import json
 
@@ -94,13 +94,6 @@ def oa_leave_del_data():
         rdata['state'] = False
         rdata['msg'] = "必须指定rowid!"
     return json.dumps(rdata, ensure_ascii=False)
-
-
-# 首页Email展示
-@oa.route("/email/portalShow/", methods=["GET", "POST"])
-@user_login
-def oa_email_show():
-    return render_template("oa/email/portalShow/show.html")
 
 
 # 个人日报
@@ -255,4 +248,160 @@ def person_work_log_edit():
     form.fimportance.data = nul2em(model.fimportance)
     form.femergency.data = nul2em(model.femergency)
     form.fcontext.data = nul2em(model.fcontext)
-    return render_template("oa/PersonUse//workLog/editData.html", form=form, model=model, nul2em=nul2em)
+    return render_template("oa/PersonUse/workLog/editData.html", form=form, model=model, nul2em=nul2em)
+
+
+# 我的群组-功能页面
+@oa.route("/PersonUse/MYGROUP/listActivity", methods=["GET", "POST"])
+@user_login
+def person_mygroup():
+    return render_template("oa/PersonUse/MYGROUP/listActivity.html")
+
+
+# 我的群组-加载数据列表
+@oa.route("/PersonUse/MYGROUP/dataList", methods=["GET", "POST"])
+@user_login
+def person_mygroup_list():
+    rdata = dict()
+    rdata['code'] = 0
+    user_id = session['user_id']
+    data_query = OAMyGroup.query.filter_by(fcreatorid=user_id)
+    search_text = url_decode(request.args.get('search_text', ''))
+    if search_text and search_text != '':
+        data_query = data_query.filter(or_(OAMyGroup.fname.ilike('%' + search_text + '%'),
+                                           OAMyGroup.fcode.ilike('%' + search_text + '%')))
+    count = data_query.count()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    rdata['count'] = count
+    page_data = data_query.order_by(OAMyGroup.fcreatetime.desc()).paginate(page, limit)
+    data = list()
+    no = 1
+    for d in page_data.items:
+        row_data = serialize(d)
+        row_data['no'] = no + (page - 1) * limit
+        data.append(row_data)
+        no += 1
+    rdata['data'] = data
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 我的群组-添加/编辑数据
+@oa.route("/PersonUse/MYGROUP/editData", methods=["GET", "POST"])
+@user_login
+def person_mygroup_edit():
+    form = MyGroupForm()
+    if form.is_submitted():
+        rdata = dict()
+        data = form.data
+        model = OAMyGroup.query.filter_by(fid=data['fid']).first()
+        if not model:
+            model = OAMyGroup()
+        form_set_data_model(form, model)
+        person = get_curr_person_info()
+        model.fcreatorid = person['personid']
+        model.fcreatorname = person['personName']
+        db.session.add(model)
+        db.session.commit()
+        rdata['state'] = True
+        rdata['data'] = model.fid
+        return json.dumps(rdata, ensure_ascii=False)
+    rowid = request.args.get("rowid")
+    model = None
+    if rowid and rowid != "":
+        model = OAMyGroup.query.filter_by(fid=rowid).first()
+    if not model:
+        model = OAMyGroup(fid=guid(), fcode='G' + datetime.strftime(datetime.now(), '%Y%m%d%H%M%S'), version=0)
+    return render_template("oa/PersonUse/MYGROUP/editData.html", form=form, model=model, nul2em=nul2em)
+
+
+# 我的群组-删除数据
+@oa.route("/PersonUse/MYGROUP/deleteData", methods=["GET", "POST"])
+@user_login
+def person_mygroup_del():
+    rdata = dict()
+    rowid = url_decode(request.form.get('rowid'))
+    data = OAMyGroup.query.filter_by(fid=rowid).first()
+    if data:
+        gp = OAMyGroupPerson.query.filter_by(fgroupid=data.fid).all()
+        for p in gp:  # 同时删除子表数据
+            db.session.delete(p)
+        db.session.delete(data)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "指定的id错误~"
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 我的群组-加载-群组人员-数据列表
+@oa.route("/PersonUse/MYGROUP/person/dataList", methods=["GET", "POST"])
+@user_login
+def person_mygroup_person_list():
+    rdata = dict()
+    rdata['code'] = 0
+    rowid = request.args.get('rowid')
+    data_query = OAMyGroupPerson.query.filter_by(fgroupid=rowid)
+    count = data_query.count()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    rdata['count'] = count
+    page_data = data_query.paginate(page, limit)
+    data = list()
+    no = 1
+    for d in page_data.items:
+        row_data = serialize(d)
+        row_data['no'] = no + (page - 1) * limit
+        data.append(row_data)
+        no += 1
+    rdata['data'] = data
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 我的群组-添加群组人员
+@oa.route("/PersonUse/MYGROUP/person/addData", methods=["GET", "POST"])
+@user_login
+def person_mygroup_person_add():
+    rdata = dict()
+    rowid = url_decode(request.form.get('rowid'))
+    ids = url_decode(request.form.get('ids'))
+    names = url_decode(request.form.get('names'))
+    if rowid and rowid != "" and ids and ids != "":
+        person_list = get_person_list_by_org(ids)
+        for person in person_list:
+            data = OAMyGroupPerson(fgroupid=rowid)
+            data.forgid = person['orgid']
+            data.fpersonid = person['personid']
+            data.fpersonname = person['personName']
+            db.session.add(data)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "数据无效~"
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 我的群组-添加群组人员
+@oa.route("/PersonUse/MYGROUP/person/delData", methods=["GET", "POST"])
+@user_login
+def person_mygroup_person_del():
+    rdata = dict()
+    rowid = url_decode(request.form.get('rowid'))
+    data = OAMyGroupPerson.query.filter_by(fid=rowid).first()
+    if data:
+        db.session.delete(data)
+        db.session.commit()
+        rdata['state'] = True
+    else:
+        rdata['state'] = False
+        rdata['msg'] = "指定的id无效~"
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 首页Email展示
+@oa.route("/email/portalShow/", methods=["GET", "POST"])
+@user_login
+def oa_email_show():
+    return render_template("oa/email/portalShow/show.html")

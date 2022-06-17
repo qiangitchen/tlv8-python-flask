@@ -47,7 +47,7 @@ class PersonDayReportForm(FlaskForm):
     )
 
 
-# 工作日志
+# 工作日志表单
 class WorkLogForm(FlaskForm):
     fid = StringField(
         render_kw={
@@ -129,6 +129,48 @@ class WorkLogForm(FlaskForm):
             "class": "layui-textarea",
             "placeholder": "请输入内容",
             "style": "height:300px"
+        }
+    )
+
+    submit = SubmitField(
+        '提交保存',
+        render_kw={
+            "class": "layui-btn",
+            "lay-submit": "",
+            "lay-filter": "mainform"
+        }
+    )
+
+
+# 我的群组表单
+class MyGroupForm(FlaskForm):
+    fid = StringField(
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    version = StringField(
+        render_kw={
+            "style": "display:none"
+        }
+    )
+
+    fcode = StringField(
+        label="编号",
+        render_kw={
+            "class": "layui-input",
+            "readonly": "readonly",
+            "placeholder": "自动生成"
+        }
+    )
+
+    fname = StringField(
+        label="标题",
+        render_kw={
+            "class": "layui-input",
+            "lay-verify": "required",
+            "placeholder": "请输入标题"
         }
     )
 
