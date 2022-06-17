@@ -500,7 +500,7 @@ function sAlert(str, stime) {
  * @description 公用对象用于构建提交数据
  */
 tlv8.Data = function () {
-    this.table = "";
+    this.table = null;
     this.relation = null;
     this.cells = "";
     this.rowid = null;
@@ -2953,6 +2953,10 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
                                candelete, canedit, viewhistory, limit, download, accept) {
     if (!div || !data || !cellname)
         return;
+    if (!data.table) {
+        layui.layer.alert("data的table属性未配置，无法初始化【附件】组件~");
+        return;
+    }
     if (typeof div == "string") {
         div = J$(div);
     }

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh">
+{% include "common/form_page_head.html" %}
+<body style="width: 100%; height: 100%; overflow: hidden;">
+<div class="layui-fluid" style="padding: 20px; position: relative; width: 100%; height: 100%; overflow: auto;">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">标题</label>
+            <div class="layui-input-block">
+                {{ form.ftitle }}
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">内容</label>
+            <div class="layui-input-block">
+                {{ form.fcontext }}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">附件</label>
+            <div class="layui-input-block" id="fujian" style="min-height: 100px;">
+            </div>
+        </div>
+        <div style="display: none;">
+            {{ form.fid }}
+        </div>
+        <div class="layui-form-item"
+             style="position: absolute; bottom: 0; text-align: right; width: 100%; right: 20px;">
+            {{ form.csrf_token }}
+            {{ form.submit }}
+            <button type="button" class="layui-btn layui-btn-primary" onclick="tlv8.portal.dailog.dailogCancel()">取消
+            </button>
+        </div>
+    </form>
+</div>
+</body>
+<script type="text/javascript">
+    const MainData = new tlv8.Data();
+    MainData.setTable("oa_dayreport");
+    let rowid = tlv8.RequestURLParam.getParam("rowid");
+    if (rowid && rowid !== "") {
+        MainData.setRowId(rowid);
+    }
+    new tlv8.fileComponent(J$("fujian"), MainData, "ffile", "/root/个人日报/附件", true, true, true);
+
+    //监听表单提交
+    layui.form.on('submit(mainform)', function (data) {
+        $.ajax({
+            url: "/oa/PersonUse/DayReport/dialog/editData",
+            type: "post",
+            async: false,
+            data: data.field,
+            dataType: "json",
+            success: function (re) {
+                if (re.state === true) {
+                    layui.layer.msg("保存成功！")
+                    let rowid = re.data;
+                    MainData.setRowId(rowid);
+                    //保存数据成功-重新初始化附件组件
+                    new tlv8.fileComponent(J$("fujian"), MainData, "ffile", "/root/个人日报/附件", true, true, true);
+                } else {
+                    layui.layer.alert("保存失败：" + re.msg);
+                }
+            }
+        });
+        return false;
+    });
+</script>
+</html>

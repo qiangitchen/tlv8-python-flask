@@ -350,3 +350,20 @@ class OALeave(db.Model):
     freason = db.Column(db.String(512), doc='请假原因')
     fenclosure = db.Column(db.String(1024), doc='附件')
     version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
+
+
+# 个人日报
+class OAPersonDayReport(db.Model):
+    __tablename__ = "oa_dayreport"
+    __table_args__ = {"useexisting": True}
+    fid = db.Column(db.String(32), primary_key=True, default=guid, doc='主键')
+    ftitle = db.Column(db.String(255), doc='标题')
+    fcontext = db.Column(db.Text, doc='内容')
+    ffile = db.Column(db.String(1024), doc='附件信息')
+    screatorid = db.Column(db.String(32), index=True, doc='创建人id')
+    screatorname = db.Column(db.String(128), doc='创建人姓名')
+    fcreatedeptid = db.Column(db.String(100), doc='创建部门id')
+    fcreatedeptname = db.Column(db.String(128), doc='创建部门名称')
+    screatetime = db.Column(db.DateTime, default=datetime.now, doc='创建时间')
+    fpushdatetime = db.Column(db.DateTime, doc='发布时间')
+    version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
