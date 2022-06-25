@@ -3115,7 +3115,7 @@ tlv8.viewFile = function (fileID, fileName) {
                 '<embed src="' + audioData + '" align="baseline" border="0" width="100%" height="100%" type="application/x-mplayer2" pluginspage="http://www.microsoft.com/isapi/redir.dll?prd=windows& sbp=mediaplayer&ar=media&sba=plugin&" name="MediaPlayer" showcontrols="1" showpositioncontrols="0" showaudiocontrols="1" showtracker="1" showdisplay="0" showstatusbar="1" showgotobar="0" showcaptioning="0" animationatstart="0" transparentatstart="0" allowscan="1" enablecontextmenu="1" clicktoplay="0" invokeurls="1" defaultframe="datawindow">你的浏览器不支持在线播放，请下载播放~</embed></object></div>'
         });
         return;
-    } else if ('.mp3.ogg.wav.'.indexOf(String(/\.[^.]+$/.exec(fileName.toLowerCase())) + '.') > -1) {
+    } else if ('.mp3.ogg.wav.m4a.aac.'.indexOf(String(/\.[^.]+$/.exec(fileName.toLowerCase())) + '.') > -1) {
         let audioData = "/system/doc/file/" + fileID + "/view/";
         layui.layer.close(tlv8.audioIndex);
         tlv8.audioIndex = layui.layer.open({
