@@ -1,5 +1,13 @@
 # TLv8 平台-Flask版
 
+<p align="center">
+
+[![OSCS Status](https://www.oscs1024.com/platform/badge/qiangitchen/tlv8-python-flask.svg?size=small)](https://www.oscs1024.com/project/qiangitchen/tlv8-python-flask?ref=badge_small)
+<a href="https://www.python.org/downloads/release/python-368/"><img src='https://img.shields.io/badge/Python-3.6+-redviolet.svg'/></a>
+<a href='LICENSE'><img src='https://img.shields.io/badge/License-BSD--3--Clause-blue.svg'></img></a>
+
+</p>
+
 #### 介绍
 基于Flask（Flask是一个用Python编写的Web应用程序框架）开发的Web应用系统框架，项目集成了工作流引擎，内置了组织机构权限管理等功能，可以应用于OA、HR、CRM、PM等系统开发。
 
