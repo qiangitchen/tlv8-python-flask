@@ -86,6 +86,11 @@ python  manage.py  db  upgrade     # 把迁移应用到数据库中
 导入sql目录下的: tlv8.sql
 
 
+<b>帮助文档：</b>[www.w3cschool.cn/oztgf](https://www.w3cschool.cn/oztgf/)
+
+
+
+
 #### 使用说明
 
 1.  启动测试服务：
