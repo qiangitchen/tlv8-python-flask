@@ -412,3 +412,42 @@ class OAMyGroupPerson(db.Model):
     fpersonid = db.Column(db.String(32), doc='人员id')
     fpersonname = db.Column(db.String(128), doc='人员姓名')
     version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
+
+
+# 邮箱-收件箱
+class OAReceiveMail(db.Model):
+    __tablename__ = "oa_em_receiveemail"
+    __table_args__ = {"useexisting": True}
+    fid = db.Column(db.String(32), primary_key=True, default=guid, doc='主键')
+    femailname = db.Column(db.String(100), index=True, doc='邮件标题')
+    ftext = db.Column(db.Text, doc='邮件内容')
+    ffjid = db.Column(db.String(1024), doc='附件')
+    fsendpername = db.Column(db.String(100), doc='发送人名称')
+    fsendperid = db.Column(db.String(100), doc='发送人id')
+    freplystate = db.Column(db.String(100), doc='接收状态')
+    fqurey = db.Column(db.String(100), doc='查看状态')
+    fconsignee = db.Column(db.String(100), doc='收件人')
+    fconsigneeid = db.Column(db.String(100), index=True, doc='收件人id')
+    fsendtime = db.Column(db.DateTime, doc='发送时间')
+    frecivetime = db.Column(db.DateTime, doc='接收时间')
+    fcollect = db.Column(db.String(10), default='0', doc='标识')
+    version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')
+
+
+# 邮箱-发件箱
+class OASendMail(db.Model):
+    __tablename__ = "oa_em_sendemail"
+    __table_args__ = {"useexisting": True}
+    fid = db.Column(db.String(32), primary_key=True, default=guid, doc='主键')
+    femailname = db.Column(db.String(100), index=True, doc='邮件标题')
+    ftext = db.Column(db.Text, doc='邮件内容')
+    ffjid = db.Column(db.String(1024), doc='附件')
+    fconsignee = db.Column(db.String(100), doc='收件人')
+    fconsigneeid = db.Column(db.String(100), index=True, doc='收件人id')
+    fstate = db.Column(db.String(100), doc='发送状态')
+    fsendpername = db.Column(db.String(100), doc='发送人名称')
+    fsendperid = db.Column(db.String(100), doc='发送人id')
+    fcreattime = db.Column(db.DateTime, default=datetime.now, doc='创建时间')
+    fsendtime = db.Column(db.DateTime, doc='发送时间')
+    fcollect = db.Column(db.String(10), default='0', doc='标识')
+    version = db.Column(db.Integer, nullable=False, default=0, doc='版本号')

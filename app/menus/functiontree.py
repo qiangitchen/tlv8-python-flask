@@ -97,6 +97,11 @@ functions = [
               }
          ]
           }
+         , {"title": "内部邮箱",
+            "href": "/oa/email/mainActivity",
+            "process": "/oa/enail/Process",
+            "activity": "mainActivity"
+            }
      ]
      }
 ]

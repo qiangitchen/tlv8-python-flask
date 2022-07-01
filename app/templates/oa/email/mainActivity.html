@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TLv8平台-内部邮箱</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap/css/bootstrap.min.css') }}" media="all">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static',filename='jquery-easyui/themes/default/easyui.css') }}"></link>
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static',filename='jquery-easyui/themes/icon.css') }}"></link>
+    <link rel="stylesheet" href="{{ url_for('static',filename='layui/css/layui.css') }}" media="all">
+    <link rel="stylesheet" href="{{ url_for('static',filename='common/css/toolbar.css') }}" media="all">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='oa/email/mainActivity.css') }}"></link>
+    <script type="text/javascript" src="{{ url_for('static',filename='common/js/jquery/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='common/js/main.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui/jquery.easyui.min.js') }}"></script>
+    <script type="text/javascript"
+            src="{{ url_for('static',filename='jquery-easyui/locale/easyui-lang-zh_CN.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='layui/layui.js') }}"></script>
+</head>
+<body>
+<div id="mainlayout" class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'center',border:false" style="padding: 0px; overflow: hidden;">
+        <table style="width: 100%; height: 100%;">
+            <tr>
+                <td class="leftMebuView" style="width: 190px; height: 100%;"
+                    valign="top">
+                    <table style="width: 100%; height: 100%;">
+                        <tr>
+                            <td align="center" style="width: 100%; height: 40px;">
+                                <a class="receiveBar" onclick="loadRecvMail()" title="接收邮件"
+                                   href="javascript:void(0);"></a>
+                                <a class="writemailBar" onclick="writeMail()" title="写信" href="javascript:void(0);"></a>
+                            </td>
+                        </tr>
+                        <tr class="funcListTR" style="background: #eee;" rel="receiveList">
+                            <td align="left" style="width: 100%; height: 25px;"><a
+                                    class="funcList" href="javascript:void(0);">收件箱 <span
+                                    id="receiveCount"></span>
+                            </a></td>
+                        </tr>
+                        <tr class="funcListTR" rel="templetList">
+                            <td align="left" style="width: 100%; height: 25px;"><a
+                                    class="funcList" href="javascript:void(0);">草稿箱 <span
+                                    id="templetCount"></span>
+                            </a></td>
+                        </tr>
+                        <tr class="funcListTR" rel="sendList">
+                            <td align="left" style="width: 100%; height: 25px;"><a
+                                    class="funcList" href="javascript:void(0);">已发送</a></td>
+                        </tr>
+                        <tr class="funcListTR" rel="collectList">
+                            <td align="left" style="width: 100%; height: 25px;"><a
+                                    class="funcList" href="javascript:void(0);">收藏邮件</a></td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </table>
+                </td>
+                <td valign="top" style="background: #a5d9f0;">
+                    <div style="width: 100%; height: 30px; border-bottom: 2px solid #A0B8C9;"
+                         id="div_search">
+                        <table style="width: 100%; height: 30px;">
+                            <tr style="width: 100%;">
+                                <td width="180px">
+                                    <div id="mail_title"></div>
+                                </td>
+                                <td></td>
+                                <td width="140px"><span
+                                        style="font-weight: bold; font-size: 13px;">全邮箱搜索</span>(主题)：
+                                </td>
+                                <td width="290px"><input type="text" id="ipt_search"
+                                                         maxlength="20" style="width: 280px;"/></td>
+                                <td width="25px">
+                                    <a href="javascript:void(0);">
+                                        <img src="{{ url_for('static',filename='oa/email/image/search.gif') }}"
+                                             title="搜索"
+                                             onclick="loadSearchMail()"/>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div id="panelview" class="easyui-panel" data-options="fit:true,border:false"
+                         style="overflow: auto;">
+                        <!-- 收件列表 -->
+                        <div id="receiveList" class="lookViewer"
+                             style="width: 100%; height: 96%; overflow: auto;">
+                            <table style="width: 100%; height: 100%;">
+                                <tr style="width: 100%; background: #a5d9f0;">
+                                    <td style="height: 30px;">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td style="width: 30%;">
+                                                    <a class="btn_gray btn_space"
+                                                       onclick="deleteCheckedRow('收件箱')"
+                                                       href="javascript:void(0);">删除</a>
+                                                    <!-- <a class="btn_gray btn_space"
+                                                    onclick="transoutCheckedMail()" href="javascript:void(0);">转发</a> -->
+                                                    <a class="btn_gray btn_space" onclick="martAlltoRead()"
+                                                       href="javascript:void(0);">全部标记为已读</a></td>
+                                                <td style="width: 70%; text-align: right;">
+                                                    <div id="recv_page_info"
+                                                         style="width: 100%; height: 100%; margin-right: 20px; margin-top: 3px;"></div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="top"
+                                        style="width: 100%; height: 100%; background: #fff;">
+                                        <table style="width: 100%;">
+                                            <tr style="background: #f2f4f6;">
+                                                <td width="15px"></td>
+                                                <td width="30px"><img
+                                                        src="{{ url_for('static',filename='oa/email/image/statelabel.gif') }}"/>
+                                                </td>
+                                                <td width="100px">发件人</td>
+                                                <td>主题</td>
+                                                <td width="120px">来件部门</td>
+                                                <td width="100px">时间</td>
+                                            </tr>
+                                        </table>
+                                        <div id="receiveListData"
+                                             style="width: 100%; margin: 0; padding: 0;"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- 已发列表 -->
+                        <div id="sendList" class="lookViewer"
+                             style="width: 100%; height: 96%; overflow: auto; display: none;">
+                            <table style="width: 100%; height: 100%;">
+                                <tr style="width: 100%; background: #a5d9f0;">
+                                    <td style="height: 30px;">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td style="width: 30%;">
+                                                    <a class="btn_gray btn_space"
+                                                       onclick="deleteCheckedRow('收件箱')"
+                                                       href="javascript:void(0);">删除</a>
+                                                    <!-- <a class="btn_gray btn_space"
+                                                    onclick="transoutCheckedMail()" href="javascript:void(0);">转发</a> -->
+                                                    <a class="btn_gray btn_space" onclick="replySendMail('all')"
+                                                       href="javascript:void(0);">再次编辑发送</a></td>
+                                                <td>&nbsp;</td>
+                                                <td style="width: 70%; text-align: right;">
+                                                    <div id="send_page_info"
+                                                         style="width: 100%; height: 100%; margin-right: 20px; margin-top: 3px;"></div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="top"
+                                        style="width: 100%; height: 100%; background: #fff;">
+                                        <table style="width: 100%;">
+                                            <tr style="background: #f2f4f6;">
+                                                <td width="15px"></td>
+                                                <td width="30px"><img
+                                                        src="{{ url_for('static',filename='oa/email/image/statelabel.gif') }}"/>
+                                                </td>
+                                                <td width="100px">收件人</td>
+                                                <td>主题</td>
+                                                <td width="120px">来件部门</td>
+                                                <td width="100px">时间</td>
+                                            </tr>
+                                        </table>
+                                        <div id="sendListData"
+                                             style="width: 100%; margin: 0; padding: 0;"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- 搜索列表 -->
+                        <div id="searchList" class="lookViewer"
+                             style="width: 100%; height: 96%; overflow: auto; display: none;">
+                            <table style="width: 100%; height: 100%;">
+                                <tr>
+                                    <td style="height: 30px;">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td style="width: 10%;">
+                                                    <a class="btn_gray btn_space"
+                                                       onclick="loadRecvMail()"
+                                                       href="javascript:void(0);">返回收件箱</a></td>
+                                                <td style="width: 50%; font-size: 13px; text-align: left;">查找到与<span
+                                                        id="SearchListValue"
+                                                        style="font-weight: bold;"></span>相关的邮件共<span
+                                                        id="SearchListCount"
+                                                        style="font-weight: bold;"></span>封,查找用时：<span
+                                                        id="SearchListTime" style="font-weight: bold;"></span>秒.
+                                                </td>
+                                                <td style="width: 40%; text-align: right;">
+                                                    <div id="search_page_info"
+                                                         style="width: 100%; height: 100%; margin-right: 20px; margin-top: 3px;"></div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="top"
+                                        style="width: 100%; height: 100%; background: #fff;">
+                                        <table style="width: 100%;">
+                                            <tr style="background: #f2f4f6;">
+                                                <td width="15px"></td>
+                                                <td width="30px"><img
+                                                        src="{{ url_for('static',filename='oa/email/image/statelabel.gif') }}"/>
+                                                </td>
+                                                <td width="100px">收件人</td>
+                                                <td width="75px">所在目录</td>
+                                                <td>主题</td>
+                                                <td width="120px">来件部门</td>
+                                                <td width="100px">时间</td>
+                                            </tr>
+                                        </table>
+                                        <div id="SearchListData"
+                                             style="width: 100%; margin: 0; padding: 0;"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- 收藏列表 -->
+                        <div id="CollectList" class="lookViewer"
+                             style="width: 100%; height: 96%; overflow: auto; display: none;">
+                            <table style="width: 100%; height: 100%;">
+                                <tr style="background: #a5d9f0;">
+                                    <td style="height: 30px;">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td style="width: 10%;">
+                                                    <!-- <a class="btn_gray btn_space"
+                                                    onclick="loadRecvMail()" href="javascript:void(0);">返回收件箱</a> -->
+                                                </td>
+                                                <td style="width: 30%; text-align: right;">
+                                                    <div id="collect_page_info"
+                                                         style="width: 100%; height: 100%; margin-right: 20px; margin-top: 3px;"></div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="top"
+                                        style="width: 100%; height: 100%; background: #fff;">
+                                        <table style="width: 100%;">
+                                            <tr style="background: #f2f4f6;">
+                                                <td width="15px"></td>
+                                                <td width="30px"><img
+                                                        src="{{ url_for('static',filename='oa/email/image/statelabel.gif') }}"/>
+                                                </td>
+                                                <td width="140px">收件人</td>
+                                                <td width="75px">所在目录</td>
+                                                <td>主题</td>
+                                                <td width="120px">来件部门</td>
+                                                <td width="100px">时间</td>
+                                            </tr>
+                                        </table>
+                                        <div id="CollectListData"
+                                             style="width: 100%; margin: 0; padding: 0;"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- 草稿箱列表 -->
+                        <div id="templetList" class="lookViewer"
+                             style="width: 100%; height: 96%; overflow: auto; display: none;">
+                            <table style="width: 100%; height: 100%;">
+                                <tr style="background: #a5d9f0;">
+                                    <td style="height: 30px;">
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td>
+                                                    <a class="btn_gray btn_space"
+                                                       onclick="deleteCheckedRow('草稿箱')"
+                                                       href="javascript:void(0);">删除</a>
+                                                    <a class="btn_gray btn_space" onclick="sendTempMail()"
+                                                       href="javascript:void(0);">发送</a>
+                                                </td>
+                                                <td style="width: 70%; text-align: right;">
+                                                    <div id="temp_page_info"
+                                                         style="width: 100%; height: 100%; margin-right: 20px; margin-top: 3px;"></div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="top"
+                                        style="width: 100%; height: 100%; background: #fff;">
+                                        <table style="width: 100%;">
+                                            <tr style="background: #f2f4f6;">
+                                                <td width="15px"></td>
+                                                <td width="30px"><img
+                                                        src="{{ url_for('static',filename='oa/email/image/statelabel.gif') }}"/>
+                                                </td>
+                                                <td width="100px">收件人</td>
+                                                <td>主题</td>
+                                                <td width="120px">来件部门</td>
+                                                <td width="100px">时间</td>
+                                            </tr>
+                                        </table>
+                                        <div id="templetListData"
+                                             style="width: 100%; margin: 0; padding: 0;"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- 写信 -->
+                        <div id="writeMailView"
+                             style="width: 100%; overflow: auto; height: 100%; display: none;">
+                            <form id="WRITE_DATA_FORM" afterRefresh="afterWriteRefersh">
+                                <table style="width: 100%;">
+                                    <tr height="45px">
+                                        <td width="7%">
+                                            <a href="javascript:void(0);"
+                                               class="toolbarItem" onclick="sendMail()">
+                                                <img src="{{ url_for('static',filename='oa/email/image/mailsend.gif') }}"/>
+                                            </a></td>
+                                        <td width="7%">
+                                            <a href="javascript:void(0);"
+                                               class="toolbarItem" onclick="saveToTempletAction()"> <img
+                                                    src="{{ url_for('static',filename='oa/email/image/saveTotm.gif') }}"/>
+                                            </a></td>
+                                        <td width="7%">
+                                            <a href="javascript:void(0);"
+                                               class="toolbarItem" onclick="goback()">
+                                                <img src="{{ url_for('static',filename='oa/email/image/cancel.gif') }}"/>
+                                            </a></td>
+                                        <td/>
+                                    </tr>
+                                    <tr>
+                                        <td
+                                                style="font-size: 11pt; color: #BEA499; font-weight: bold; height: 25px;">
+                                            发件人
+                                        </td>
+                                        <td colspan="3"><label id="FSENDPERNAME"></label> <label
+                                                id="FCONSIGNEEID" style="display: none;"></label><label
+                                                id="FFJID" class="FJINFO" style="display: none;"></label></td>
+                                    </tr>
+                                    <tr>
+                                        <td
+                                                style="font-size: 11pt; color: #546AB1; font-weight: bold; height: 25px;">
+                                            收件人
+                                        </td>
+                                        <td colspan="3"><input type="text" id="FCONSIGNEE"
+                                                               class="DetailInput" readonly="readonly"
+                                                               style="width: 80%;"/>
+                                            <a href="javascript:void(0);" class="toolbarItem"
+                                               style="width: 170px;" onclick="selectReceivePsm()"> <img
+                                                    src="{{ url_for('static',filename='oa/email/image/search.gif') }}"/>请点击此选择收件人
+                                            </a></td>
+                                    </tr>
+                                    <tr>
+                                        <td
+                                                style="font-size: 11pt; color: #546AB1; font-weight: bold; height: 25px;">
+                                            主题
+                                        </td>
+                                        <td colspan="3"><input type="text" id="FEMAILNAME"
+                                                               class="DetailInput" style="width: 98%;"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td
+                                                style="font-size: 11pt; color: #546AB1; font-weight: bold; height: 25px;">
+                                            附件
+                                        </td>
+                                        <td colspan="3" valign="top">
+                                            <!--
+                                            <div id="show_fj_title" style="height: 15px; margin-top: 2px;">
+                                                <span>&nbsp;如需上传附件，请先将邮件存为草稿</span>
+                                            </div>
+                                             -->
+                                            <div id="write_fj"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td
+                                                style="font-size: 11pt; color: #546AB1; font-weight: bold; height: 25px;">
+                                            正文
+                                        </td>
+                                        <td colspan="3" valign="top" style="min-height: 250px;">
+                                            <textarea id="FTEXT" class="write_content"
+                                                      style="width: 99%; height: 250px;"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr height="40px">
+                                        <td width="7%">
+                                            <a href="javascript:void(0);"
+                                               class="toolbarItem" onclick="sendMail()">
+                                                <img src="{{ url_for('static',filename='oa/email/image/mailsend.gif') }}"/>
+                                            </a></td>
+                                        <td width="7%">
+                                            <a href="javascript:void(0);"
+                                               class="toolbarItem" onclick="saveToTempletAction()">
+                                                <img src="{{ url_for('static',filename='oa/email/image/saveTotm.gif') }}"/>
+                                            </a>
+                                        </td>
+                                        <td width="7%">
+                                            <a href="javascript:void(0);"
+                                               class="toolbarItem" onclick="loadSendMail()">
+                                                <img src="{{ url_for('static',filename='oa/email/image/cancel.gif') }}"/>
+                                            </a>
+                                        </td>
+                                        <td>&nbsp;</td>
+                                    </tr>
+                                </table>
+                            </form>
+                        </div>
+                        <!-- 查看 -->
+                        <div id="lookMailView"
+                             style="width: 100%; height: 100%; overflow: auto; display: none;">
+                            <form id="mail_look" afterRefresh="lookviewback"
+                                  style="margin: 0;">
+                                <table style="width: 100%; height: 100%;">
+                                    <tr style="width: 100%; height: 30px; background: #a5d9f0;">
+                                        <td>
+                                            <table style="width: 100%;">
+                                                <tr>
+                                                    <td>
+                                                        <a class="btn_gray btn_space" onclick="goback()"
+                                                           href="javascript:void(0);">返回</a> <a
+                                                            class="btn_gray btn_space" onclick="replySendMail()"
+                                                            id="show_resend_agin" href="javascript:void(0);">再次编辑发送</a>
+                                                        <a class="btn_gray btn_space" onclick="replyCurrentMail()"
+                                                           id="show_reply" href="javascript:void(0);">回复</a> <a
+                                                            class="btn_gray btn_space" onclick="deleteCurrentMail()"
+                                                            href="javascript:void(0);">删除</a> <a
+                                                            class="btn_gray btn_space"
+                                                            onclick="transoutCuurrentMail()"
+                                                            href="javascript:void(0);">转发</a> <a
+                                                            class="btn_gray btn_space" onclick="collectMail()"
+                                                            id="collectMail" style="display: none;"
+                                                            href="javascript:void(0);">收藏此邮件</a> <a
+                                                            class="btn_gray btn_space" onclick="unCollectMail()"
+                                                            id="unCollectMail" style="display: none;"
+                                                            href="javascript:void(0);">取消收藏</a></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr style="background: #E4ECF5; height: 85px;">
+                                        <td>
+                                            <div>
+												<span style="font-size: 14px; margin-left: 5px; cursor: default;">发件人：
+                                                    <input type="text" id="FSENDPERNAME" readonly="readonly"
+                                                           class="showDetail">
+												</span>
+                                                <br/>
+                                                <span style="font-size: 14px; margin-left: 5px; cursor: default;">时&nbsp;&nbsp;&nbsp;间：
+                                                    <input type="text" id="FSENDTIME" readonly="readonly"
+                                                           class="showDetail">
+												</span>
+                                                <br/>
+                                                <span style="font-size: 14px; margin-left: 5px; cursor: default;">收件人：
+                                                    <input type="text" id="FCONSIGNEE" readonly="readonly"
+                                                           class="showDetail">
+												</span>
+                                                <br/>
+                                                <span style="font-size: 14px; margin-left: 5px; cursor: default;">主&nbsp;&nbsp;&nbsp;题：
+                                                    <input type="text" id="FEMAILNAME" readonly="readonly"
+                                                           class="showDetail">
+												</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td id="td_show_detail"
+                                            style="width: 100%; border: 2px solid #E4ECF5; cursor: default; background: #fff;">
+                                            <textarea id="FTEXT" name="FTEXT" class="look_content"
+                                                      style="display: none;"></textarea>
+                                            <input type="text"
+                                                   id="FCOLLECT" name="FCOLLECT"
+                                                   style="display: none;"/>
+                                            <div id="show_ftext"></div>
+                                        </td>
+                                    </tr>
+                                    <tr style="width: 100%; background: #E4ECF5;">
+                                        <td>
+                                            <table style="width: 100%;">
+                                                <tr style="width: 98%; height: 30px;">
+                                                    <td>
+                                                        <div style="font-weight: bold;">附件</div>
+                                                    </td>
+                                                </tr>
+                                                <tr style="width: 100%; background: #ffffff;">
+                                                    <td id="fileListView" style="width: 98%; background: #fff;">
+                                                        <div id="fj_view"></div>
+                                                        <input type="text" id="FFJID"
+                                                               readonly="readonly" style="display: none;">
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>

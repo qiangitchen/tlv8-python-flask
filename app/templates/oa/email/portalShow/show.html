@@ -3,8 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 2px;
+        }
+
+        a {
+            color: #1f3a87;
+            font-size: 11pt;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: none;
+            color: red;
+            font-size: 11pt;
+        }
+
+        .countTixview_un {
+            position: relative;
+            top: 20px;
+            left: 55px;
+            width: 32px;
+            height: 32px;
+            z-index: 99;
+            margin-top: -20px;
+        }
+
+        .countTixview {
+            position: relative;
+            top: 25px;
+            left: 20px;
+            width: 32px;
+            height: 32px;
+            background: url({{ url_for('static',filename='oa/email/portalShow/rouan.png') }});
+            z-index: 99;
+            margin-top: -20px;
+            font-weight: bold;
+        }
+
+        .showTitle {
+            white-space: nowrap;
+            -o-text-overflow: ellipsis; /*--4 opera--*/
+            text-overflow: ellipsis;
+            overflow: hidden;;
+        }
+    </style>
+    <script type="text/javascript" src="{{ url_for('static',filename='common/js/jquery/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='common/js/main.js') }}"></script>
 </head>
-<body>
-<p>您当前没有邮件内容~</p>
+<body style="padding: 20px;">
+<table style="width: 100%; table-layout: fixed;" border="0">
+    <tr>
+        <td style="width: 90px;" valign="middle" align="center">
+            <div class='countTixview_un' id="empty_email"></div>
+            <a href="javascript:void(0);" onclick="openWin()" id='email' title="打开邮箱">
+                <img src="{{ url_for('static',filename='oa/email/portalShow/mail.png') }}" style="border: 0;"/><br/>
+                <span>( 查看更多 )</span>
+            </a>
+        </td>
+        <td style="width: 100%;" valign="top">
+            <div id="showlist" style="font-size: 12pt; text-align: center; padding: 10px;">
+                您当前没有邮件内容~
+            </div>
+        </td>
+    </tr>
+</table>
 </body>
+<script type="text/javascript">
+    function openWin() {
+        tlv8.portal.openWindow('内部邮件', '/oa/email/mainActivity');
+    }
+</script>
 </html>

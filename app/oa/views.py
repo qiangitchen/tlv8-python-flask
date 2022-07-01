@@ -437,3 +437,10 @@ def person_use_person_info():
 @user_login
 def oa_email_show():
     return render_template("oa/email/portalShow/show.html")
+
+
+# 内部邮箱功能
+@oa.route("/email/mainActivity", methods=["GET", "POST"])
+@user_login
+def oa_email():
+    return render_template("oa/email/mainActivity.html")

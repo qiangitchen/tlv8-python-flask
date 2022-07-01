@@ -1,0 +1,191 @@
+.leftMebuView {
+	width: 100%;
+	height: 100%;
+	background: url('image/backg.jpg');
+	border-top: 1px solid #eee;
+	border-left: 1px solid #eee;
+	border-right: 1px solid #999999;
+}
+
+.funcListTR {
+	cursor: pointer;
+}
+
+.receiveBar {
+	width: 90px;
+	height: 35px;
+	border: 0;
+	background: url('image/sevandwrite.gif') no-repeat -1px -1px;
+	float: left;
+}
+
+.receiveBar:HOVER {
+	background: url('image/recive.gif') no-repeat -1px -1px;
+}
+
+.writemailBar {
+	width: 90px;
+	height: 35px;
+	border: 0;
+	background: url('image/sevandwrite.gif') no-repeat -88px -1px;
+	float: left;
+	margin-left:-3px;
+}
+.writemailBar:HOVER {
+	background: url('image/write.gif') no-repeat -88px -1px;
+}
+
+.funcList {
+	margin-left: 10px;
+	font-size: 11pt;
+	text-decoration: none;
+	color: #000999;
+}
+
+.actionbuuton {
+	height: 25px;;
+	background: url('image/buttonbackg.gif') 0 -2px;;
+}
+
+.DatalistRow {
+	cursor: hand;
+}
+
+#writeMailView {
+	background: url('image/writeMailviewbg.gif');
+}
+
+.toolbarItem {
+	border: 0;
+	text-decoration: none;
+}
+/*
+.toolbarItem:hover{
+	border: 1px solid #999;
+	text-decoration: none;
+}*/
+.toolbarItem img {
+	border: 0;
+}
+
+.ShowdatalistRow {
+	height: 25px;
+	cursor: pointer;
+}
+
+.ShowdatalistRowNoread {
+	font-weight: bold;
+	height: 25px;
+	cursor: pointer;
+}
+
+.bd {
+	border: 1px solid #6fbce2;
+}
+
+.title {
+	display: block;
+	font-size: 11pt;
+	font-weight: normal;
+	text-decoration: none;
+	clear: both;
+	border-left: none;
+	border-right: none;
+	padding: 8px 0 3px 9px;
+	border-bottom-width: 2px;
+	border-top: none;
+	position: relative;
+}
+
+.cur_default {
+	color: #006091;
+	cursor: default;
+}
+
+a {
+	text-decoration: none;
+	cursor: pointer;
+	outline: none;
+}
+
+img{
+	border: 0;
+}
+
+.underline {
+	text-decoration: underline !important;
+}
+
+body,table {
+	font-size: 11pt;
+	margin: 0;
+	padding: 0;
+}
+
+.M {
+	table-layout: fixed;
+	height: 25px;
+	border-bottom: 1px solid #e3e6eb;
+	font-weight: normal;
+	clear: both;
+	width: 100%;
+	border-spacing: 0;
+}
+
+.nomail {
+	height: 70px;
+	line-height: 70px;
+	text-align: center;
+	background: #dff3fc;
+	display: block;
+}
+
+.btn_space {
+	margin-right: 3px;
+}
+
+.btn_gray {
+	border: 1px solid #888;
+	color: #000000;
+	background: #F3F3F3;
+	background: -moz-linear-gradient(top, #ffffff 0%, #ebebeb 90%, #F3F3F3 100%);
+	background: -webkit-linear-gradient(top, #ffffff 0%, #ebebeb 90%, #F3F3F3 100%);
+	background: -o-linear-gradient(top, #ffffff 0%, #ebebeb 90%, #F3F3F3 100%);
+	background: -ms-linear-gradient(top, #ffffff 0%, #ebebeb 90%, #F3F3F3 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff',
+		endColorstr='#d7d7d7', GradientType=0);
+	background: linear-gradient(top, #ffffff 0%, #ebebeb 90%, #F3F3F3 100%);
+}
+
+.btn_gray {
+	display: inline-block;
+	height: 22px;
+	min-width: 24px;
+	line-height: 22px;
+	_overflow-y: hidden;
+	padding: 0 12px;
+	margin: 0;
+	text-align: center;
+	text-decoration: none;
+	vertical-align: middle;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	border-radius: 3px;
+}
+
+.showDetail {
+	border: 0;
+	background: #E4ECF5;
+	width: 90%;
+}
+
+.showSenderTheme {
+	white-space: nowrap;
+	-o-text-overflow: ellipsis; /*--4 opera--*/
+	text-overflow: ellipsis;
+	overflow: hidden;;
+}
+
+.lookViewer {
+	
+}
