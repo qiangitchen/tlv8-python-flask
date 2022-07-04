@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TLv8平台-内部邮箱</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap/css/bootstrap.min.css') }}" media="all">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static',filename='jquery-easyui/themes/default/easyui.css') }}"></link>
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static',filename='jquery-easyui/themes/icon.css') }}"></link>
+    <link rel="stylesheet" href="{{ url_for('static',filename='layui/css/layui.css') }}" media="all">
+    <link rel="stylesheet" href="{{ url_for('static',filename='common/css/toolbar.css') }}" media="all">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='oa/email/mainActivity.css') }}"></link>
+    <script type="text/javascript" src="{{ url_for('static',filename='common/js/jquery/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='common/js/main.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='bootstrap/js/bootstrap.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='jquery-easyui/jquery.easyui.min.js') }}"></script>
+    <script type="text/javascript"
+            src="{{ url_for('static',filename='jquery-easyui/locale/easyui-lang-zh_CN.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='layui/layui.js') }}"></script>
+</head>
+<body>
+<div id="mainlayout" class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'center',border:false" style="padding: 0px; overflow: hidden;">
+        <table style="width: 100%; height: 100%;">
+            <tr>
+                <td class="leftMebuView" style="width: 190px; height: 100%;"
+                    valign="top">
+                    <table style="width: 100%; height: 100%;">
+                        <tr>
+                            <td align="center" style="width: 100%; height: 40px;">
+                                <a class="receiveBar" title="接收邮件" href="/oa/email/mainActivity"></a>
+                                <a class="writemailBar" title="写信" href="/oa/email/writeEmail"></a>
+                            </td>
+                        </tr>
+                        <tr class="funcListTR" style="background: #eee;" rel="receiveList">
+                            <td align="left" style="width: 100%; height: 25px;">
+                                <a class="funcList" href="/oa/email/mainActivity">
+                                    收件箱
+                                    <span id="receiveCount"></span>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr class="funcListTR" rel="templetList">
+                            <td align="left" style="width: 100%; height: 25px;">
+                                <a class="funcList" href="/oa/email/templetEmail">
+                                    草稿箱
+                                    <span id="templetCount"></span>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr class="funcListTR" rel="sendList">
+                            <td align="left" style="width: 100%; height: 25px;">
+                                <a class="funcList" href="/oa/email/sendedMail">已发送</a>
+                            </td>
+                        </tr>
+                        <tr class="funcListTR" rel="collectList">
+                            <td align="left" style="width: 100%; height: 25px;">
+                                <a class="funcList" href="/oa/email/collectMail">收藏邮件</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </table>
+                </td>
+                <td valign="top" style="background: #a5d9f0;">
+                    <div style="width: 100%; height: 30px; border-bottom: 2px solid #A0B8C9;"
+                         id="div_search">
+                        <table style="width: 100%; height: 30px;">
+                            <tr style="width: 100%;">
+                                <td width="180px">
+                                    <div id="mail_title"></div>
+                                </td>
+                                <td></td>
+                                <td width="140px"><span
+                                        style="font-weight: bold; font-size: 13px;">全邮箱搜索</span>(主题)：
+                                </td>
+                                <td width="290px">
+                                    <input type="text" id="ipt_search"
+                                           maxlength="20" style="width: 280px;"/></td>
+                                <td width="25px">
+                                    <a href="javascript:void(0);">
+                                        <img src="{{ url_for('static',filename='oa/email/image/search.gif') }}"
+                                             title="搜索" onclick="loadSearchMail($('#ipt_search').val())"/>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div id="panelview" class="easyui-panel" data-options="fit:true,border:false"
+                         style="overflow: auto;">
+                        <!--内容-->
+                        {% block content %}{% endblock %}
+                        <!--内容-->
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    $("#ipt_search").keyup(function (event) {
+        if (event.keyCode === 13) {
+            loadSearchMail($('#ipt_search').val());
+        }
+    });
+</script>
+</html>

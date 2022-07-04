@@ -6,6 +6,7 @@ from app import db
 from app.common.decorated import user_login
 from app.common.pubstatic import url_decode, guid, serialize, nul2em, form_set_data_model
 from app.models import SAPerson, SAOrganization, OALeave, OAPersonDayReport, OAWorkLog, OAMyGroup, OAMyGroupPerson
+from app.models import OASendMail, OAReceiveMail
 from app.sa.forms import PersonForm
 from app.oa.forms import PersonDayReportForm, WorkLogForm, MyGroupForm
 from app.common.persons import get_curr_person_info, get_person_list_by_org
@@ -443,4 +444,17 @@ def oa_email_show():
 @oa.route("/email/mainActivity", methods=["GET", "POST"])
 @user_login
 def oa_email():
-    return render_template("oa/email/mainActivity.html")
+    personid = session['user_id']
+    data_query = OAReceiveMail.query.filter_by(fconsigneeid=personid)
+    count = data_query.count()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    page_data = data_query.paginate(page, limit)
+    return render_template("oa/email/mainActivity.html", page_data=page_data, count=count)
+
+
+# 内部邮箱功能-写信
+@oa.route("/email/writeEmail", methods=["GET", "POST"])
+@user_login
+def oa_email_write():
+    return render_template("oa/email/writeEmail.html")

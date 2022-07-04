@@ -1,0 +1,96 @@
+{% extends "common/email.html" %}
+{% block content %}
+    <!-- 写信 -->
+    <div id="writeMailView"
+         style="width: 100%; overflow: auto; height: 100%; padding: 5px;">
+        <form id="WRITE_DATA_FORM" afterRefresh="afterWriteRefersh">
+            <table style="width: 100%; table-layout: fixed;">
+                <tr height="45px">
+                    <td width="7%">
+                        <a href="javascript:void(0);"
+                           class="toolbarItem" onclick="sendMail()">
+                            <img src="{{ url_for('static',filename='oa/email/image/mailsend.gif') }}" alt=""/>
+                        </a></td>
+                    <td width="7%">
+                        <a href="javascript:void(0);"
+                           class="toolbarItem" onclick="saveToTempletAction()">
+                            <img src="{{ url_for('static',filename='oa/email/image/saveTotm.gif') }}" alt=""/>
+                        </a></td>
+                    <td width="7%">
+                        <a href="javascript:void(0);"
+                           class="toolbarItem" onclick="goback()">
+                            <img src="{{ url_for('static',filename='oa/email/image/cancel.gif') }}" alt=""/>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size: 11pt; color: #BEA499; font-weight: bold; height: 25px;">发件人
+                    </td>
+                    <td colspan="3">
+                        <label id="FSENDPERNAME"></label> <label
+                            id="FCONSIGNEEID" style="display: none;"></label><label
+                            id="FFJID" class="FJINFO" style="display: none;"></label>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size: 11pt; color: #546AB1; font-weight: bold; height: 25px;">收件人
+                    </td>
+                    <td colspan="3">
+                        <input type="text" id="FCONSIGNEE"
+                               class="DetailInput" readonly="readonly" style="width: 80%;"/>
+                        <a href="javascript:void(0);" class="toolbarItem"
+                           style="width: 170px;" onclick="selectReceivePsm()">
+                            <img src="{{ url_for('static',filename='oa/email/image/search.gif') }}" alt=""/>请点击此选择收件人
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size: 11pt; color: #546AB1; font-weight: bold; height: 25px;">主题
+                    </td>
+                    <td colspan="3">
+                        <input type="text" id="FEMAILNAME"
+                               class="DetailInput" style="width: 98%;"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td
+                            style="font-size: 11pt; color: #546AB1; font-weight: bold; height: 25px;">附件
+                    </td>
+                    <td colspan="3" valign="top">
+                        <!--
+                        <div id="show_fj_title" style="height: 15px; margin-top: 2px;">
+                            <span>&nbsp;如需上传附件，请先将邮件存为草稿</span>
+                        </div>
+                         -->
+                        <div id="write_fj"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size: 11pt; color: #546AB1; font-weight: bold; height: 25px;">正文
+                    </td>
+                    <td colspan="3" valign="top" style="min-height: 250px;">
+                        <textarea id="FTEXT" class="write_content"
+                                  style="width: 99%; height: 350px;"></textarea>
+                    </td>
+                </tr>
+                <tr height="40px">
+                    <td width="7%">
+                        <a href="javascript:void(0);" class="toolbarItem" onclick="sendMail()">
+                            <img src="{{ url_for('static',filename='oa/email/image/mailsend.gif') }}" alt=""/>
+                        </a>
+                    </td>
+                    <td width="7%">
+                        <a href="javascript:void(0);"
+                           class="toolbarItem" onclick="saveToTempletAction()">
+                            <img src="{{ url_for('static',filename='oa/email/image/saveTotm.gif') }}" alt=""/>
+                        </a></td>
+                    <td width="7%">
+                        <a href="javascript:void(0);" class="toolbarItem" onclick="loadSendMail()">
+                            <img src="{{ url_for('static',filename='oa/email/image/cancel.gif') }}" alt=""/>
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+{% endblock %}
