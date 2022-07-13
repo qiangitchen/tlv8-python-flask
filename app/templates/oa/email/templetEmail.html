@@ -12,8 +12,6 @@
                                 <a class="btn_gray btn_space"
                                    onclick="deleteCheckedRow()"
                                    href="javascript:void(0);">删除</a>
-                                <a class="btn_gray btn_space" onclick="martAllToRead()"
-                                   href="javascript:void(0);">全部标记为已读</a></td>
                             <td style="width: 70%; text-align: right;">
                                 <div id="recv_page_info"
                                      style="width: 100%; height: 100%; margin-right: 20px; margin-top: 3px;"></div>
@@ -30,7 +28,7 @@
                             <td width="15px"></td>
                             <td width="30px"><img
                                     src="{{ url_for('static',filename='oa/email/image/statelabel.gif') }}"/></td>
-                            <td width="100px">发件人</td>
+                            <td width="100px">收件人</td>
                             <td>主题</td>
                             <td width="100px">时间</td>
                         </tr>
@@ -44,24 +42,19 @@
                                     class="underline">{{ count }}&nbsp;封</span>）</label></a></div>
                             {% for d in page_data.items %}
                                 <table cellspacing="0" class="M" style="width: 100%;">
-                                    <tr id="{{ d.fid }}" onclick="lookMail('{{ d.fid }}')"
-                                        class="{% if d.fqurey != "已查看" %}ShowdatalistRowNoread{% else %}ShowdatalistRow{% endif %}">
+                                    <tr id="{{ d.fid }}" onclick="editMail('{{ d.fid }}')"
+                                        class="ShowdatalistRowNoread">
                                         <td style="width:25px;">
                                             <input type="checkbox" row="{{ d.fid }}"
                                                    class="selectCheckBox"></td>
                                         <td style="width:30px;">
-                                            {% if d.fqurey != "已查看" %}
-                                                <img src="{{ url_for('static',filename='oa/email/image/weidu.gif') }}"
-                                                     alt="未读邮件"/>
-                                            {% else %}
-                                                <img src="{{ url_for('static',filename='oa/email/image/yidu.gif') }}"
-                                                     alt="已读邮件"/>
-                                            {% endif %}
+                                            <img src="{{ url_for('static',filename='oa/email/image/weidu.gif') }}"
+                                                 alt="未发邮件"/>
                                         </td>
-                                        <td style="width:100px;">{{ d.fsendpername }}</td>
+                                        <td style="width:100px;">{{ d.fconsignee }}</td>
                                         <td class="showSenderTheme"
                                             title="{{ d.femailname }}">{{ d.femailname }}</td>
-                                        <td style="width:150px">{{ d.fsendtime }}</td>
+                                        <td style="width:150px">{{ d.fcreattime }}</td>
                                     </tr>
                                 </table>
                             {% endfor %}
@@ -84,8 +77,8 @@
 
         }
 
-        function lookMail(id) {
-            window.location.href = "/oa/email/lookEmail?id=" + id;
+        function editMail(id) {
+            window.location.href = "/oa/email/writeEmail?id=" + id;
         }
     </script>
 {% endblock %}

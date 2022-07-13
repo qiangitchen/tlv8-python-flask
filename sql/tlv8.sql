@@ -16,6 +16,112 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `oa_dayreport`
+--
+
+DROP TABLE IF EXISTS `oa_dayreport`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `oa_dayreport` (
+  `fid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ftitle` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fcontext` text COLLATE utf8mb4_unicode_ci,
+  `ffile` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fcreatorid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fcreatorname` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fcreatedeptid` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fcreatedeptname` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fcreatetime` datetime DEFAULT NULL,
+  `fpushdatetime` datetime DEFAULT NULL,
+  `version` int(11) NOT NULL,
+  PRIMARY KEY (`fid`) USING BTREE,
+  KEY `ix_oa_dayreport_fcreatorid` (`fcreatorid`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `oa_dayreport`
+--
+
+LOCK TABLES `oa_dayreport` WRITE;
+/*!40000 ALTER TABLE `oa_dayreport` DISABLE KEYS */;
+/*!40000 ALTER TABLE `oa_dayreport` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `oa_em_receiveemail`
+--
+
+DROP TABLE IF EXISTS `oa_em_receiveemail`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `oa_em_receiveemail` (
+  `fid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `femailname` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ftext` text COLLATE utf8mb4_unicode_ci,
+  `ffjid` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fsendpername` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fsendperid` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `freplystate` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fqurey` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fconsignee` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fconsigneeid` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fsendtime` datetime DEFAULT NULL,
+  `frecivetime` datetime DEFAULT NULL,
+  `fcollect` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `version` int(11) NOT NULL,
+  PRIMARY KEY (`fid`),
+  KEY `ix_oa_em_receiveemail_fconsigneeid` (`fconsigneeid`),
+  KEY `ix_oa_em_receiveemail_femailname` (`femailname`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `oa_em_receiveemail`
+--
+
+LOCK TABLES `oa_em_receiveemail` WRITE;
+/*!40000 ALTER TABLE `oa_em_receiveemail` DISABLE KEYS */;
+/*!40000 ALTER TABLE `oa_em_receiveemail` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `oa_em_sendemail`
+--
+
+DROP TABLE IF EXISTS `oa_em_sendemail`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `oa_em_sendemail` (
+  `fid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `femailname` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ftext` text COLLATE utf8mb4_unicode_ci,
+  `ffjid` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fconsignee` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fconsigneeid` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fstate` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fsendpername` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fsendperid` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fcreattime` datetime DEFAULT NULL,
+  `fsendtime` datetime DEFAULT NULL,
+  `fcollect` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `version` int(11) NOT NULL,
+  PRIMARY KEY (`fid`),
+  KEY `ix_oa_em_sendemail_fconsigneeid` (`fconsigneeid`),
+  KEY `ix_oa_em_sendemail_femailname` (`femailname`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `oa_em_sendemail`
+--
+
+LOCK TABLES `oa_em_sendemail` WRITE;
+/*!40000 ALTER TABLE `oa_em_sendemail` DISABLE KEYS */;
+/*!40000 ALTER TABLE `oa_em_sendemail` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `oa_leave`
 --
 
@@ -49,6 +155,99 @@ LOCK TABLES `oa_leave` WRITE;
 /*!40000 ALTER TABLE `oa_leave` DISABLE KEYS */;
 INSERT INTO `oa_leave` VALUES ('0F243D91B06446DF93ED0041A068A0B3','system','PSN01','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 10:16:43','2022-06-09 10:16:46','2022-06-09 10:16:47',1,'事假','','',0,NULL),('1B658382A55295130ECEB76A3E87ADB1','system','PSN01','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-13 10:12:21','2022-06-13 10:12:22','2022-06-14 10:12:24',2,'事假','','333',0,''),('40DA9136A31EF77121AE326205FE6B00','system','PSN01','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 18:14:52','2022-06-10 18:14:55','2022-06-11 18:14:58',2,'事假','','22',0,'');
 /*!40000 ALTER TABLE `oa_leave` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `oa_mygroup`
+--
+
+DROP TABLE IF EXISTS `oa_mygroup`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `oa_mygroup` (
+  `fid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fcode` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fname` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fcreatorid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fcreatorname` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fcreatetime` datetime DEFAULT NULL,
+  `version` int(11) NOT NULL,
+  PRIMARY KEY (`fid`) USING BTREE,
+  KEY `ix_oa_mygroup_fcreatorid` (`fcreatorid`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `oa_mygroup`
+--
+
+LOCK TABLES `oa_mygroup` WRITE;
+/*!40000 ALTER TABLE `oa_mygroup` DISABLE KEYS */;
+/*!40000 ALTER TABLE `oa_mygroup` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `oa_mygroup_person`
+--
+
+DROP TABLE IF EXISTS `oa_mygroup_person`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `oa_mygroup_person` (
+  `fid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fgroupid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `forgid` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fpersonid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fpersonname` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `version` int(11) NOT NULL,
+  PRIMARY KEY (`fid`) USING BTREE,
+  KEY `ix_oa_mygroup_person_fgroupid` (`fgroupid`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `oa_mygroup_person`
+--
+
+LOCK TABLES `oa_mygroup_person` WRITE;
+/*!40000 ALTER TABLE `oa_mygroup_person` DISABLE KEYS */;
+/*!40000 ALTER TABLE `oa_mygroup_person` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `oa_worklog`
+--
+
+DROP TABLE IF EXISTS `oa_worklog`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `oa_worklog` (
+  `fid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fcode` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fcustomer` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fimportance` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fplan` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `femergency` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `flimittime` datetime DEFAULT NULL,
+  `fname` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fproject` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fcontext` text COLLATE utf8mb4_unicode_ci,
+  `fcreatorid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fcreatorname` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fcreatetime` datetime DEFAULT NULL,
+  `version` int(11) NOT NULL,
+  PRIMARY KEY (`fid`) USING BTREE,
+  KEY `ix_oa_worklog_fcreatorid` (`fcreatorid`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `oa_worklog`
+--
+
+LOCK TABLES `oa_worklog` WRITE;
+/*!40000 ALTER TABLE `oa_worklog` DISABLE KEYS */;
+/*!40000 ALTER TABLE `oa_worklog` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -150,33 +349,6 @@ LOCK TABLES `sa_flowconclusion` WRITE;
 /*!40000 ALTER TABLE `sa_flowconclusion` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
--- ----------------------------
--- Table structure for sa_flowrecord
--- ----------------------------
-
-DROP TABLE IF EXISTS `sa_flowrecord`;
-CREATE TABLE `sa_flowrecord`  (
-  `sid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sbillid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `snodeid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `snodename` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `sagreetext` varchar(2048) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `sopviewid` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `staskid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `sflowid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `screatorid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `screatorname` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `ssign` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `screatetime` datetime NULL DEFAULT NULL,
-  `version` int(11) NOT NULL,
-  PRIMARY KEY (`sid`) USING BTREE,
-  INDEX `ix_sa_flowrecord_sbillid`(`sbillid`) USING BTREE,
-  INDEX `ix_sa_flowrecord_screatorid`(`screatorid`) USING BTREE,
-  INDEX `ix_sa_flowrecord_sopviewid`(`sopviewid`) USING BTREE,
-  INDEX `ix_sa_flowrecord_staskid`(`staskid`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 --
 -- Table structure for table `sa_flowdrawlg`
 --
@@ -241,6 +413,44 @@ CREATE TABLE `sa_flowfolder` (
 LOCK TABLES `sa_flowfolder` WRITE;
 /*!40000 ALTER TABLE `sa_flowfolder` DISABLE KEYS */;
 /*!40000 ALTER TABLE `sa_flowfolder` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sa_flowrecord`
+--
+
+DROP TABLE IF EXISTS `sa_flowrecord`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sa_flowrecord` (
+  `sid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sbillid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `snodeid` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `snodename` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sagreetext` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sopviewid` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `staskid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `sflowid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `screatorid` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `screatorname` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ssign` text COLLATE utf8mb4_unicode_ci,
+  `screatetime` datetime DEFAULT NULL,
+  `version` int(11) NOT NULL,
+  PRIMARY KEY (`sid`) USING BTREE,
+  KEY `ix_sa_flowrecord_sbillid` (`sbillid`) USING BTREE,
+  KEY `ix_sa_flowrecord_screatorid` (`screatorid`) USING BTREE,
+  KEY `ix_sa_flowrecord_sopviewid` (`sopviewid`) USING BTREE,
+  KEY `ix_sa_flowrecord_staskid` (`staskid`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sa_flowrecord`
+--
+
+LOCK TABLES `sa_flowrecord` WRITE;
+/*!40000 ALTER TABLE `sa_flowrecord` DISABLE KEYS */;
+/*!40000 ALTER TABLE `sa_flowrecord` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -425,7 +635,7 @@ CREATE TABLE `sa_oppermission` (
 
 LOCK TABLES `sa_oppermission` WRITE;
 /*!40000 ALTER TABLE `sa_oppermission` DISABLE KEYS */;
-INSERT INTO `sa_oppermission` VALUES ('0CF6C83DE6FD16BEBF75D2A8FD056881','RL01','/SA/log/logProcess','/系统管理/系统工具/操作日志','mainActivity',NULL,NULL,0,'/system/logs',9,1,0),('17C6F4FE19E6A556F61A066164ACD546','RL01','/oa/leave/Process','/OA系统/人事管理/部门审批','bizActivity4',NULL,NULL,0,'/oa/leave/bizActivity4',2,1,0),('1CE9B0FF633B989E55BC6E793A851E32','RL02-doc','/SA/doc/docCenter/docCenterProcess','/系统管理/文档管理/文档中心','docCenter',NULL,NULL,0,'/system/doc/docCenter',1,1,0),('1DC3831C34AC8ED61524C41E177B67C4','RL01','/SA/OPM/authorization/authorizationProcess','/系统管理/组织机构/授权管理','mainActivity',NULL,NULL,0,'/system/OPM/authorization',3,1,0),('2BD4857CB8069793990F186B0E986439','62C986B66A97D0F6F251698A0553FC42','/oa/leave/Process','/OA系统/人事管理/返回申请人','bizActivity8',NULL,NULL,0,'/oa/leave/bizActivity8',4,1,0),('325BFA75C55FD1DB49075F44C4B72628','RL01','/SA/task/taskCenter/process','/系统管理/流程管理/流程监控','monitorActivity',NULL,NULL,0,'/system/flow/monitor',5,1,0),('36D5BF85AD5EEEEA7122F4069E0F204D','62C986B66A97D0F6F251698A0553FC42','/oa/leave/Process','/OA系统/人事管理/部门审批','bizActivity4',NULL,NULL,0,'/oa/leave/bizActivity4',2,1,0),('57EF14E4A669882A9843271C4EBA7E58','RL01','/SA/doc/docCenter/docCenterProcess','/系统管理/文档管理/文档中心','docCenter',NULL,NULL,0,'/system/doc/docCenter',7,1,0),('5C5DA17E97DFF3148C2CAAD054684473','RL01','/flw/dwr/process','/系统管理/流程管理/流程设计','vml-dwr-editor',NULL,NULL,0,'/system/flow/flow_design',6,1,0),('630E9DFA815B532F5C2D50253EB19DF2','RL02','/flw/dwr/process','/系统管理/流程管理/流程设计','vml-dwr-editor',NULL,NULL,0,'/system/flow/flow_design',2,1,0),('7A62182221B15DCE20F289F315680340','RL01','/SA/OPM/role/roleProcess','/系统管理/组织机构/角色管理','mainActivity',NULL,NULL,0,'/system/OPM/role',2,1,0),('8037E66DAD0A90DC4256EC9848E536AF','RL01','/SA/online/onlineProcess','/系统管理/系统工具/在线用户','mainActivity',NULL,NULL,0,'/system/online',10,1,0),('8091869B1201127C4B54F200AC7E878F','RL01','/SA/doc/docSearch/docSearchProcess','/系统管理/文档管理/文档检索','mainActivity',NULL,NULL,0,'/system/doc/docSearch',8,1,0),('8D4CBA9B74D45ABE5726D5E14A779DB0','62C986B66A97D0F6F251698A0553FC42','/oa/leave/Process','/OA系统/人事管理/请假申请','mainActivity',NULL,NULL,0,'/oa/leave/mainActivity',1,1,0),('A7FA204F027AF509F2762F4990F6F1CC','RL02-doc','/SA/doc/docSearch/docSearchProcess','/系统管理/文档管理/文档检索','mainActivity',NULL,NULL,0,'/system/doc/docSearch',2,1,0),('B1E719EBCCF8CEF030C083CFA7DF0966','RL01','/SA/OPM/organization/organizationProcess','/系统管理/组织机构/机构管理','mainActivity',NULL,NULL,0,'/system/OPM/organization',1,1,0),('BCB09BC3E99CD319DBF8009A9CBAB1AC','RL01','/oa/leave/Process','/OA系统/人事管理/请假申请','mainActivity',NULL,NULL,0,'/oa/leave/mainActivity',1,1,0),('CFA94636F5844609400AB0322D9C27DA','RL01','/oa/leave/Process','/OA系统/人事管理/返回申请人','bizActivity8',NULL,NULL,0,'/oa/leave/bizActivity8',4,1,0),('E572B9CCC095B962A41AE8D8B7878D54','RL02','/SA/task/taskCenter/process','/系统管理/流程管理/流程监控','monitorActivity',NULL,NULL,0,'/system/flow/monitor',1,1,0),('EAA850865197E41D5F597DAC4A0CAAFC','62C986B66A97D0F6F251698A0553FC42','/oa/leave/Process','/OA系统/人事管理/领导审批','bizActivity6',NULL,NULL,0,'/oa/leave/bizActivity6',3,1,0),('F3613C14223CFDE0396DC82D8D8F10CB','RL01','/oa/leave/Process','/OA系统/人事管理/领导审批','bizActivity6',NULL,NULL,0,'/oa/leave/bizActivity6',3,1,0),('F669B3828A5E307943559F69E938DD51','RL01','/SA/OPM/recycled/recycledProcess','/系统管理/组织机构/回收站','mainActivity',NULL,NULL,0,'/system/OPM/recycled',4,1,0);
+INSERT INTO `sa_oppermission` VALUES ('0CF6C83DE6FD16BEBF75D2A8FD056881','RL01','/SA/log/logProcess','/系统管理/系统工具/操作日志','mainActivity',NULL,NULL,0,'/system/logs',9,1,0),('17C6F4FE19E6A556F61A066164ACD546','RL01','/oa/leave/Process','/OA系统/人事管理/部门审批','bizActivity4',NULL,NULL,0,'/oa/leave/bizActivity4',2,1,0),('1CE9B0FF633B989E55BC6E793A851E32','RL02-doc','/SA/doc/docCenter/docCenterProcess','/系统管理/文档管理/文档中心','docCenter',NULL,NULL,0,'/system/doc/docCenter',1,1,0),('1DC3831C34AC8ED61524C41E177B67C4','RL01','/SA/OPM/authorization/authorizationProcess','/系统管理/组织机构/授权管理','mainActivity',NULL,NULL,0,'/system/OPM/authorization',3,1,0),('20794BD40A6145B0C28AEF266B9CF6EB','RL01','/oa/leave/Process','/OA系统/人事管理/领导审批','bizActivity6',NULL,NULL,0,'/oa/leave/bizActivity6',3,1,0),('2BD4857CB8069793990F186B0E986439','62C986B66A97D0F6F251698A0553FC42','/oa/leave/Process','/OA系统/人事管理/返回申请人','bizActivity8',NULL,NULL,0,'/oa/leave/bizActivity8',4,1,0),('325BFA75C55FD1DB49075F44C4B72628','RL01','/SA/task/taskCenter/process','/系统管理/流程管理/流程监控','monitorActivity',NULL,NULL,0,'/system/flow/monitor',5,1,0),('36D5BF85AD5EEEEA7122F4069E0F204D','62C986B66A97D0F6F251698A0553FC42','/oa/leave/Process','/OA系统/人事管理/部门审批','bizActivity4',NULL,NULL,0,'/oa/leave/bizActivity4',2,1,0),('57EF14E4A669882A9843271C4EBA7E58','RL01','/SA/doc/docCenter/docCenterProcess','/系统管理/文档管理/文档中心','docCenter',NULL,NULL,0,'/system/doc/docCenter',7,1,0),('5C5DA17E97DFF3148C2CAAD054684473','RL01','/flw/dwr/process','/系统管理/流程管理/流程设计','vml-dwr-editor',NULL,NULL,0,'/system/flow/flow_design',6,1,0),('5C9FB4F107984597E9BAB4C29A435333','RL01','/oa/enail/Process','/OA系统/内部邮箱','mainActivity',NULL,NULL,0,'/oa/email/mainActivity',5,1,0),('630E9DFA815B532F5C2D50253EB19DF2','RL02','/flw/dwr/process','/系统管理/流程管理/流程设计','vml-dwr-editor',NULL,NULL,0,'/system/flow/flow_design',2,1,0),('7A62182221B15DCE20F289F315680340','RL01','/SA/OPM/role/roleProcess','/系统管理/组织机构/角色管理','mainActivity',NULL,NULL,0,'/system/OPM/role',2,1,0),('8037E66DAD0A90DC4256EC9848E536AF','RL01','/SA/online/onlineProcess','/系统管理/系统工具/在线用户','mainActivity',NULL,NULL,0,'/system/online',10,1,0),('8091869B1201127C4B54F200AC7E878F','RL01','/SA/doc/docSearch/docSearchProcess','/系统管理/文档管理/文档检索','mainActivity',NULL,NULL,0,'/system/doc/docSearch',8,1,0),('8D4CBA9B74D45ABE5726D5E14A779DB0','62C986B66A97D0F6F251698A0553FC42','/oa/leave/Process','/OA系统/人事管理/请假申请','mainActivity',NULL,NULL,0,'/oa/leave/mainActivity',1,1,0),('A7FA204F027AF509F2762F4990F6F1CC','RL02-doc','/SA/doc/docSearch/docSearchProcess','/系统管理/文档管理/文档检索','mainActivity',NULL,NULL,0,'/system/doc/docSearch',2,1,0),('B1E719EBCCF8CEF030C083CFA7DF0966','RL01','/SA/OPM/organization/organizationProcess','/系统管理/组织机构/机构管理','mainActivity',NULL,NULL,0,'/system/OPM/organization',1,1,0),('BCB09BC3E99CD319DBF8009A9CBAB1AC','RL01','/oa/leave/Process','/OA系统/人事管理/请假申请','mainActivity',NULL,NULL,0,'/oa/leave/mainActivity',1,1,0),('C842E9B149FEC54C9E2337AED0E2AB7C','RL01','/oa/leave/Process','/OA系统/人事管理/请假申请','mainActivity',NULL,NULL,0,'/oa/leave/mainActivity',1,1,0),('CFA94636F5844609400AB0322D9C27DA','RL01','/oa/leave/Process','/OA系统/人事管理/返回申请人','bizActivity8',NULL,NULL,0,'/oa/leave/bizActivity8',4,1,0),('D1BDEB0BEC827741D56913C2BAC970D2','RL01','/oa/leave/Process','/OA系统/人事管理/部门审批','bizActivity4',NULL,NULL,0,'/oa/leave/bizActivity4',2,1,0),('D97C01662F8E50046C7827D7B9B3365E','RL01','/oa/leave/Process','/OA系统/人事管理/返回申请人','bizActivity8',NULL,NULL,0,'/oa/leave/bizActivity8',4,1,0),('E572B9CCC095B962A41AE8D8B7878D54','RL02','/SA/task/taskCenter/process','/系统管理/流程管理/流程监控','monitorActivity',NULL,NULL,0,'/system/flow/monitor',1,1,0),('EAA850865197E41D5F597DAC4A0CAAFC','62C986B66A97D0F6F251698A0553FC42','/oa/leave/Process','/OA系统/人事管理/领导审批','bizActivity6',NULL,NULL,0,'/oa/leave/bizActivity6',3,1,0),('F3613C14223CFDE0396DC82D8D8F10CB','RL01','/oa/leave/Process','/OA系统/人事管理/领导审批','bizActivity6',NULL,NULL,0,'/oa/leave/bizActivity6',3,1,0),('F669B3828A5E307943559F69E938DD51','RL01','/SA/OPM/recycled/recycledProcess','/系统管理/组织机构/回收站','mainActivity',NULL,NULL,0,'/system/OPM/recycled',4,1,0);
 /*!40000 ALTER TABLE `sa_oppermission` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -661,85 +871,6 @@ LOCK TABLES `sa_task` WRITE;
 INSERT INTO `sa_task` VALUES ('07B039490F8D6203B7D6C3D4BD6717D2','3EA26484F5E662037B1A193308415611','请假申请:请假流程','3EA26484F5E662037B1A193308415611','/oa/leave/Process','bizActivity2','tesFinished','已完成','2022-06-06 18:19:35',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-06 18:19:40','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'','/oa/leave/mainActivity','C9DA139CAC800001EDC2AD8010301A30','task',NULL,1),('0DF208464B9B0CE809F88AFC1C6ABF6A',NULL,'请假流程','0DF208464B9B0CE809F88AFC1C6ABF6A','/oa/leave/Process',NULL,'tesExecuting','正在处理','2022-06-06 18:34:23',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1',NULL,NULL,NULL,'C9DA147589800001D43E109014601501','task',NULL,0),('0EFCE24A356C75D304895A231C557B4D','0DF208464B9B0CE809F88AFC1C6ABF6A','请假申请:请假流程','0DF208464B9B0CE809F88AFC1C6ABF6A','/oa/leave/Process','bizActivity2','tesReady','尚未处理','2022-06-06 18:34:23',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1','7BA4523D57DB87BE42614FA76B34B122','','/oa/leave/mainActivity','C9DA147589800001D43E109014601501','task',NULL,1),('28771185FEEB6DC3EEB11594DCB3676D','8A13B81B2567FC2FCA689F6E71DC371D','部门审批:请假流程','6E5B1A5B244D3FA542B24481190079F7','/oa/leave/Process','bizActivity4','tesReady','尚未处理','2022-06-06 18:51:41',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1',NULL,'D8B1FF9943C8C87CB1C8C8B9F94D0B16','测试人员3','E21FD204D22403C8F010B849D6450D6A','测试部门2','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/E21FD204D22403C8F010B849D6450D6A.dpt/B8AE1E355B0F86B3CC80D35DC31C25C9.pos/D8B1FF9943C8C87CB1C8C8B9F94D0B16@B8AE1E355B0F86B3CC80D35DC31C25C9.psm','/测试机构/测试部门2/测试岗位2/测试人员3',NULL,'/oa/leave/mainActivity','/oa/leave/bizActivity4','C9DA1478640000012F492E0A1F201696','task',NULL,2),('35F6C6A30F8720A6081F2145754EBE1B',NULL,'请假流程','35F6C6A30F8720A6081F2145754EBE1B','/oa/leave/Process',NULL,'tesExecuting','正在处理','2022-06-13 10:12:30',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,NULL,NULL,'1B658382A55295130ECEB76A3E87ADB1','task',NULL,0),('3EA26484F5E662037B1A193308415611',NULL,'请假流程','3EA26484F5E662037B1A193308415611','/oa/leave/Process',NULL,'tesExecuting','正在处理','2022-06-06 18:19:35',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 16:27:11','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,NULL,NULL,'C9DA139CAC800001EDC2AD8010301A30','task',NULL,8),('6E5B1A5B244D3FA542B24481190079F7',NULL,'请假流程','6E5B1A5B244D3FA542B24481190079F7','/oa/leave/Process',NULL,'tesExecuting','正在处理','2022-06-06 18:34:35',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1','2022-06-09 15:23:49','7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1',NULL,NULL,NULL,'C9DA1478640000012F492E0A1F201696','task',NULL,2),('6FD1E81D86E2DA24242F5CAFB3AD24AA','D69B14BE69AB0F60A4288A9B63C81DE1','请假申请:请假流程','D69B14BE69AB0F60A4288A9B63C81DE1','/oa/leave/Process','bizActivity2','tesPause','已暂停','2022-06-09 10:18:55',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 13:48:32','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','PSN01','','/oa/leave/mainActivity','0F243D91B06446DF93ED0041A068A0B3','task',NULL,1),('756281414288444A2555B2DAC6D57D63','07B039490F8D6203B7D6C3D4BD6717D2','部门审批:请假流程','3EA26484F5E662037B1A193308415611','/oa/leave/Process','bizActivity4','tesFinished','已完成','2022-06-06 18:19:40',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 16:38:56','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','PSN01','/oa/leave/mainActivity','/oa/leave/bizActivity4','C9DA139CAC800001EDC2AD8010301A30','task',NULL,11),('76D4B52BB0CA98FA1918D494ADA63F24',NULL,'请假流程','76D4B52BB0CA98FA1918D494ADA63F24','/oa/leave/Process',NULL,'tesAborted','已终止','2022-06-06 18:19:21',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 14:08:14','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,NULL,NULL,'C9DA139941800001D2DF1100C7D619B4','task',NULL,3),('8A13B81B2567FC2FCA689F6E71DC371D','6E5B1A5B244D3FA542B24481190079F7','请假申请:请假流程','6E5B1A5B244D3FA542B24481190079F7','/oa/leave/Process','bizActivity2','tesFinished','已完成','2022-06-06 18:34:35',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1','2022-06-06 18:51:41','7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1','7BA4523D57DB87BE42614FA76B34B122','','/oa/leave/mainActivity','C9DA1478640000012F492E0A1F201696','task',NULL,1),('9ACE9E05A6D3AF9C5ABC5433CB4FB51B','756281414288444A2555B2DAC6D57D63','领导审批:请假流程','3EA26484F5E662037B1A193308415611','/oa/leave/Process','bizActivity6','tesReady','尚未处理','2022-06-09 16:38:56',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'7BA4523D57DB87BE42614FA76B34B122','测试人员1','CD92B921EE135105A1D4856539B2D58A','测试部门1','3C0D1C2F08132B7EC6A3908BD662928E','测试机构','/3C0D1C2F08132B7EC6A3908BD662928E.ogn/CD92B921EE135105A1D4856539B2D58A.dpt/97DA9DF40D94E4EDD350A1A0DC4C0917.pos/7BA4523D57DB87BE42614FA76B34B122@3C0D1C2F08132B7EC6A3908BD662928E.psm','/测试机构/测试部门1/测试岗位1/测试人员1','PSN01','/oa/leave/bizActivity4','/oa/leave/bizActivity6',NULL,'task',NULL,0),('9E1369FAD4E9D3FA8F453D61DE49E8F9','C9B05E5EBEDE6118A48AC326B25DB9D7','部门审批:请假流程','A38E985D92586D3E9A61FA8399EDEA5C','/oa/leave/Process','bizActivity4','tesReady','尚未处理','2022-06-09 18:15:09',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','PSN01','/oa/leave/mainActivity','/oa/leave/bizActivity4','40DA9136A31EF77121AE326205FE6B00','task',NULL,0),('A38E985D92586D3E9A61FA8399EDEA5C',NULL,'请假流程','A38E985D92586D3E9A61FA8399EDEA5C','/oa/leave/Process',NULL,'tesExecuting','正在处理','2022-06-09 18:15:04',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,NULL,NULL,'40DA9136A31EF77121AE326205FE6B00','task',NULL,0),('A7B3525540D1A84CAFAE9E267207FA26','76D4B52BB0CA98FA1918D494ADA63F24','请假申请:请假流程','76D4B52BB0CA98FA1918D494ADA63F24','/oa/leave/Process','bizActivity2','tesAborted','已终止','2022-06-06 18:19:21',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 14:08:14','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','PSN01','','/oa/leave/mainActivity','C9DA139941800001D2DF1100C7D619B4','task',NULL,3),('BAFF4F662365352923D92811A2B41A83','35F6C6A30F8720A6081F2145754EBE1B','请假申请:请假流程','35F6C6A30F8720A6081F2145754EBE1B','/oa/leave/Process','mainActivity','tesReady','尚未处理','2022-06-13 10:12:30',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','PSN01','','/oa/leave/mainActivity','1B658382A55295130ECEB76A3E87ADB1','task',NULL,0),('C9B05E5EBEDE6118A48AC326B25DB9D7','A38E985D92586D3E9A61FA8399EDEA5C','请假申请:请假流程','A38E985D92586D3E9A61FA8399EDEA5C','/oa/leave/Process','mainActivity','tesFinished','已完成','2022-06-09 18:15:04',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 18:15:09','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,'','/oa/leave/mainActivity','40DA9136A31EF77121AE326205FE6B00','task',NULL,1),('D69B14BE69AB0F60A4288A9B63C81DE1',NULL,'请假流程','D69B14BE69AB0F60A4288A9B63C81DE1','/oa/leave/Process',NULL,'tesPause','已暂停','2022-06-09 10:18:55',NULL,'PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system','2022-06-09 13:48:32','PSN01','system','','','ORG01','管理员','/ORG01.ogn/PSN01@ORG01.psm','/管理员/system',NULL,NULL,NULL,'0F243D91B06446DF93ED0041A068A0B3','task',NULL,1);
 /*!40000 ALTER TABLE `sa_task` ENABLE KEYS */;
 UNLOCK TABLES;
-
--- ----------------------------
--- Table structure for oa_dayreport
--- ----------------------------
-DROP TABLE IF EXISTS `oa_dayreport`;
-CREATE TABLE `oa_dayreport`  (
-  `fid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ftitle` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fcontext` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `ffile` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fcreatorid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fcreatorname` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fcreatedeptid` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fcreatedeptname` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fcreatetime` datetime NULL DEFAULT NULL,
-  `fpushdatetime` datetime NULL DEFAULT NULL,
-  `version` int(11) NOT NULL,
-  PRIMARY KEY (`fid`) USING BTREE,
-  INDEX `ix_oa_dayreport_fcreatorid`(`fcreatorid`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
--- ----------------------------
--- Table structure for oa_worklog
--- ----------------------------
-DROP TABLE IF EXISTS `oa_worklog`;
-CREATE TABLE `oa_worklog`  (
-  `fid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `fcode` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fcustomer` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fimportance` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fplan` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `femergency` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `flimittime` datetime NULL DEFAULT NULL,
-  `fname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fproject` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fcontext` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `fcreatorid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fcreatorname` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fcreatetime` datetime NULL DEFAULT NULL,
-  `version` int(11) NOT NULL,
-  PRIMARY KEY (`fid`) USING BTREE,
-  INDEX `ix_oa_worklog_fcreatorid`(`fcreatorid`) USING BTREE
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
--- ----------------------------
--- Table structure for oa_mygroup
--- ----------------------------
-DROP TABLE IF EXISTS `oa_mygroup`;
-CREATE TABLE `oa_mygroup`  (
-  `fid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `fcode` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fcreatorid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fcreatorname` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fcreatetime` datetime(0) NULL DEFAULT NULL,
-  `version` int(11) NOT NULL,
-  PRIMARY KEY (`fid`) USING BTREE,
-  INDEX `ix_oa_mygroup_fcreatorid`(`fcreatorid`) USING BTREE
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
--- ----------------------------
--- Table structure for oa_mygroup_person
--- ----------------------------
-DROP TABLE IF EXISTS `oa_mygroup_person`;
-CREATE TABLE `oa_mygroup_person`  (
-  `fid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `fgroupid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `forgid` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fpersonid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `fpersonname` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
-  `version` int(11) NOT NULL,
-  PRIMARY KEY (`fid`) USING BTREE,
-  INDEX `ix_oa_mygroup_person_fgroupid`(`fgroupid`) USING BTREE
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -750,4 +881,4 @@ CREATE TABLE `oa_mygroup_person`  (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-06-15 19:16:08
+-- Dump completed on 2022-07-13 16:12:17

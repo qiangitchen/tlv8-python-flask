@@ -1,96 +1,194 @@
 {% extends "common/email.html" %}
 {% block content %}
     <!-- 写信 -->
-    <div id="writeMailView"
-         style="width: 100%; overflow: auto; height: 100%; padding: 5px;">
-        <form id="WRITE_DATA_FORM" afterRefresh="afterWriteRefersh">
-            <table style="width: 100%; table-layout: fixed;">
-                <tr height="45px">
-                    <td width="7%">
-                        <a href="javascript:void(0);"
-                           class="toolbarItem" onclick="sendMail()">
-                            <img src="{{ url_for('static',filename='oa/email/image/mailsend.gif') }}" alt=""/>
-                        </a></td>
-                    <td width="7%">
-                        <a href="javascript:void(0);"
-                           class="toolbarItem" onclick="saveToTempletAction()">
-                            <img src="{{ url_for('static',filename='oa/email/image/saveTotm.gif') }}" alt=""/>
-                        </a></td>
-                    <td width="7%">
-                        <a href="javascript:void(0);"
-                           class="toolbarItem" onclick="goback()">
-                            <img src="{{ url_for('static',filename='oa/email/image/cancel.gif') }}" alt=""/>
-                        </a>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="font-size: 11pt; color: #BEA499; font-weight: bold; height: 25px;">发件人
-                    </td>
-                    <td colspan="3">
-                        <label id="FSENDPERNAME"></label> <label
-                            id="FCONSIGNEEID" style="display: none;"></label><label
-                            id="FFJID" class="FJINFO" style="display: none;"></label>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="font-size: 11pt; color: #546AB1; font-weight: bold; height: 25px;">收件人
-                    </td>
-                    <td colspan="3">
-                        <input type="text" id="FCONSIGNEE"
-                               class="DetailInput" readonly="readonly" style="width: 80%;"/>
-                        <a href="javascript:void(0);" class="toolbarItem"
-                           style="width: 170px;" onclick="selectReceivePsm()">
-                            <img src="{{ url_for('static',filename='oa/email/image/search.gif') }}" alt=""/>请点击此选择收件人
-                        </a>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="font-size: 11pt; color: #546AB1; font-weight: bold; height: 25px;">主题
-                    </td>
-                    <td colspan="3">
-                        <input type="text" id="FEMAILNAME"
-                               class="DetailInput" style="width: 98%;"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td
-                            style="font-size: 11pt; color: #546AB1; font-weight: bold; height: 25px;">附件
-                    </td>
-                    <td colspan="3" valign="top">
-                        <!--
-                        <div id="show_fj_title" style="height: 15px; margin-top: 2px;">
-                            <span>&nbsp;如需上传附件，请先将邮件存为草稿</span>
-                        </div>
-                         -->
-                        <div id="write_fj"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="font-size: 11pt; color: #546AB1; font-weight: bold; height: 25px;">正文
-                    </td>
-                    <td colspan="3" valign="top" style="min-height: 250px;">
-                        <textarea id="FTEXT" class="write_content"
-                                  style="width: 99%; height: 350px;"></textarea>
-                    </td>
-                </tr>
-                <tr height="40px">
-                    <td width="7%">
-                        <a href="javascript:void(0);" class="toolbarItem" onclick="sendMail()">
-                            <img src="{{ url_for('static',filename='oa/email/image/mailsend.gif') }}" alt=""/>
-                        </a>
-                    </td>
-                    <td width="7%">
-                        <a href="javascript:void(0);"
-                           class="toolbarItem" onclick="saveToTempletAction()">
-                            <img src="{{ url_for('static',filename='oa/email/image/saveTotm.gif') }}" alt=""/>
-                        </a></td>
-                    <td width="7%">
-                        <a href="javascript:void(0);" class="toolbarItem" onclick="loadSendMail()">
-                            <img src="{{ url_for('static',filename='oa/email/image/cancel.gif') }}" alt=""/>
-                        </a>
-                    </td>
-                </tr>
-            </table>
+    <div id="writeMailView" style="width: 100%; overflow: auto; height: 100%; padding: 5px;">
+        <table style="width: 100%; table-layout: fixed;">
+            <tr height="45px">
+                <td width="7%">
+                    <a href="javascript:void(0);"
+                       class="toolbarItem" onclick="sendMail()">
+                        <img src="{{ url_for('static',filename='oa/email/image/mailsend.gif') }}" alt=""/>
+                    </a></td>
+                <td width="7%">
+                    <a href="javascript:void(0);"
+                       class="toolbarItem" onclick="saveToTempletAction()">
+                        <img src="{{ url_for('static',filename='oa/email/image/saveTotm.gif') }}" alt=""/>
+                    </a></td>
+                <td width="7%">
+                    <a href="javascript:void(0);"
+                       class="toolbarItem" onclick="goback()">
+                        <img src="{{ url_for('static',filename='oa/email/image/cancel.gif') }}" alt=""/>
+                    </a>
+                </td>
+                <td></td>
+            </tr>
+        </table>
+        <form class="layui-form" id="MAIN_DATA_FORM" style="padding: 5px; background: #ffffff;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">收件人</label>
+                <div class="layui-input-block">
+                    <input type="text" id="fconsigneeid" name="fconsigneeid" value="{{ nul2em(sendmail.fconsigneeid) }}"
+                           style="display: none;">
+                    <input type="text" id="fconsignee" name="fconsignee" value="{{ nul2em(sendmail.fconsignee) }}"
+                           class="layui-input" readonly="readonly"
+                           required lay-verify="required" style="width: 90%; float: left;"/>
+                    <a href="javascript:void(0);" class="toolbarItem"
+                       style="float: left; line-height: 35px;" onclick="selectReceivePsm()">
+                        <img src="{{ url_for('static',filename='oa/email/image/search.gif') }}" alt=""/>选择收件人
+                    </a>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">主题</label>
+                <div class="layui-input-block">
+                    <input type="text" id="femailname" name="femailname" value="{{ nul2em(sendmail.femailname) }}"
+                           required lay-verify="required"
+                           autocomplete="off" class="layui-input" style="width: 90%;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">发件人</label>
+                <div class="layui-input-block">
+                    <input type="text" id="fsendpername" name="fsendpername" value="{{ nul2em(sendmail.fsendpername) }}"
+                           required lay-verify="required"
+                           autocomplete="off" class="layui-input" style="width: 90%;" readonly="readonly">
+                    <input type="text" id="fsendperid" name="fsendperid" value="{{ nul2em(sendmail.fsendperid) }}"
+                           style="display: none;">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">正文</label>
+                <div class="layui-input-block">
+                    <textarea id="ftext" name="ftext" class="layui-textarea"
+                              style="width: 90%; height: 350px;">{{ nul2em(sendmail.ftext) }}</textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">附件</label>
+                <div class="layui-input-block">
+                    <div id="write_fj" style="width:90%; min-height: 60px;">保存“草稿”后可上传附件~</div>
+                </div>
+            </div>
+            <div style="display: none;">
+                <button id="mainfsub" class="layui-btn" lay-submit
+                        lay-filter="mainform">立即提交
+                </button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
         </form>
+        <table style="width: 100%; table-layout: fixed;">
+            <tr height="40px">
+                <td width="7%">
+                    <a href="javascript:void(0);" class="toolbarItem" onclick="sendMail()">
+                        <img src="{{ url_for('static',filename='oa/email/image/mailsend.gif') }}" alt=""/>
+                    </a>
+                </td>
+                <td width="7%">
+                    <a href="javascript:void(0);"
+                       class="toolbarItem" onclick="saveToTempletAction()">
+                        <img src="{{ url_for('static',filename='oa/email/image/saveTotm.gif') }}" alt=""/>
+                    </a></td>
+                <td width="7%">
+                    <a href="javascript:void(0);" class="toolbarItem" onclick="goback()">
+                        <img src="{{ url_for('static',filename='oa/email/image/cancel.gif') }}" alt=""/>
+                    </a>
+                </td>
+                <td></td>
+            </tr>
+        </table>
     </div>
+    <script type="text/javascript">
+        var edindex = layui.layedit.build('ftext', {
+            height: Math.max($(document).height() - 460, 300)
+        });
+
+        function selectReceivePsm() {
+            tlv8.portal.dailog.openDailog("选择人员", "/system/dialog/SelectChPsm", 800, 600, function (data) {
+                if (data) {
+                    //ids: data.id, names: data.name
+                    $("#fconsigneeid").val(data.id);
+                    $("#fconsignee").val(data.name);
+                }
+            });
+        }
+
+        var rowid = "{{ id }}";
+        const MainData = new tlv8.Data();
+        MainData.setTable("oa_em_sendemail");
+        MainData.setFormId("MAIN_DATA_FORM");
+        if (rowid && rowid !== "") {
+            MainData.setRowId(rowid);
+            new tlv8.fileComponent(J$("write_fj"), MainData, "ffjid", "/root/内部邮箱/附件", true, true);
+        }
+
+        $(document).ready(function () {
+            $("#fsendpername").val(tlv8.Context.getCurrentPersonName());
+            $("#fsendperid").val(tlv8.Context.getCurrentPersonID());
+        });
+
+        function goback() {
+            //window.location.href = "/oa/email/mainActivity";
+            window.history.back();
+        }
+
+        var tosend = false;
+
+        function saveToTempletAction() {
+            tosend = false;
+            var cont = layui.layedit.getContent(edindex);
+            $("#ftext").val(cont);
+            $("#mainfsub").click();
+        }
+
+
+        function sendMail() {
+            tosend = true;
+            var cont = layui.layedit.getContent(edindex);
+            $("#ftext").val(cont);
+            $("#mainfsub").click();
+        }
+
+
+        layui.form.on('submit(mainform)', function (data) {
+            //console.log(data.field);
+            $.ajax({
+                url: "/oa/email/svaeSendEmail?id=" + rowid,
+                type: "post",
+                async: true,
+                data: data.field,
+                dataType: "json",
+                success: function (re) {
+                    if (re.state === true) {
+                        rowid = re.data;
+                        MainData.setRowId(rowid);
+                        new tlv8.fileComponent(J$("write_fj"), MainData, "ffjid", "/root/内部邮箱/附件", true, true);
+                        layui.layer.msg("保存成功！");
+                        if (tosend) {
+                            sendMailDo(rowid);
+                        }
+                    } else {
+                        layui.layer.alert("保存失败：" + re.msg);
+                    }
+                }
+            });
+            return false;
+        });
+
+        function sendMailDo(id) {
+            $.ajax({
+                url: "/oa/email/toSendEmail?id=" + id,
+                type: "post",
+                async: true,
+                dataType: "json",
+                success: function (re) {
+                    if (re.state === true) {
+                        layui.layer.msg("发送成功！");
+                        window.location.href = "/oa/email/mainActivity";
+                    } else {
+                        layui.layer.alert("发送失败：" + re.msg);
+                    }
+                }
+            });
+        }
+    </script>
 {% endblock %}

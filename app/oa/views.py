@@ -457,4 +457,104 @@ def oa_email():
 @oa.route("/email/writeEmail", methods=["GET", "POST"])
 @user_login
 def oa_email_write():
-    return render_template("oa/email/writeEmail.html")
+    sendmail = OASendMail()
+    id = request.args.get("id", "")
+    if id and id != "":
+        sendmail = OASendMail.query.filter_by(fid=id).first()
+    return render_template("oa/email/writeEmail.html", id=id, sendmail=sendmail, nul2em=nul2em)
+
+
+# 内部邮箱功能-保存数据
+@oa.route("/email/svaeSendEmail", methods=["POST"])
+@user_login
+def oa_email_save():
+    rdata = dict()
+    sendmail = OASendMail()
+    id = request.args.get("id")
+    if id and id != "":
+        sendmail = OASendMail.query.filter_by(fid=id).first()
+    sendmail.fconsigneeid = request.form.get("fconsigneeid")
+    sendmail.fconsignee = request.form.get("fconsignee")
+    sendmail.femailname = request.form.get("femailname")
+    sendmail.fsendpername = request.form.get("fsendpername")
+    sendmail.fsendperid = request.form.get("fsendperid")
+    sendmail.ftext = request.form.get("ftext")
+    db.session.add(sendmail)
+    db.session.commit()
+    rdata['state'] = True
+    rdata['data'] = sendmail.fid
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 内部邮箱功能-发送内部邮件
+@oa.route("/email/toSendEmail", methods=["POST"])
+@user_login
+def oa_email_send():
+    rdata = dict()
+    sendmail = None
+    id = request.args.get("id")
+    if id and id != "":
+        sendmail = OASendMail.query.filter_by(fid=id).first()
+    if not sendmail:
+        rdata['state'] = False
+        rdata['msg'] = '指定的发送信息无效~'
+    else:
+        person_list = get_person_list_by_org(sendmail.fconsigneeid)
+        sendtime = datetime.now()
+        for person in person_list:
+            reciveMail = OAReceiveMail()
+            reciveMail.femailname = sendmail.femailname
+            reciveMail.ftext = sendmail.ftext
+            reciveMail.ffjid = sendmail.ffjid
+            reciveMail.fsendpername = sendmail.fsendpername
+            reciveMail.fsendperid = sendmail.fsendperid
+            reciveMail.fconsignee = person['personName']
+            reciveMail.fconsigneeid = person['personid']
+            reciveMail.fsendtime = sendtime
+            db.session.add(reciveMail)
+        sendmail.fstate = '已发送'
+        sendmail.fsendtime = sendtime
+        db.session.add(sendmail)
+        db.session.commit()
+        rdata['state'] = True
+    return json.dumps(rdata, ensure_ascii=False)
+
+
+# 内部邮箱功能-草稿箱
+@oa.route("/email/templetEmail", methods=["GET", "POST"])
+@user_login
+def oa_email_temp():
+    personid = session['user_id']
+    data_query = OASendMail.query.filter_by(fsendperid=personid, fstate='未发送')
+    count = data_query.count()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    page_data = data_query.paginate(page, limit)
+    return render_template("oa/email/templetEmail.html", page_data=page_data, count=count)
+
+
+# 内部邮箱功能-草稿箱
+@oa.route("/email/sendedMail", methods=["GET", "POST"])
+@user_login
+def oa_email_sended():
+    personid = session['user_id']
+    data_query = OASendMail.query.filter_by(fsendperid=personid, fstate='已发送')
+    count = data_query.count()
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    page_data = data_query.paginate(page, limit)
+    return render_template("oa/email/sendedMail.html", page_data=page_data, count=count)
+
+# 内部邮箱功能-查看邮件
+@oa.route("/email/lookEmail", methods=["GET", "POST"])
+@user_login
+def oa_email_look():
+    reciveMail = OAReceiveMail()
+    id = request.args.get("id", "")
+    if id and id != "":
+        reciveMail = OAReceiveMail.query.filter_by(fid=id).first()
+        if reciveMail.fsendtime:
+            reciveMail.fqurey = '已查看'
+            db.session.add(reciveMail)
+            db.session.commit()
+    return render_template("oa/email/lookEmail.html", id=id, reciveMail=reciveMail, nul2em=nul2em)
