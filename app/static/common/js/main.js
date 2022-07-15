@@ -1784,7 +1784,7 @@ tlv8.portal.dailog = {
      * @param data
      * @param b_g
      */
-    dailogEngin: function (data, b_g,) {
+    dailogEngin: function (data, b_g) {
         this.returnData = data ? data : this.returnData;
         try {
             let callbackFn;
