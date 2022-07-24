@@ -55,12 +55,12 @@ if [ "$1" = "start" ]; then
   source venv/bin/activate
   echo "Load flask venv"
   mkdir -p $FLASK_PATH/logs >/dev/null 2>&1
-  echo "Log folder maked"
+  echo "Log folder created"
   nohup python server.py >$FLASK_PATH/logs/flask.log 2>&1 &
   echo "start in nohup"
   echo $! >$FLASK_PID
   echo "PID:$(cat $FLASK_PID)"
-  echo "Falsk started."
+  echo "Flask started."
 
 elif [ "$1" = "stop" ]; then
 
@@ -83,7 +83,7 @@ elif [ "$1" = "stop" ]; then
 
   echo "To Stop Flask"
   kill -9 $(cat $FLASK_PID) >/dev/null 2>&1
-  echo "Falsk stopped."
+  echo "Flask stopped."
   rm -f $FLASK_PID >/dev/null 2>&1
   echo "PID File cleared."
 
