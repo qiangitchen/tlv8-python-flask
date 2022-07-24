@@ -145,3 +145,6 @@ migrations
 
 #log
 logs
+
+#pid
+*.pid
