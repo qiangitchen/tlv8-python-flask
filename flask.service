@@ -1,0 +1,22 @@
+# sudo cp flask.service /usr/lib/systemd/system/flask.service
+#配置开机启动
+#sudo systemctl enable flask
+#启动 flask
+#sudo systemctl start flask
+#停止 flask
+#sudo systemctl stop flask
+#重启 flask
+#sudo systemctl restart tomcat
+[Unit]
+Description=flask
+After=syslog.target network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=forking
+ExecStart=/app/flask/tlv8-python-flask/startup.sh
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=false
+
+[Install]
+WantedBy=multi-user.target
