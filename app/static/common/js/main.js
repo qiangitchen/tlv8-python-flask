@@ -3088,7 +3088,7 @@ tlv8.fileComponent = function (div, data, cellname, docPath, canupload,
  */
 tlv8.trangereditfile = function (fileID, fileName) {
     if ('.doc.docx.xls.xlsx.ppt.pptx.mpp.vsd.dps.wps.et.'
-        .indexOf(String(/\.[^.]+$/.exec(fileName)) + '.') < 0) {
+        .indexOf(String(/\.[^.]+$/.exec(fileName.toLowerCase())) + '.') < 0) {
         alert("不支持非Office文件在线编辑");
         return;
     }
@@ -3159,8 +3159,7 @@ tlv8.viewFile = function (fileID, fileName) {
         let url = "/system/doc/pdf/fileBrowser?fileID=" + fileID;
         window.open(url);
         return;
-    } else if ('.doc.docx.xls.xlsx.ppt.pptx.mpp.vsd.dps.wps.et.'
-        .indexOf(String(/\.[^.]+$/.exec(fileName)) + '.') < 0) {
+    } else if ('.doc.docx.xls.xlsx.ppt.pptx.mpp.vsd.dps.wps.et.'.indexOf(String(/\.[^.]+$/.exec(fileName.toLowerCase())) + '.') < 0) {
         layui.layer.confirm("文件不支持在线查看，请下载查看~", function () {
             tlv8.downloadFile(fileID);
         });
