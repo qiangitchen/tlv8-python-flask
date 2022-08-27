@@ -98,6 +98,7 @@ functions = [
          ]
           }
          , {"title": "内部邮箱",
+            "icon": "layui-icon layui-icon-email",
             "href": "/oa/email/mainActivity",
             "process": "/oa/enail/Process",
             "activity": "mainActivity"
