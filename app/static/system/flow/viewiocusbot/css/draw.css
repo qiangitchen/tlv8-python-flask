@@ -33,7 +33,7 @@ p {
 	line-height: 27px;
 	position: absolute;
 	left: 0px;
-	top: 100%;
+	bottom: 20px;
 	margin-top: -30px;
 	text-align: center;
 	v-align: center;

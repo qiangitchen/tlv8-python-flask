@@ -2104,7 +2104,6 @@ function selectSinglNodeById(nodeid) {
 function drow_init(processID, processName, json) {
     var g = new Group(processID, processName);
     g.init(); // 初始化画布
-    g.setGroupArea();
 
     var w = new HelpWindow();
     w.init();// 初始化提示窗
@@ -2117,4 +2116,6 @@ function drow_init(processID, processName, json) {
     } else if (json) {
         g.jsonTo(json);
     }
+
+    g.setGroupArea();
 }
