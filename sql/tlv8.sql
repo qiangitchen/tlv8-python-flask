@@ -97,8 +97,8 @@ CREATE TABLE `oa_em_sendemail` (
   `femailname` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ftext` text COLLATE utf8mb4_unicode_ci,
   `ffjid` varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `fconsignee` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `fconsigneeid` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fconsignee` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fconsigneeid` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fstate` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fsendpername` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fsendperid` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -107,7 +107,7 @@ CREATE TABLE `oa_em_sendemail` (
   `fcollect` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `version` int(11) NOT NULL,
   PRIMARY KEY (`fid`),
-  KEY `ix_oa_em_sendemail_fconsigneeid` (`fconsigneeid`),
+  KEY `ix_oa_em_sendemail_fsendperid` (`fsendperid`),
   KEY `ix_oa_em_sendemail_femailname` (`femailname`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
