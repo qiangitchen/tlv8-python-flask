@@ -88,7 +88,7 @@ def get_org_unit_has_role_by_code(roleCode, inOrg, personMember):
         orgs0.append(o.SORGID)
     orgUnit = ','.join(orgs)
     if personMember:
-        sql1 = ("select SID from sa_oporg o where o.sfid like '" + org.sfid + "%' EXISTS(select SFID from sa_oporg "
+        sql1 = ("select SID as SORGID from sa_oporg o where o.sfid like '" + org.sfid + "%' and EXISTS(select SFID from sa_oporg "
                 + " o1 where SID in (" + orgUnit
                 + ") and o.SFID like concat(o1.SFID,'%')) and SORGKINDID = 'psm'")
         rs1 = db.session.execute(sql1)
