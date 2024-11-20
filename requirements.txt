@@ -26,5 +26,5 @@ pyexcel-xls==0.7.0
 pyexcel-xlsx==0.6.0
 pyexcel-ods==0.6.0
 xlsxwriter~=3.0.3
-gevent~=21.12.0
-pillow~=9.1.0
+gevent~=24.11.1
+pillow~=11.0.0
